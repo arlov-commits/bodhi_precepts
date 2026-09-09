@@ -66,6 +66,11 @@ data came off the DRBA printed calendar or the HKO tables.
   other way — its leap 2nd month got no repeat of the monthly memorial and no
   repeat of Guan Yin's birthday — so it is worth confirming at CTTB before
   2028-06-23, when the next one starts.
+- **Quarter moons** follow from the same convention: a quarter cycle either
+  side of the full moon puts them at lunar 8 and 23, which are already two of
+  the six fast days. They show as the disc alone, unnamed and without the
+  halo, so a glance at a card or a row gives the phase without another label.
+  Derived in the browser, like the recitation days.
 - **New and full moon** follow the calendar convention, day 1 and day 15,
   rather than the astronomical instant. The moon discs in the Today view are
   drawn from the day number, so the 15th shows as very nearly rather than
@@ -169,8 +174,10 @@ the 月 and 日 of a wrapped date in the same column.
 The year sits on the week heading rather than on every row; with weeks off
 there is no heading to carry it, so it stays on the row. The Fast
 column does double duty: **Long Fast** for a day inside a long fasting month,
-and the day's own fast marked under it. Recitation is the pole star and the
-moon is the same disc the band draws, halo and all.
+and the day's own fast marked under it as 齋. Recitation is the pole star and
+the moon is the same disc the band draws, halo and all. The day cards name
+their marks and carry the same glyphs — *Fast day 齋*, *Precept Recitation ✦*,
+*Full moon* with its disc.
 
 ## Sources
 

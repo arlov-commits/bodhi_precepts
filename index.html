@@ -81,6 +81,7 @@
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
+.han{font-family:var(--han)}
 body{
   margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
   font-size:16px;line-height:1.5;
@@ -204,6 +205,11 @@ h2{font-size:1rem;font-weight:600;letter-spacing:.02em;margin:2.25rem 0 .5rem}
   color:var(--moonc)}
 .tags li.recite{border-color:var(--recite-line);background:var(--recite-dim);
   color:var(--recite)}
+/* the glyph and the marks sit inline with the tag's own text */
+.tags li{display:inline-flex;align-items:center;gap:.28rem}
+.tags li .han{font-size:1.1em}
+.tags li .moon-ic{width:.85rem;vertical-align:0}
+.tags li .star-ic{width:.68rem}
 /* A week break: enough air and a rule to let the eye group the days into
    working weeks. Spans the whole grid, so the next week starts a fresh row. */
 .weekbreak{grid-column:1/-1;display:flex;align-items:center;gap:.75rem;
@@ -272,6 +278,7 @@ tbody tr.is-fast.is-moon{background-color:var(--fast-moon)}
 td.han{font-family:var(--han);font-size:1.05rem}
 td.num{font-variant-numeric:tabular-nums}
 td .yes{color:var(--fast);font-weight:600}
+td .yes.han{font-size:1.15rem;font-weight:400;line-height:1.2}
 td .rec{color:var(--recite);font-weight:600}
 .upcoming{display:grid;gap:1.25rem;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));
   margin-bottom:1.5rem}
@@ -794,10 +801,23 @@ body.no-recite .recite-only{display:none}
       '<circle class="rim" r="' + r + '" stroke-width="0.8"/>' +
       '<path class="lit" d="' + path + '"/></svg>';
   }
-  /* the same disc the band draws, at the size the table needs */
+  /* The quarters sit where the same convention puts them: a quarter cycle
+     either side of the full moon, at lunar 8 and 23 — which the tradition
+     already keeps as fast days. Derived here rather than stored, like the
+     recitation days. */
+  function moonLabel(d) {
+    if (d.moon === "new") return "New moon";
+    if (d.moon === "full") return "Full moon";
+    if (d.dayNum === 8) return "First quarter";
+    if (d.dayNum === 23) return "Last quarter";
+    return "";
+  }
+  /* the same disc the band draws, at the size the table needs. Only the
+     exact new and full moons take the halo; the quarters are plain. */
   function moonIcon(d) {
-    return '<span class="moon-ic is-phase" title="' + d.moon + ' moon">' +
-      moonSvg(d.dayNum, d.cycle, 22) + "</span>";
+    return '<span class="moon-ic' + (d.moon ? " is-phase" : "") +
+      '" title="' + moonLabel(d) + '">' + moonSvg(d.dayNum, d.cycle, 22) +
+      "</span>";
   }
 
   /* which day are we on --------------------------------------------- */
@@ -883,10 +903,13 @@ body.no-recite .recite-only{display:none}
         : n === 1 ? "Tomorrow"
         : WEEK[parse(d.date).getDay()];
       var tags = "";
-      if (d.fast) tags += '<li class="fast">Fast day</li>';
-      if (reciting(d)) tags += '<li class="recite">Precept Recitation</li>';
-      if (d.moon) tags += '<li class="moon">' +
-        (d.moon === "new" ? "New moon" : "Full moon") + "</li>";
+      if (d.fast) tags +=
+        '<li class="fast">Fast day <span class="han">齋</span></li>';
+      if (reciting(d)) tags += '<li class="recite">Precept Recitation ' +
+        '<span class="star-ic">' + STAR + "</span></li>";
+      /* new and full are named; the quarters are the disc alone */
+      if (moonLabel(d)) tags += '<li class="moon">' +
+        (d.moon ? moonLabel(d) + " " : "") + moonIcon(d) + "</li>";
       var events = eventsOf(d).map(function (e) {
         return "<li>" + esc(e) + "</li>";
       }).join("");
@@ -922,7 +945,7 @@ body.no-recite .recite-only{display:none}
       return '<li role="listitem"><span class="when">' + shortDate(d.date) +
         "</span>" +
         '<span class="wd">' + d.weekday + "</span>" +
-        '<span class="mn">' + (d.moon ? moonIcon(d) : "") + "</span>" +
+        '<span class="mn">' + (moonLabel(d) ? moonIcon(d) : "") + "</span>" +
         '<span class="lu">' + lunarCell(d) + "</span></li>";
     }).join("") + "</ul>";
   }
@@ -993,11 +1016,12 @@ body.no-recite .recite-only{display:none}
         '<td class="han">' + lunarCell(d) + "</td>" +
         "<td>" +
         (d.longFast ? '<span class="longfast">Long Fast</span>' : "") +
-        (d.fast ? '<span class="yes">yes</span>' : "") + "</td>" +
+        (d.fast ? '<span class="yes han">齋</span>' : "") + "</td>" +
         '<td class="recite-only">' +
         (reciting(d) ? '<span class="star-ic" title="Precept Recitation">' +
           STAR + "</span>" : "") + "</td>" +
-        '<td class="moon-cell">' + (d.moon ? moonIcon(d) : "") + "</td>" +
+        '<td class="moon-cell">' +
+        (moonLabel(d) ? moonIcon(d) : "") + "</td>" +
         '<td class="opt">' + eventsOf(d).map(function (e) {
           return "<div>" + esc(e) + "</div>";
         }).join("") + (d.leap ? "<div>leap month</div>" : "") + "</td>" +
