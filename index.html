@@ -5,37 +5,57 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Fast days</title>
 <style>
+/* Brahma Net (梵網經): the jewelled net of the Brahma heaven, where every
+   knot holds a gem and every gem reflects all the others. Deep indigo ground,
+   a faint lattice with lit knots, and cool jewel tones for the markings. */
 :root{
-  --paper:#DEE2E1;
-  --panel:#F2F4F2;
-  --night:#1F2A2E;
-  --ink:#1E2622;
-  --quiet:#6E756F;
-  --line:#C2C8C4;
-  --ochre:#9C6412;
-  --ochre-soft:#EBDCC2;
-  --lapis:#2E4A72;
-  --lapis-soft:#D7DFEA;
-  --jade:#3A6152;
-  --jade-soft:#D6E3DC;
-  --moon:#E9E5DA;
+  color-scheme:dark;
+  --paper:#0E1320;
+  --panel:#161E2F;
+  --raised:#1D273B;
+  --night:#070B14;
+  --ink:#E9EDF8;
+  --quiet:#8B96B1;
+  --line:#2A3450;
+  --net:rgba(140,172,228,.055);
+  --knot:rgba(163,196,246,.11);
+  --fast:#5FCBB0;
+  --fast-dim:#14332F;
+  --fast-line:#2C6A5E;
+  --recite:#AC91E4;
+  --recite-dim:#241F42;
+  --recite-line:#5A4A8F;
+  --moonc:#9FC3F0;
+  --moonc-dim:#182541;
+  --moonc-line:#3C5A8C;
+  --leap:#E28FAA;
+  --leap-dim:#341F2C;
+  --moonlit:#E4EBFA;
   --sans:"Optima","Avenir Next","Gill Sans MT","Gill Sans","Trebuchet MS",sans-serif;
   --han:"Songti SC","STSong","Noto Serif CJK SC","Noto Serif SC","SimSun",serif;
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{
-  margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+  margin:0;color:var(--ink);font-family:var(--sans);
   font-size:16px;line-height:1.5;
+  background-color:var(--paper);
+  background-image:
+    radial-gradient(circle at 0 0,var(--knot) 1.1px,transparent 1.6px),
+    linear-gradient(var(--net) 1px,transparent 1px),
+    linear-gradient(90deg,var(--net) 1px,transparent 1px);
+  background-size:2.5rem 2.5rem;
+  background-attachment:fixed;
 }
 .wrap{max-width:56rem;margin:0 auto;padding:1.5rem 1.25rem 4rem}
 
 /* ---------------------------------------------------------- masthead */
 .masthead{display:flex;flex-wrap:wrap;gap:1rem;align-items:baseline;
   justify-content:space-between;padding-bottom:.75rem;
-  border-bottom:1px solid var(--ink)}
+  border-bottom:1px solid var(--line)}
 .brand{display:flex;align-items:baseline;gap:.6rem}
-.brand .han{font-family:var(--han);font-size:1.5rem;letter-spacing:.12em}
+.brand .han{font-family:var(--han);font-size:1.5rem;letter-spacing:.12em;
+  color:var(--fast)}
 .brand h1{font-size:1.3rem;font-weight:600;margin:0;letter-spacing:.01em}
 nav{display:flex;gap:.25rem}
 nav button{
@@ -43,72 +63,51 @@ nav button{
   border:1px solid transparent;padding:.3rem .7rem;cursor:pointer;
   border-radius:0;
 }
-nav button[aria-current="page"]{color:var(--ink);border-color:var(--ink);
+nav button[aria-current="page"]{color:var(--ink);border-color:var(--line);
   background:var(--panel)}
 nav button:hover{color:var(--ink)}
 nav button:focus-visible,a:focus-visible,select:focus-visible,
-input:focus-visible,.chip:focus-visible{outline:2px solid var(--lapis);
+input:focus-visible,.chip:focus-visible{outline:2px solid var(--moonc);
   outline-offset:2px}
 
-/* ------------------------------------------------------------- today */
-.today{padding:2rem 0 1.25rem;display:grid;
-  grid-template-columns:auto 1fr;gap:1.75rem;align-items:center}
-.glyph{font-family:var(--han);font-size:5.5rem;line-height:.9;
-  letter-spacing:.02em}
-.today .when{font-size:.95rem;color:var(--quiet);letter-spacing:.06em}
-.today .lunar{font-size:1.15rem;margin:.35rem 0 .8rem}
-.today .lunar .han{font-family:var(--han);font-size:1.35rem}
-.verdict{font-size:1.35rem;line-height:1.35;max-width:34ch}
-.verdict b{font-weight:600}
-.verdict.is-fast b{color:var(--ochre)}
-.marks{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.9rem}
-.mark{font-size:.8rem;letter-spacing:.08em;padding:.2rem .55rem;
-  border:1px solid var(--line);background:var(--panel)}
-.mark.fast{border-color:var(--ochre);background:var(--ochre-soft);
-  color:#5F3D07}
-.mark.moon{border-color:var(--lapis);background:var(--lapis-soft);
-  color:#22355A}
-.mark.recite{border-color:var(--jade);background:var(--jade-soft);
-  color:#254237}
-.mark.leap{border-color:#9A5B3D;background:#F0DED4;color:#6E3A22}
-
 /* ------------------------------------------------------ lunation band */
-.band{background:var(--night);color:var(--moon);padding:1.1rem 1.1rem .9rem}
+.band{background:var(--night);color:var(--moonlit);border:1px solid var(--line);
+  padding:1.1rem 1.1rem .9rem;margin-top:1.5rem}
 .band .head{display:flex;justify-content:space-between;align-items:baseline;
-  gap:1rem;font-size:.85rem;letter-spacing:.06em;color:#9FB0B3;
+  gap:1rem;font-size:.85rem;letter-spacing:.06em;color:#7E8CAB;
   margin-bottom:.7rem}
-.band .head .han{font-family:var(--han);color:var(--moon);font-size:1.05rem}
+.band .head .han{font-family:var(--han);color:var(--moonlit);font-size:1.05rem}
 .band-scroll{overflow-x:auto}
 .discs{display:flex;gap:.2rem;align-items:flex-start}
 .disc{flex:1 1 0;min-width:0;text-align:center;padding:.15rem .1rem .25rem}
 .disc svg{display:block;margin:0 auto;width:100%;max-width:1.45rem;height:auto}
-.disc .cap{height:.55rem;font-size:.5rem;line-height:.55rem;color:transparent}
-.disc .n{font-size:.62rem;color:#8C9C9F;margin-top:.25rem;
+.disc .cap{height:.6rem;font-size:.55rem;line-height:.6rem;color:transparent}
+.disc .n{font-size:.62rem;color:#6E7B98;margin-top:.25rem;
   font-variant-numeric:tabular-nums}
-.disc.is-fast .n{color:var(--moon)}
+.disc.is-fast .n{color:var(--fast)}
 .disc .tick{height:3px;margin-top:.2rem;background:transparent}
-.disc.is-fast .tick{background:#C68A2E}
-.disc .dot{height:.3rem;margin-top:.16rem;font-size:0}
-.disc.is-recite .dot{background:#7FB59E;
-  clip-path:polygon(50% 0,100% 100%,0 100%)}
-.disc.is-today{background:rgba(255,255,255,.11);
-  outline:1px solid rgba(255,255,255,.6)}
-.disc.is-today .cap{color:#fff;letter-spacing:.04em}
+.disc.is-fast .tick{background:var(--fast)}
+.disc .dot{height:.34rem;margin-top:.16rem;font-size:0}
+.disc.is-recite .dot{width:.34rem;margin-left:auto;margin-right:auto;
+  border-radius:50%;background:var(--recite)}
+.disc.is-today{background:rgba(159,195,240,.14);
+  outline:1px solid rgba(159,195,240,.75)}
+.disc.is-today .cap{color:var(--moonlit);letter-spacing:.04em}
 .disc.is-today .n{color:#fff;font-weight:700}
-.disc.is-today svg circle.rim{stroke:#fff;stroke-width:1.6}
-.band .legend{display:flex;flex-wrap:wrap;gap:.9rem;margin-top:.7rem;
-  font-size:.72rem;letter-spacing:.05em;color:#9FB0B3}
-.band .legend i{font-style:normal;display:inline-block;width:.7rem;
-  height:.3rem;margin-right:.3rem;vertical-align:.06rem}
-.band .legend i.f{background:#C68A2E}
-.band .legend i.r{background:#7FB59E;
-  clip-path:polygon(50% 0,100% 100%,0 100%)}
-.band .legend i.t{background:transparent;border:1px solid rgba(255,255,255,.6);
-  height:.62rem;width:.62rem}
+.disc.is-today svg circle.rim{stroke:var(--moonlit);stroke-width:1.6}
 @media (prefers-reduced-motion:no-preference){
   .discs.animate .disc{animation:rise .5s both}
 }
 @keyframes rise{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+.band .legend{display:flex;flex-wrap:wrap;gap:.9rem;margin-top:.7rem;
+  font-size:.72rem;letter-spacing:.05em;color:#7E8CAB}
+.band .legend i{font-style:normal;display:inline-block;width:.7rem;
+  height:.3rem;margin-right:.35rem;vertical-align:.06rem}
+.band .legend i.f{background:var(--fast)}
+.band .legend i.r{background:var(--recite);width:.34rem;height:.34rem;
+  border-radius:50%}
+.band .legend i.t{background:rgba(159,195,240,.14);
+  border:1px solid rgba(159,195,240,.75);height:.62rem;width:.62rem}
 
 /* --------------------------------------------------------- day cards */
 h2{font-size:1rem;font-weight:600;letter-spacing:.02em;margin:2.25rem 0 .5rem}
@@ -117,18 +116,18 @@ h2{font-size:1rem;font-weight:600;letter-spacing:.02em;margin:2.25rem 0 .5rem}
 .card{background:var(--panel);border:1px solid var(--line);
   border-top:3px solid var(--line);padding:.75rem .85rem .85rem;
   display:flex;flex-direction:column}
-.card.is-fast{background:var(--ochre-soft);border-top-color:var(--ochre);
-  border-color:#D6C6A8}
-.card.is-today{border-top-color:var(--ink);border-color:var(--ink)}
-.card.is-today.is-fast{border-top-color:var(--ochre)}
+.card.is-fast{background:var(--fast-dim);border-color:var(--fast-line);
+  border-top-color:var(--fast)}
+.card.is-today{border-color:var(--moonc-line);border-top-color:var(--moonc);
+  box-shadow:0 0 0 1px rgba(159,195,240,.45)}
 .card .rel{font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;
   color:var(--quiet)}
-.card.is-today .rel{color:var(--ink);font-weight:700}
+.card.is-today .rel{color:var(--moonc);font-weight:700}
 .card .greg{font-size:1.02rem;margin-top:.1rem;
   font-variant-numeric:tabular-nums}
 .card .lunar{margin-top:.55rem;padding-top:.55rem;
   border-top:1px solid var(--line);font-size:.9rem;color:var(--quiet)}
-.card.is-fast .lunar{border-top-color:#D6C6A8}
+.card.is-fast .lunar{border-top-color:var(--fast-line)}
 .card .lunar .big{display:block;font-size:1.05rem;color:var(--ink);
   margin-top:.1rem}
 .card .lunar .han{font-family:var(--han);font-size:1.1rem;
@@ -136,16 +135,18 @@ h2{font-size:1rem;font-weight:600;letter-spacing:.02em;margin:2.25rem 0 .5rem}
 .tags{list-style:none;margin:.6rem 0 0;padding:0;display:flex;
   flex-wrap:wrap;gap:.3rem}
 .tags li{font-size:.75rem;letter-spacing:.05em;padding:.16rem .45rem;
-  border:1px solid var(--line);background:#fff}
-.tags li.fast{border-color:var(--ochre);background:#fff;color:#5F3D07}
-.tags li.moon{border-color:var(--lapis);background:var(--lapis-soft);
-  color:#22355A}
-.tags li.recite{border-color:var(--jade);background:var(--jade-soft);
-  color:#254237}
-.card .plain{margin-top:.6rem;font-size:.8rem;color:var(--quiet);
-  letter-spacing:.04em}
-.card .event{margin-top:.6rem;font-size:.82rem;color:var(--ink);
-  border-left:2px solid var(--line);padding-left:.5rem}
+  border:1px solid var(--line);background:var(--raised);color:var(--quiet)}
+.tags li.fast{border-color:var(--fast-line);background:transparent;
+  color:var(--fast)}
+.tags li.moon{border-color:var(--moonc);background:var(--moonc-dim);
+  color:var(--moonc)}
+.tags li.recite{border-color:var(--recite-line);background:var(--recite-dim);
+  color:var(--recite)}
+.tags li.leap{border-color:var(--leap);background:var(--leap-dim);
+  color:var(--leap)}
+.card .events{list-style:none;margin:.6rem 0 0;padding:0}
+.card .events li{font-size:.82rem;color:var(--ink);
+  border-left:2px solid var(--moonc);padding-left:.5rem;margin-top:.35rem}
 
 /* ------------------------------------------------------------ record */
 .filters{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;
@@ -153,30 +154,30 @@ h2{font-size:1rem;font-weight:600;letter-spacing:.02em;margin:2.25rem 0 .5rem}
 .chip{font:inherit;font-size:.85rem;letter-spacing:.04em;padding:.3rem .7rem;
   border:1px solid var(--line);background:var(--panel);color:var(--quiet);
   cursor:pointer}
-.chip[aria-pressed="true"]{border-color:var(--ink);color:var(--ink);
-  background:#fff}
+.chip[aria-pressed="true"]{border-color:var(--fast);color:var(--fast);
+  background:var(--fast-dim)}
 label.jump{font-size:.85rem;color:var(--quiet);margin-left:auto}
 input[type=date],select{font:inherit;font-size:.85rem;padding:.25rem .4rem;
-  border:1px solid var(--line);background:#fff;color:var(--ink)}
+  border:1px solid var(--line);background:var(--raised);color:var(--ink)}
 table{border-collapse:collapse;width:100%;font-size:.9rem}
 caption{text-align:left;color:var(--quiet);font-size:.85rem;
   padding-bottom:.5rem}
 th,td{text-align:left;padding:.42rem .5rem;border-bottom:1px solid var(--line);
   vertical-align:top}
 thead th{position:sticky;top:0;background:var(--paper);
-  border-bottom:1px solid var(--ink);font-weight:600;font-size:.8rem;
+  border-bottom:1px solid var(--fast-line);font-weight:600;font-size:.8rem;
   letter-spacing:.05em}
-tbody tr.is-fast{background:var(--ochre-soft)}
-tbody tr.is-moon{background:var(--lapis-soft)}
-tbody tr.is-fast.is-moon{background:#E6E0DC}
+tbody tr.is-fast{background:var(--fast-dim)}
+tbody tr.is-moon{background:var(--moonc-dim)}
+tbody tr.is-fast.is-moon{background:#17293C}
 td.han{font-family:var(--han);font-size:1.05rem}
 td.num{font-variant-numeric:tabular-nums}
-td .yes{color:var(--ochre)}
-td .rec{color:var(--jade);font-weight:600}
+td .yes{color:var(--fast)}
+td .rec{color:var(--recite);font-weight:600}
 .upcoming{display:grid;gap:1.25rem;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));
   margin-bottom:1.5rem}
 .upcoming section{background:var(--panel);padding:.9rem 1rem;
-  border-top:2px solid var(--ink)}
+  border:1px solid var(--line);border-top:2px solid var(--fast)}
 .upcoming h3{margin:0 0 .5rem;font-size:.9rem;font-weight:600;
   letter-spacing:.03em}
 .upcoming ul{list-style:none;margin:0;padding:0;font-size:.9rem}
@@ -184,47 +185,55 @@ td .rec{color:var(--jade);font-weight:600}
   display:flex;justify-content:space-between;gap:.75rem}
 .upcoming li:last-child{border-bottom:0}
 .upcoming li .han{font-family:var(--han)}
+.upcoming li span:last-child{color:var(--quiet)}
 .upcoming p{margin:.2rem 0 0;font-size:.9rem;color:var(--quiet)}
 .downloads{display:flex;flex-wrap:wrap;gap:.75rem;align-items:center;
   margin:1rem 0 1.5rem;font-size:.9rem}
-.downloads a{color:var(--lapis);text-decoration:underline;
+.downloads a{color:var(--moonc);text-decoration:underline;
   text-underline-offset:2px}
+
 /* ---------------------------------------------------------- settings */
 nav button.gear{font-size:1.05rem;line-height:1;padding:.35rem .55rem}
-.setting{background:var(--panel);border-top:2px solid var(--ink);
-  padding:1rem 1.1rem;margin:1rem 0;max-width:40rem}
+.setting{background:var(--panel);border:1px solid var(--line);
+  border-top:2px solid var(--recite);padding:1rem 1.1rem;margin:1rem 0;
+  max-width:40rem}
 .setting h3{margin:0 0 .35rem;font-size:.95rem;font-weight:600}
 .setting p{margin:.35rem 0 0;font-size:.88rem;color:var(--quiet)}
 .setting .han{font-family:var(--han)}
-.switch{display:flex;align-items:center;gap:.7rem;margin-top:.85rem;
+.setting code{background:var(--raised);padding:.05rem .3rem;
+  font-size:.85em;color:var(--moonc)}
+.switch{display:flex;align-items:center;gap:.7rem;margin-top:.9rem;
   cursor:pointer;font-size:.92rem}
 .switch input{position:absolute;opacity:0;width:0;height:0}
-.switch .track{flex:0 0 auto;width:2.6rem;height:1.4rem;background:#fff;
+.switch .track{flex:0 0 auto;width:2.6rem;height:1.4rem;background:var(--night);
   border:1px solid var(--line);position:relative;transition:background .15s}
 .switch .track::after{content:"";position:absolute;top:.2rem;left:.2rem;
   width:.9rem;height:.9rem;background:var(--quiet);transition:transform .15s}
-.switch input:checked + .track{background:var(--jade-soft);
-  border-color:var(--jade)}
+.switch input:checked + .track{background:var(--recite-dim);
+  border-color:var(--recite)}
 .switch input:checked + .track::after{transform:translateX(1.2rem);
-  background:var(--jade)}
-.switch input:focus-visible + .track{outline:2px solid var(--lapis);
+  background:var(--recite)}
+.switch input:focus-visible + .track{outline:2px solid var(--moonc);
   outline-offset:2px}
-.setting .state{color:var(--quiet);font-size:.85rem;letter-spacing:.05em}
+.field{display:flex;flex-wrap:wrap;align-items:center;gap:.6rem;
+  margin-top:.9rem;font-size:.92rem}
+.setting .state{color:var(--quiet);font-size:.85rem;letter-spacing:.04em;
+  border-left:2px solid var(--recite-line);padding-left:.6rem;margin-top:.9rem}
+
 footer{margin-top:3rem;padding-top:1rem;border-top:1px solid var(--line);
   font-size:.82rem;color:var(--quiet);max-width:60ch}
 footer p{margin:.4rem 0}
-footer .han{font-family:var(--han)}
+footer .han{font-family:var(--han);color:var(--fast)}
 .hidden{display:none}
 body.no-recite .recite-only{display:none}
-.notice{background:#F0DED4;border-left:3px solid #9A5B3D;padding:.7rem .9rem;
-  font-size:.9rem;margin:1rem 0}
+.notice{background:var(--leap-dim);border-left:3px solid var(--leap);
+  padding:.7rem .9rem;font-size:.9rem;margin:1rem 0;color:var(--ink)}
 @media (max-width:640px){
-  .today{grid-template-columns:1fr;gap:.75rem;padding-top:1.25rem}
-  .glyph{font-size:4.25rem}
   .discs{min-width:max-content;gap:.34rem}
   .disc{flex:0 0 1.55rem}
   .disc svg{max-width:1.55rem}
   th.opt,td.opt{display:none}
+  label.jump{margin-left:0}
 }
 </style>
 </head>
@@ -247,16 +256,6 @@ body.no-recite .recite-only{display:none}
   <!-- ======================================================= today -->
   <main id="view-today">
     <div id="range-notice"></div>
-
-    <div class="today">
-      <div class="glyph" id="t-glyph" aria-hidden="true"></div>
-      <div>
-        <div class="when" id="t-when"></div>
-        <div class="lunar" id="t-lunar"></div>
-        <p class="verdict" id="t-verdict"></p>
-        <div class="marks" id="t-marks"></div>
-      </div>
-    </div>
 
     <div class="band">
       <div class="head">
@@ -320,23 +319,37 @@ body.no-recite .recite-only{display:none}
 
     <div class="setting">
       <h3>Precept Recitation days</h3>
-      <p>Flag the 15th and the last day of each lunar month as Precept
-        Recitation (<span class="han">布薩</span>, bùsà) days, in every view.
-        These are the two days the monastic assembly gathers to recite the
-        precepts.</p>
+      <p>Which days carry the Precept Recitation flag
+        (<span class="han">布薩</span>, bùsà), in every view — the days the
+        assembly gathers to recite the precepts. Traditionally two a month,
+        at the full moon and at the month's end.</p>
+
       <label class="switch">
-        <input type="checkbox" id="opt-recite">
+        <input type="checkbox" id="opt-15">
         <span class="track" aria-hidden="true"></span>
-        <span>Show Precept Recitation</span>
+        <span>The 15th of the lunar month</span>
       </label>
-      <p class="state" id="opt-recite-state"></p>
+
+      <div class="field">
+        <label for="opt-other">The second recitation day</label>
+        <select id="opt-other">
+          <option value="last">Last day of the lunar month</option>
+          <option value="30">Day 30</option>
+          <option value="29">Day 29</option>
+          <option value="28">Day 28</option>
+          <option value="1">Day 1</option>
+          <option value="none">None</option>
+        </select>
+      </div>
+
+      <p class="state" id="opt-state"></p>
     </div>
 
     <div class="setting">
       <h3>Where this is kept</h3>
-      <p>Settings are saved in this browser only, under the key
-        <code>bodhi.settings</code>. Nothing is sent anywhere. Clearing your
-        browser data resets them.</p>
+      <p>These settings, and the filters chosen on the record, are saved in
+        this browser only, under the key <code>bodhi.settings</code>. Nothing
+        is sent anywhere. Clearing your browser data resets them.</p>
       <button class="chip" type="button" id="opt-reset">Reset to defaults</button>
     </div>
   </main>
@@ -372,34 +385,62 @@ body.no-recite .recite-only{display:none}
   var index = {};
   days.forEach(function (d, i) { index[d.date] = i; });
 
-  /* precept recitation: lunar 15, and the last day of the lunar month.
-     The last day is found by lookahead rather than from monthLength, which
-     is short for the truncated month at the end of the dataset. */
+  /* The last day of a lunar month is found by lookahead to the next day 1,
+     rather than from monthLength, which is short for the truncated month at
+     the end of the dataset. */
   days.forEach(function (d, i) {
     var next = days[i + 1];
     d.lastOfMonth = next ? next.dayNum === 1 : false;
-    d.recite = d.dayNum === 15 || d.lastOfMonth;
   });
 
   /* settings ---------------------------------------------------------- */
   var SETTINGS_KEY = "bodhi.settings";
-  var DEFAULTS = { recite: true };
-  var settings = (function () {
-    var s = { recite: DEFAULTS.recite };
+  var OTHER_DAYS = ["last", "30", "29", "28", "1", "none"];
+  var FILTERS = ["all", "fast", "moon", "recite", "long", "event"];
+  var DEFAULTS = { recite15: true, reciteOther: "last", filter: "fast" };
+  var settings = {
+    recite15: DEFAULTS.recite15,
+    reciteOther: DEFAULTS.reciteOther,
+    filter: DEFAULTS.filter,
+    from: null
+  };
+  (function () {
     try {
       var raw = localStorage.getItem(SETTINGS_KEY);
-      if (raw) {
-        var saved = JSON.parse(raw);
-        if (typeof saved.recite === "boolean") s.recite = saved.recite;
-      }
+      if (!raw) return;
+      var saved = JSON.parse(raw);
+      if (typeof saved.recite15 === "boolean") settings.recite15 = saved.recite15;
+      if (OTHER_DAYS.indexOf(saved.reciteOther) > -1)
+        settings.reciteOther = saved.reciteOther;
+      if (FILTERS.indexOf(saved.filter) > -1) settings.filter = saved.filter;
+      if (typeof saved.from === "string" && index[saved.from] !== undefined)
+        settings.from = saved.from;
     } catch (err) { /* private mode, or file:// with storage blocked */ }
-    return s;
   })();
   function saveSettings() {
     try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); }
     catch (err) { /* nothing to do but keep the session's choice */ }
   }
-  function reciting(d) { return settings.recite && d.recite; }
+  function reciteOn() {
+    return settings.recite15 || settings.reciteOther !== "none";
+  }
+  function reciting(d) {
+    if (settings.recite15 && d.dayNum === 15) return true;
+    if (settings.reciteOther === "none") return false;
+    if (settings.reciteOther === "last") return d.lastOfMonth;
+    return d.dayNum === +settings.reciteOther;
+  }
+
+  /* the spreadsheet packs same-day events into one cell, pipe separated */
+  function eventsOf(d) {
+    return d.event ? d.event.split("|").map(function (e) {
+      return e.trim();
+    }).filter(Boolean) : [];
+  }
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+  }
 
   var MONTHS = ["January","February","March","April","May","June","July",
                 "August","September","October","November","December"];
@@ -414,11 +455,6 @@ body.no-recite .recite-only{display:none}
   function parse(s) {
     var p = s.split("-");
     return new Date(+p[0], +p[1] - 1, +p[2]);
-  }
-  function longDate(s) {
-    var d = parse(s);
-    return WEEK[d.getDay()] + " " + d.getDate() + " " +
-      MONTHS[d.getMonth()] + " " + d.getFullYear();
   }
   function shortDate(s) {
     var d = parse(s);
@@ -438,9 +474,9 @@ body.no-recite .recite-only{display:none}
     return '<svg width="' + size + '" height="' + size + '" viewBox="' +
       (-size / 2) + " " + (-size / 2) + " " + size + " " + size +
       '" aria-hidden="true">' +
-      '<circle class="rim" r="' + r + '" fill="#0F1619" stroke="#3C4A4E" ' +
+      '<circle class="rim" r="' + r + '" fill="#070B14" stroke="#37456A" ' +
       'stroke-width="0.8"/>' +
-      '<path d="' + path + '" fill="#E9E5DA"/></svg>';
+      '<path d="' + path + '" fill="#E4EBFA"/></svg>';
   }
 
   /* which day are we on --------------------------------------------- */
@@ -456,43 +492,6 @@ body.no-recite .recite-only{display:none}
       ". Regenerate with build_data.py to extend it.</div>";
   }
 
-  /* today panel ------------------------------------------------------ */
-  var t = days[cursor];
-  document.getElementById("t-glyph").textContent = t.dayCn;
-  document.getElementById("t-when").textContent = longDate(t.date);
-  document.getElementById("t-lunar").innerHTML =
-    "Lunar " + t.monthLabel + ' <span class="han">' + t.monthCn + "</span>" +
-    ' &nbsp;·&nbsp; day ' + t.dayNum + ' <span class="han">' + t.dayCn +
-    "</span>";
-
-  function nextFastAfter(i) {
-    for (var j = i + 1; j < days.length; j++) if (days[j].fast) return j;
-    return -1;
-  }
-  var verdict = document.getElementById("t-verdict");
-  if (t.fast) {
-    verdict.className = "verdict is-fast";
-    verdict.innerHTML = "Today is <b>a fast day</b>.";
-  } else {
-    var nf = nextFastAfter(cursor);
-    var gap = nf < 0 ? null : (parse(days[nf].date) - parse(t.date)) / 86400000;
-    verdict.className = "verdict";
-    verdict.innerHTML = "Not a fast day. " + (nf < 0 ? "" :
-      "The next is " + (gap === 1 ? "tomorrow" :
-        "in " + gap + " days, " + shortDate(days[nf].date)) + ".");
-  }
-  function renderMarks() {
-    var m = [];
-    if (reciting(t)) m.push('<span class="mark recite">Precept Recitation' +
-      "</span>");
-    if (t.moon) m.push('<span class="mark moon">' +
-      (t.moon === "new" ? "New moon" : "Full moon") + "</span>");
-    if (t.longFast) m.push('<span class="mark fast">Long fasting month</span>');
-    if (t.leap) m.push('<span class="mark leap">Leap month — flagged</span>');
-    if (t.event) m.push('<span class="mark">' + t.event + "</span>");
-    document.getElementById("t-marks").innerHTML = m.join("");
-  }
-
   /* the lunation band ------------------------------------------------ */
   function drawBand() {
     var d = days[cursor], start = cursor;
@@ -502,7 +501,7 @@ body.no-recite .recite-only{display:none}
          days[j].dayNum !== 1); j++) discs.push(j);
     discs.forEach(function (k, n) {
       var day = days[k], isToday = day.date === d.date;
-      var label = shortDate(day.date) + " — day " + day.dayNum + " " +
+      var label = shortDate(day.date) + " — lunar day " + day.dayNum + " " +
         day.dayCn + (day.fast ? ", fast day" : "") +
         (reciting(day) ? ", Precept Recitation" : "") +
         (isToday ? " (today)" : "");
@@ -513,20 +512,23 @@ body.no-recite .recite-only{display:none}
         '"><div class="cap">' + (isToday ? "&#9660;" : "") + "</div>" +
         moonSvg(day.dayNum, discs.length, 22) +
         '<div class="tick"></div><div class="dot"></div>' +
-        '<div class="n">' + day.dayNum + "</div></div>";
+        '<div class="n">' + parse(day.date).getDate() + "</div></div>";
     });
     document.getElementById("band-discs").innerHTML = html;
+    var firstDay = days[discs[0]], lastDay = days[discs[discs.length - 1]];
     document.getElementById("band-month").innerHTML =
       "Lunar " + d.monthLabel + ' <span class="han">' + d.monthCn +
-      "</span>, " + discs.length + " days" + (d.leap ? " · leap" : "");
+      "</span> &nbsp;·&nbsp; " + shortDate(firstDay.date) + " to " +
+      shortDate(lastDay.date) + (d.leap ? " · leap" : "") +
+      (d.longFast ? " · long fasting month" : "");
     document.getElementById("band-note").textContent =
       discs.filter(function (k) { return days[k].fast; }).length +
       " fast days this month";
     document.getElementById("band-legend").innerHTML =
+      "<span>dates below are Gregorian</span>" +
       '<span><i class="t"></i>today</span>' +
       '<span><i class="f"></i>fast day</span>' +
-      (settings.recite ? '<span><i class="r"></i>Precept Recitation</span>'
-        : "");
+      (reciteOn() ? '<span><i class="r"></i>Precept Recitation</span>' : "");
   }
 
   /* the next seven days, today first --------------------------------- */
@@ -543,6 +545,11 @@ body.no-recite .recite-only{display:none}
       if (reciting(d)) tags += '<li class="recite">Precept Recitation</li>';
       if (d.moon) tags += '<li class="moon">' +
         (d.moon === "new" ? "New moon" : "Full moon") + "</li>";
+      if (d.longFast) tags += "<li>Long fasting month</li>";
+      if (d.leap) tags += '<li class="leap">Leap month</li>';
+      var events = eventsOf(d).map(function (e) {
+        return "<li>" + esc(e) + "</li>";
+      }).join("");
       html += '<article class="card' + (d.fast ? " is-fast" : "") +
         (!outOfRange && n === 0 ? " is-today" : "") + '">' +
         '<div class="rel">' + rel + "</div>" +
@@ -551,9 +558,8 @@ body.no-recite .recite-only{display:none}
         ' <span class="han">' + d.monthCn + "</span>" +
         '<span class="big">Day ' + d.dayNum +
         '<span class="han">' + d.dayCn + "</span></span></div>" +
-        (tags ? '<ul class="tags">' + tags + "</ul>"
-              : '<div class="plain">Ordinary day</div>') +
-        (d.event ? '<div class="event">' + d.event + "</div>" : "") +
+        (tags ? '<ul class="tags">' + tags + "</ul>" : "") +
+        (events ? '<ul class="events">' + events + "</ul>" : "") +
         "</article>";
     }
     document.getElementById("cards").innerHTML = html;
@@ -584,10 +590,10 @@ body.no-recite .recite-only{display:none}
       ul(listOf(function (d) { return d.fast; }, 8), function (d) {
         return "day " + d.dayNum + ' <span class="han">' + d.dayCn + "</span>";
       }) + "</section>" +
-      (settings.recite ?
+      (reciteOn() ?
         "<section><h3>Next Precept Recitations</h3>" +
-        ul(listOf(function (d) { return d.recite; }, 6), function (d) {
-          return d.dayNum === 15 ? "15th" : "last day";
+        ul(listOf(reciting, 6), function (d) {
+          return "day " + d.dayNum + (d.lastOfMonth ? " · last" : "");
         }) + "</section>" : "") +
       "<section><h3>Next moons</h3>" +
       ul(listOf(function (d) { return d.moon; }, 6), function (d) {
@@ -604,7 +610,7 @@ body.no-recite .recite-only{display:none}
   }
 
   /* the table -------------------------------------------------------- */
-  var filter = "fast", from = days[cursor].date;
+  var from = settings.from || days[cursor].date;
   var fromInput = document.getElementById("from-date");
   fromInput.value = from;
   fromInput.min = days[0].date;
@@ -612,18 +618,18 @@ body.no-recite .recite-only{display:none}
 
   function passes(d) {
     if (d.date < from) return false;
-    if (filter === "fast") return d.fast;
-    if (filter === "moon") return !!d.moon;
-    if (filter === "recite") return reciting(d);
-    if (filter === "long") return d.longFast;
-    if (filter === "event") return !!d.event;
+    if (settings.filter === "fast") return d.fast;
+    if (settings.filter === "moon") return !!d.moon;
+    if (settings.filter === "recite") return reciting(d);
+    if (settings.filter === "long") return d.longFast;
+    if (settings.filter === "event") return !!d.event;
     return true;
   }
   var shown = [];
   function renderTable() {
     shown = days.filter(passes);
     var cap = shown.length + " days" +
-      (filter === "all" ? "" : " matching this filter") +
+      (settings.filter === "all" ? "" : " matching this filter") +
       ", from " + shortDate(from) + " to " +
       shortDate(days[days.length - 1].date) + ".";
     document.getElementById("table-caption").textContent = cap;
@@ -640,8 +646,9 @@ body.no-recite .recite-only{display:none}
         '<td class="recite-only">' +
         (reciting(d) ? '<span class="rec">yes</span>' : "") + "</td>" +
         "<td>" + (d.moon || "") + "</td>" +
-        '<td class="opt">' + (d.event || "") +
-        (d.leap ? (d.event ? " · " : "") + "leap month" : "") + "</td>" +
+        '<td class="opt">' + eventsOf(d).map(function (e) {
+          return "<div>" + esc(e) + "</div>";
+        }).join("") + (d.leap ? "<div>leap month</div>" : "") + "</td>" +
         "</tr>";
     }).join("");
     if (shown.length > 500) {
@@ -651,29 +658,38 @@ body.no-recite .recite-only{display:none}
     document.getElementById("table-body").innerHTML = rows;
   }
 
+  function markChips() {
+    Array.prototype.forEach.call(
+      document.querySelectorAll(".chip[data-filter]"), function (b) {
+        b.setAttribute("aria-pressed",
+          b.dataset.filter === settings.filter ? "true" : "false");
+      });
+  }
   Array.prototype.forEach.call(document.querySelectorAll(".chip[data-filter]"),
     function (btn) {
       btn.addEventListener("click", function () {
-        filter = btn.dataset.filter;
-        Array.prototype.forEach.call(
-          document.querySelectorAll(".chip[data-filter]"), function (b) {
-            b.setAttribute("aria-pressed", b === btn ? "true" : "false");
-          });
+        settings.filter = btn.dataset.filter;
+        saveSettings();
+        markChips();
         renderTable();
       });
     });
   fromInput.addEventListener("change", function () {
-    if (fromInput.value) { from = fromInput.value; renderTable(); }
+    if (!fromInput.value) return;
+    from = fromInput.value;
+    settings.from = from;
+    saveSettings();
+    renderTable();
   });
   document.getElementById("copy-visible").addEventListener("click",
     function (e) {
-      var rec = settings.recite;
+      var rec = reciteOn();
       var head = "date\tweekday\tlunar_month\tlunar_day\tday_number\tfast\t" +
         (rec ? "recitation\t" : "") + "moon\tevent\n";
       var body = shown.map(function (d) {
         var row = [d.date, d.weekday, d.monthCn, d.dayCn, d.dayNum,
                    d.fast ? "yes" : ""];
-        if (rec) row.push(d.recite ? "yes" : "");
+        if (rec) row.push(reciting(d) ? "yes" : "");
         return row.concat([d.moon, d.event]).join("\t");
       }).join("\n");
       var text = head + body;
@@ -715,35 +731,53 @@ body.no-recite .recite-only{display:none}
   });
 
   /* settings --------------------------------------------------------- */
-  var reciteBox = document.getElementById("opt-recite");
+  var box15 = document.getElementById("opt-15");
+  var otherSel = document.getElementById("opt-other");
+
+  function stateText() {
+    var parts = [];
+    if (settings.recite15) parts.push("the 15th");
+    if (settings.reciteOther === "last") parts.push("the last day");
+    else if (settings.reciteOther !== "none")
+      parts.push("day " + settings.reciteOther);
+    if (!parts.length) return "Nothing is flagged as Precept Recitation.";
+    return "Flagged: " + parts.join(" and ") + " of each lunar month." +
+      (settings.reciteOther !== "none" && settings.reciteOther !== "last" &&
+       +settings.reciteOther > 28
+        ? " A shorter month has no day " + settings.reciteOther + "."
+        : "");
+  }
+
   function applySettings() {
-    document.body.classList.toggle("no-recite", !settings.recite);
-    if (!settings.recite && filter === "recite") {
-      filter = "fast";
-      Array.prototype.forEach.call(
-        document.querySelectorAll(".chip[data-filter]"), function (b) {
-          b.setAttribute("aria-pressed",
-            b.dataset.filter === "fast" ? "true" : "false");
-        });
-    }
-    reciteBox.checked = settings.recite;
-    document.getElementById("opt-recite-state").textContent =
-      settings.recite
-        ? "On. The 15th and the last day of each lunar month carry the flag."
-        : "Off. Fast days and moons are still shown.";
-    renderMarks();
+    var on = reciteOn();
+    document.body.classList.toggle("no-recite", !on);
+    if (!on && settings.filter === "recite") settings.filter = "fast";
+    box15.checked = settings.recite15;
+    otherSel.value = settings.reciteOther;
+    document.getElementById("opt-state").textContent = stateText();
+    markChips();
     drawBand();
     renderCards();
     renderUpcoming();
     renderTable();
   }
-  reciteBox.addEventListener("change", function () {
-    settings.recite = reciteBox.checked;
+  box15.addEventListener("change", function () {
+    settings.recite15 = box15.checked;
+    saveSettings();
+    applySettings();
+  });
+  otherSel.addEventListener("change", function () {
+    settings.reciteOther = otherSel.value;
     saveSettings();
     applySettings();
   });
   document.getElementById("opt-reset").addEventListener("click", function () {
-    settings.recite = DEFAULTS.recite;
+    settings.recite15 = DEFAULTS.recite15;
+    settings.reciteOther = DEFAULTS.reciteOther;
+    settings.filter = DEFAULTS.filter;
+    settings.from = null;
+    from = days[cursor].date;
+    fromInput.value = from;
     saveSettings();
     applySettings();
   });
