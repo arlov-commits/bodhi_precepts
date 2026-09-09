@@ -75,19 +75,31 @@ data came off the DRBA printed calendar or the HKO tables.
   recitation days and today.
 - **Precept Recitation** (布薩, bùsà): the days the assembly gathers to recite
   the precepts. Two a month by default — the 15th, and the last day. Both are
-  already fast days; the flag is an extra marking on top. Which days count is
-  a setting, not a fixed rule, so this is derived in the browser rather than
-  stored in the dataset. The last day is found by looking ahead to the next
+  already fast days, so the flag is an extra marking on top; reckoned by the
+  nearest weekend instead, it usually lands on a day that is not. Which days
+  count is a setting, not a fixed rule, so this is derived in the browser
+  rather than stored in the dataset. The last day is found by looking ahead to the next
   day-1 rather than from `monthLength`, which is short for the truncated month
   at the end of the dataset.
 
 ## Settings
 
 The gear opens a Settings view, which decides which days carry the Precept
-Recitation flag: the 15th is a switch, and the second day is a choice of the
-last day of the lunar month (the default), day 30, 29, 28, 1, or none. Turning
-both off drops the flag, its filter and its column from every view. Choosing a
-fixed day 29 or 30 means shorter months simply have none.
+Recitation flag. It is reckoned one of four ways:
+
+- **By lunar day** (the default), which then takes two more settings: the 15th
+  is a switch, and the second day is a choice of the last day of the lunar
+  month (the default), day 30, 29, 28, 1, or none. Turning both off drops the
+  flag. Choosing a fixed day 29 or 30 means shorter months simply have none.
+- **Nearest Saturday** or **nearest Sunday to each moon**, for an assembly
+  that gathers at weekends: the Saturday or Sunday closest to each new and
+  full moon, never more than three days off. Over this dataset that lands on
+  every other Saturday 74 times in 83, stretching to three weeks the other 9,
+  where the moons drift far enough that the nearer weekend is the next one.
+  Recitation then usually falls on a day that is not a fast day, which is what
+  the third card colour is for.
+- **Not at all**, which drops the flag, its filter and its column from every
+  view.
 
 Settings also carries how many day cards the Today view shows, counting today
 as the first — seven by default, any whole number from 1 to 366.
