@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Fast days</title>
+<title>Bodhi Precepts 齋日</title>
 <!-- The browser's own chrome — the address bar on Android, the status bar in
      a standalone window — is tinted to the paper the page is on. The app's
      "auto" follows the device clock rather than the system setting, so this
@@ -20,7 +20,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Fast days">
+<meta name="apple-mobile-web-app-title" content="Bodhi Precepts">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <style>
 /* Sumi: ink on paper, with cinnabar for what matters. Two inks only —
@@ -107,10 +107,12 @@ body{
 .wrap{max-width:56rem;margin:0 auto;padding:1.5rem 1.25rem 4rem}
 
 /* ---------------------------------------------------------- masthead */
-.masthead{display:flex;flex-wrap:wrap;gap:1rem;align-items:baseline;
+.masthead{display:flex;flex-wrap:wrap;gap:1rem;align-items:flex-end;
   justify-content:space-between;padding-bottom:.75rem;
   border-bottom:1px solid var(--ink)}
-.brand{display:flex;align-items:baseline;gap:.6rem}
+/* The glyphs sit over the name rather than beside it, so the two read as a
+   title and its reading rather than as one long line. */
+.brand{display:flex;flex-direction:column;align-items:flex-start;gap:.1rem}
 .brand .han{font-family:var(--han);font-size:1.5rem;letter-spacing:.12em;
   color:var(--fast)}
 .brand h1{font-size:1.3rem;font-weight:600;margin:0;letter-spacing:.01em}
@@ -399,7 +401,7 @@ body.no-recite .recite-only{display:none}
   <header class="masthead">
     <div class="brand">
       <span class="han" aria-hidden="true">六齋日</span>
-      <h1>Fast days</h1>
+      <h1>Days of Abstinence</h1>
     </div>
     <nav>
       <button type="button" id="nav-today" aria-current="page">Today</button>
@@ -574,11 +576,11 @@ body.no-recite .recite-only{display:none}
 
     <div class="setting">
       <h3>Install</h3>
-      <p>Fast days can sit on a home screen or in a dock like any other app
-        and open without the browser around it. Once it is installed the
+      <p>Bodhi Precepts can sit on a home screen or in a dock like any other
+        app and open without the browser around it. Once it is installed the
         calendar is on the device, so it opens with no connection at all.</p>
       <button class="chip" type="button" id="opt-install" hidden>
-        Install Fast days</button>
+        Install Bodhi Precepts</button>
       <p class="state" id="opt-install-state"></p>
     </div>
 

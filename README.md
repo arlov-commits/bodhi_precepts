@@ -1,4 +1,4 @@
-# Fast days
+# Bodhi Precepts 齋日
 
 A small web view of the six fast days (六齋日, liù zhāi rì), the three long
 fasting months (三長齋月, sān cháng zhāi yuè), and the new and full moons,
@@ -11,7 +11,7 @@ filesystem.
 
 | File | What it is |
 | --- | --- |
-| `index.html` | The whole app. Three views: **Today**, **Upcoming**, and **Settings** (the gear). |
+| `index.html` | The whole app, *Bodhi Precepts 齋日*. Three views: **Today**, **Upcoming**, and **Settings** (the gear). |
 | `manifest.webmanifest` | Makes it installable: the name, the icons and the standalone display. |
 | `sw.js` | The service worker. Keeps a copy of the app so an installed one opens offline. |
 | `icon.svg` | The favicon: a cinnabar seal carrying a crescent and the pole star. |
@@ -27,7 +27,8 @@ filesystem.
 It is a progressive web app, so it installs from the browser on all three —
 no store, no download.
 
-- **Android, and Chrome or Edge on a PC**: Settings has an **Install** button
+- **Android, and Chrome or Edge on a PC**: Settings has an **Install Bodhi
+  Precepts** button
   when the browser offers one, and the browser's own menu or address bar will
   offer it too.
 - **iPhone and iPad**: Safari has no install prompt, so use the Share button
@@ -223,6 +224,12 @@ The icon beside the gear cycles three themes — auto, light, dark — and the
 choice is kept with the rest. Auto follows the **device clock**, not the
 system setting: light from 6am to 6pm, dark outside it, rechecked while the
 page is left open.
+
+The masthead sets 六齋日 over *Days of Abstinence*, the glyphs and their
+reading stacked as a title and its gloss rather than run together on one
+line. The launcher and the browser tab carry the app's own name instead,
+*Bodhi Precepts 齋日*, shortened to *Bodhi Precepts* where a home screen has
+no room for it.
 
 Lunar dates are written month then day throughout — `7月28日`, and `閏5月1日`
 in a leap month. Gregorian dates stay in the Western order, and a span names
