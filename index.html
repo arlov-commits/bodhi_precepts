@@ -38,7 +38,7 @@
   --moonc-line:#BDB7A8;
   --leap:#9E2A24;
   --leap-dim:#F7EAE6;
-  --netline:rgba(28,26,22,.11);
+  --netline:rgba(28,26,22,.094);
   --hatch:repeating-linear-gradient(45deg,var(--netline) 0 1px,transparent 1px 9px),
           repeating-linear-gradient(-45deg,var(--netline) 0 1px,transparent 1px 9px);
   --sans:"Optima","Avenir Next","Gill Sans MT","Gill Sans","Trebuchet MS",sans-serif;
@@ -77,7 +77,7 @@
   --moonc-line:#505860;
   --leap:#DE9184;
   --leap-dim:#3A302E;
-  --netline:rgba(233,231,222,.11);
+  --netline:rgba(233,231,222,.094);
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
@@ -232,14 +232,26 @@ input[type=number]{width:5rem}
 table{border-collapse:collapse;width:100%;font-size:.9rem}
 caption{text-align:left;color:var(--quiet);font-size:.85rem;
   padding-bottom:.5rem}
-th,td{text-align:left;padding:.42rem .5rem;border-bottom:1px solid var(--hair);
-  vertical-align:top}
+th,td{text-align:center;padding:.42rem .4rem;
+  border-bottom:1px solid var(--hair);vertical-align:middle}
 thead th{position:sticky;top:0;background:var(--paper);
   border-bottom:1px solid var(--ink);font-weight:600;font-size:.8rem;
-  letter-spacing:.05em}
+  letter-spacing:.05em;white-space:nowrap}
+/* Widths on the headings alone, so the columns share the table evenly
+   instead of being sized by whichever row holds the longest text. */
+thead th:nth-child(1){width:14%}
+thead th:nth-child(2){width:9%}
+thead th:nth-child(3){width:14%}
+thead th:nth-child(4){width:16%}
+thead th:nth-child(5){width:15%}
+thead th:nth-child(6){width:10%}
+/* The lunar date: two unbreakable pieces that stack in one column. */
+.lun{display:inline-block;text-align:left}
+.lun .lp{display:inline-block;white-space:nowrap}
+.lun .lp i{display:inline-block;min-width:1.25em;text-align:right;
+  font-style:normal}
 tbody tr.is-fast{background-color:var(--fast-wash)}
 td.wd{color:var(--quiet);font-size:.85rem}
-td.moon-cell{width:1.9rem}
 .moon-ic{display:inline-block;width:1.15rem;vertical-align:-.25rem}
 .moon-ic svg{display:block;width:100%;height:auto}
 .star-ic{display:inline-block;width:.8rem;vertical-align:-.05rem}
@@ -251,7 +263,7 @@ td .longfast{color:var(--ink-soft);font-size:.75rem;letter-spacing:.05em;
    so a long fasting month reads as one stretch without displacing the marks
    for the single days inside it. */
 tbody tr.is-long,.card.is-long{background-image:var(--hatch)}
-tbody tr.weekbreak-row td{padding:1.15rem .5rem .3rem;
+tbody tr.weekbreak-row td{padding:1.15rem .4rem .3rem;
   border-bottom:1px solid var(--ink);font-size:.7rem;letter-spacing:.14em;
   text-transform:uppercase;color:var(--quiet)}
 tbody tr.weekbreak-row:first-child td{padding-top:.35rem}
@@ -323,6 +335,13 @@ body.no-recite .recite-only{display:none}
   .disc svg{max-width:1.55rem}
   th.opt,td.opt{display:none}
   label.jump{margin-left:0}
+  /* Narrow enough that the longest heading and the Long Fast label were
+     setting the column widths on their own; shrink them so the shares hold. */
+  th,td{padding:.42rem .2rem}
+  thead th{font-size:.68rem;letter-spacing:.01em}
+  td.han{font-size:.98rem}
+  td .longfast{font-size:.62rem;letter-spacing:.01em}
+  td.wd{font-size:.78rem}
 }
 </style>
 </head>
@@ -660,6 +679,14 @@ body.no-recite .recite-only{display:none}
   function lunarDate(d) {
     return (d.leap ? "閏" : "") + d.monthNum + "月" + d.dayNum + "日";
   }
+  /* Month and day as two unbreakable pieces, so a narrow column can only
+     ever break at 月, and the two glyphs stack in the same column because
+     each number sits in a box of the same width. */
+  function lunarCell(d) {
+    return '<span class="lun"><span class="lp"><i>' +
+      (d.leap ? "閏" : "") + d.monthNum + "</i>月</span>" +
+      '<span class="lp"><i>' + d.dayNum + "</i>日</span></span>";
+  }
   /* A span of Gregorian dates, naming the year once unless it turns over. */
   function dateRange(a, b) {
     var da = parse(a), db = parse(b);
@@ -896,7 +923,7 @@ body.no-recite .recite-only{display:none}
         '<td class="num">' +
         (week ? dayMonth(d.date) : shortDate(d.date)) + "</td>" +
         '<td class="wd">' + d.weekday + "</td>" +
-        '<td class="han">' + lunarDate(d) + "</td>" +
+        '<td class="han">' + lunarCell(d) + "</td>" +
         "<td>" +
         (d.longFast ? '<span class="longfast">Long Fast</span>' : "") +
         (d.fast ? '<span class="yes">yes</span>' : "") + "</td>" +

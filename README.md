@@ -140,8 +140,14 @@ in a leap month. Gregorian dates stay in the Western order, and a span names
 the year once unless it turns over: *26 Aug to 23 Sep 2026*, but *14 Dec 2026
 to 11 Jan 2027*.
 
-On Upcoming the year sits on the week heading rather than on every row; with
-weeks off there is no heading to carry it, so it stays on the row. The Fast
+Upcoming centres every heading and cell, and shares its columns out by
+proportion rather than letting whichever row holds the longest text decide.
+The lunar date is set as two unbreakable pieces, so a narrow column can only
+ever break at 月, and each number sits in a box of the same width, which puts
+the 月 and 日 of a wrapped date in the same column.
+
+The year sits on the week heading rather than on every row; with weeks off
+there is no heading to carry it, so it stays on the row. The Fast
 column does double duty: **Long Fast** for a day inside a long fasting month,
 and the day's own fast marked under it. Recitation is the pole star and the
 moon is the same disc the band draws, halo and all.
