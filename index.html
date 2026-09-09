@@ -17,9 +17,10 @@
   --quiet:#7A756B;
   --line:#D8D2C4;
   --hair:#E6E1D5;
-  --fast:#9E2A24;
-  --fast-dim:#FAF0EC;
-  --fast-line:#D7B2AC;
+  --fast:#96231D;
+  --fast-dim:#EDD6CE;
+  --fast-wash:#F8EDE9;
+  --fast-line:#C08A7E;
   --recite:#2E2A24;
   --recite-dim:#EFECE2;
   --recite-line:#B4AE9F;
@@ -75,8 +76,8 @@ input:focus-visible,.chip:focus-visible{outline:2px solid var(--fast);
 .band .legend i{font-style:normal;display:inline-block;width:.75rem;
   height:.25rem;margin-right:.35rem;vertical-align:.1rem}
 .band .legend i.f{background:var(--fast)}
-.band .legend i.r{background:var(--recite);width:.34rem;height:.34rem;
-  border-radius:50%}
+.band .legend i.r{background:none;width:auto;height:auto;
+  color:var(--recite);font-size:.8rem;line-height:1;vertical-align:-.05rem}
 .band .legend i.t{background:var(--fast-dim);border:1px solid var(--ink);
   height:.62rem;width:.62rem}
 .band-scroll{overflow-x:auto}
@@ -89,9 +90,9 @@ input:focus-visible,.chip:focus-visible{outline:2px solid var(--fast);
 .disc.is-fast .n{color:var(--fast);font-weight:600}
 .disc .tick{height:3px;margin-top:.2rem;background:transparent}
 .disc.is-fast .tick{background:var(--fast)}
-.disc .dot{height:.34rem;margin-top:.16rem;font-size:0}
-.disc.is-recite .dot{width:.34rem;margin-left:auto;margin-right:auto;
-  border-radius:50%;background:var(--recite)}
+.disc .dot{height:.7rem;line-height:.7rem;font-size:.62rem;margin-top:.1rem;
+  color:transparent}
+.disc.is-recite .dot{color:var(--recite)}
 .disc.is-today{background:var(--fast-dim);outline:1px solid var(--ink)}
 .disc.is-today .cap{color:var(--ink);letter-spacing:.04em}
 .disc.is-today .n{color:var(--ink);font-weight:700}
@@ -118,10 +119,11 @@ h2{font-size:1rem;font-weight:600;letter-spacing:.02em;margin:2.25rem 0 .5rem}
 .card .lunar{margin-top:.6rem;padding-top:.6rem;width:100%;
   border-top:1px solid var(--hair);font-size:.88rem;color:var(--quiet)}
 .card.is-fast .lunar{border-top-color:var(--fast-line)}
-.card .lunar .big{display:block;font-size:1.05rem;color:var(--ink);
-  margin-top:.15rem}
-.card .lunar .han{font-family:var(--han);font-size:1.1rem;
-  margin-left:.35rem;color:var(--quiet)}
+.card .lunar .lbl{font-size:.72rem;letter-spacing:.12em;
+  text-transform:uppercase}
+.card .lunar .big{display:block;font-size:1.25rem;color:var(--ink);
+  margin-top:.1rem;letter-spacing:.03em}
+.card .lunar .han{font-family:var(--han)}
 .tags{list-style:none;margin:.65rem 0 0;padding:0;display:flex;
   flex-wrap:wrap;gap:.3rem;justify-content:center}
 .tags li{font-size:.75rem;letter-spacing:.05em;padding:.16rem .5rem;
@@ -157,7 +159,9 @@ th,td{text-align:left;padding:.42rem .5rem;border-bottom:1px solid var(--hair);
 thead th{position:sticky;top:0;background:var(--paper);
   border-bottom:1px solid var(--ink);font-weight:600;font-size:.8rem;
   letter-spacing:.05em}
-tbody tr.is-fast{background:var(--fast-dim)}
+tbody tr.is-fast{background:var(--fast-wash)}
+td .aside{font-family:var(--sans);font-size:.8rem;color:var(--quiet);
+  margin-left:.4rem}
 tbody tr.is-moon{background:var(--moonc-dim)}
 tbody tr.is-fast.is-moon{background:#F4EFE7}
 td.han{font-family:var(--han);font-size:1.05rem}
@@ -286,8 +290,7 @@ body.no-recite .recite-only{display:none}
       <thead>
         <tr>
           <th scope="col">Date</th>
-          <th scope="col">Lunar month</th>
-          <th scope="col">Lunar day</th>
+          <th scope="col">Lunar date</th>
           <th scope="col">Fast</th>
           <th scope="col" class="recite-only">Recitation</th>
           <th scope="col">Moon</th>
@@ -463,6 +466,18 @@ body.no-recite .recite-only{display:none}
     var p = s.split("-");
     return new Date(+p[0], +p[1] - 1, +p[2]);
   }
+  /* Lunar dates read month then day, as they are written: 7月28日, and a
+     leap month takes 閏 in front. */
+  function lunarDate(d) {
+    return (d.leap ? "閏" : "") + d.monthNum + "月" + d.dayNum + "日";
+  }
+  /* A span of Gregorian dates, naming the year once unless it turns over. */
+  function dateRange(a, b) {
+    var da = parse(a), db = parse(b);
+    var head = da.getDate() + " " + MONTHS[da.getMonth()].slice(0, 3);
+    if (da.getFullYear() !== db.getFullYear()) head += " " + da.getFullYear();
+    return head + " to " + shortDate(b);
+  }
   function shortDate(s) {
     var d = parse(s);
     return d.getDate() + " " + MONTHS[d.getMonth()].slice(0, 3) + " " +
@@ -512,8 +527,8 @@ body.no-recite .recite-only{display:none}
     var html = "";
     for (var k = start; k < end; k++) {
       var day = days[k], isToday = day.date === d.date;
-      var label = shortDate(day.date) + " — lunar day " + day.dayNum + " " +
-        day.dayCn + (day.fast ? ", fast day" : "") +
+      var label = shortDate(day.date) + " — lunar " + lunarDate(day) +
+        (day.fast ? ", fast day" : "") +
         (reciting(day) ? ", Precept Recitation" : "") +
         (isToday ? " (today)" : "");
       html += '<div class="disc' + (day.fast ? " is-fast" : "") +
@@ -522,7 +537,7 @@ body.no-recite .recite-only{display:none}
         '" style="animation-delay:' + ((k - start) * 18) + 'ms" title="' +
         label + '"><div class="cap">' + (isToday ? "&#9660;" : "") + "</div>" +
         moonSvg(day.dayNum, day.cycle, 22) +
-        '<div class="tick"></div><div class="dot"></div>' +
+        '<div class="tick"></div><div class="dot">&#9733;</div>' +
         '<div class="n">' + parse(day.date).getDate() + "</div></div>";
     }
     document.getElementById("band-discs").innerHTML = html;
@@ -536,15 +551,15 @@ body.no-recite .recite-only{display:none}
         (scroller.clientWidth - tBox.width) / 2;
     }
     document.getElementById("band-month").innerHTML =
-      "Lunar " + d.monthLabel + ' <span class="han">' + d.monthCn +
-      "</span> &nbsp;·&nbsp; day " + d.dayNum;
+      'lunar <span class="han">' + lunarDate(d) + "</span>";
     document.getElementById("band-note").textContent =
-      shortDate(days[start].date) + " to " + shortDate(days[end - 1].date);
+      dateRange(days[start].date, days[end - 1].date);
     document.getElementById("band-legend").innerHTML =
       "<span>Gregorian dates</span>" +
       '<span><i class="t"></i>today</span>' +
       '<span><i class="f"></i>fast day</span>' +
-      (reciteOn() ? '<span><i class="r"></i>precept recitation</span>' : "");
+      (reciteOn() ? '<span><i class="r">&#9733;</i>precept recitation</span>'
+        : "");
   }
 
   /* the next seven days, today first --------------------------------- */
@@ -568,10 +583,8 @@ body.no-recite .recite-only{display:none}
         (!outOfRange && n === 0 ? " is-today" : "") + '">' +
         '<div class="rel">' + rel + "</div>" +
         '<div class="greg">' + shortDate(d.date) + "</div>" +
-        '<div class="lunar">Lunar ' + d.monthLabel +
-        ' <span class="han">' + d.monthCn + "</span>" +
-        '<span class="big">Day ' + d.dayNum +
-        '<span class="han">' + d.dayCn + "</span></span></div>" +
+        '<div class="lunar"><span class="lbl">lunar</span>' +
+        '<span class="big han">' + lunarDate(d) + "</span></div>" +
         (tags ? '<ul class="tags">' + tags + "</ul>" : "") +
         (events ? '<ul class="events">' + events + "</ul>" : "") +
         "</article>";
@@ -602,12 +615,13 @@ body.no-recite .recite-only{display:none}
     document.getElementById("upcoming").innerHTML =
       "<section><h3>Next eight fast days</h3>" +
       ul(listOf(function (d) { return d.fast; }, 8), function (d) {
-        return "day " + d.dayNum + ' <span class="han">' + d.dayCn + "</span>";
+        return '<span class="han">' + lunarDate(d) + "</span>";
       }) + "</section>" +
       (reciteOn() ?
         "<section><h3>Next Precept Recitations</h3>" +
         ul(listOf(reciting, 6), function (d) {
-          return "day " + d.dayNum + (d.lastOfMonth ? " · last" : "");
+          return '<span class="han">' + lunarDate(d) + "</span>" +
+            (d.lastOfMonth ? " · last" : "");
         }) + "</section>" : "") +
       "<section><h3>Next moons</h3>" +
       ul(listOf(function (d) { return d.moon; }, 6), function (d) {
@@ -652,10 +666,8 @@ body.no-recite .recite-only{display:none}
         (d.moon ? "is-moon" : "") + '">' +
         '<td class="num">' + shortDate(d.date) + " <span style=color:var(--quiet)>" +
         d.weekday + "</span></td>" +
-        '<td class="han">' + d.monthCn + ' <span style="font-family:var(--sans);font-size:.85rem;color:var(--quiet)">' +
-        d.monthLabel + (d.longFast ? " · long fast" : "") + "</span></td>" +
-        '<td class="han">' + d.dayCn + ' <span style="font-family:var(--sans);font-size:.85rem;color:var(--quiet)">' +
-        d.dayNum + "</span></td>" +
+        '<td class="han">' + lunarDate(d) +
+        (d.longFast ? ' <span class="aside">long fast</span>' : "") + "</td>" +
         '<td>' + (d.fast ? '<span class="yes">yes</span>' : "") + "</td>" +
         '<td class="recite-only">' +
         (reciting(d) ? '<span class="rec">yes</span>' : "") + "</td>" +
@@ -666,7 +678,7 @@ body.no-recite .recite-only{display:none}
         "</tr>";
     }).join("");
     if (shown.length > 500) {
-      rows += '<tr><td colspan="7">Showing the first 500. Move the start ' +
+      rows += '<tr><td colspan="6">Showing the first 500. Move the start ' +
         "date forward, or open data.csv for the rest.</td></tr>";
     }
     document.getElementById("table-body").innerHTML = rows;

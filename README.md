@@ -100,6 +100,11 @@ Sumi: ink on paper, cinnabar for what matters. Warm paper ground, hairline
 rules, a lot of empty space, and two inks only — black for the substance,
 seal red for the fast days.
 
+Lunar dates are written month then day throughout — `7月28日`, and `閏5月1日`
+in a leap month. Gregorian dates stay in the Western order, and a span names
+the year once unless it turns over: *26 Aug to 23 Sep 2026*, but *14 Dec 2026
+to 11 Jan 2027*.
+
 ## Sources
 
 - Lunar dates: Hong Kong Observatory Gregorian-Lunar Calendar Conversion
