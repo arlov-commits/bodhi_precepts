@@ -18,7 +18,7 @@
   --raised:#FFFFFF;
   --ink:#1C1A16;
   --ink-soft:#3E3A33;
-  --quiet:#7A756B;
+  --quiet:#6E695F;
   --line:#D8D2C4;
   --hair:#E6E1D5;
   --fast:#96231D;
@@ -26,6 +26,10 @@
   --fast-wash:#F8EDE9;
   --fast-moon:#F4EFE7;
   --fast-line:#C08A7E;
+  --both-dim:#E0B9AC;
+  --both-line:#A25B4B;
+  --rec-dim:#CFD4CE;
+  --rec-line:#98A096;
   --recite:#2E2A24;
   --recite-dim:#EFECE2;
   --recite-line:#B4AE9F;
@@ -37,34 +41,39 @@
   --sans:"Optima","Avenir Next","Gill Sans MT","Gill Sans","Trebuchet MS",sans-serif;
   --han:"Songti SC","STSong","Noto Serif CJK SC","Noto Serif SC","SimSun",serif;
 }
-/* The same ink at night: a rubbing rather than a page — pale strokes on a
-   dark ground, with the seal red lifted enough to hold against it. */
+/* Evening ink: diluted 墨 is never black but a blue-grey, so the dark ground
+   is slate rather than soot, the strokes are warm paper, and the cinnabar
+   drops back to the dustier clay it dries to. */
 :root[data-theme="dark"]{
   color-scheme:dark;
-  --moon-dark:#0C0B09;
-  --moon-edge:#5E5849;
-  --moon-lit:#EDE8DC;
-  --paper:#141310;
-  --panel:#1C1A16;
-  --raised:#242118;
-  --ink:#EDE8DC;
-  --ink-soft:#CBC4B4;
-  --quiet:#948D7E;
-  --line:#36322A;
-  --hair:#2A2721;
-  --fast:#D9564C;
-  --fast-dim:#3A201C;
-  --fast-wash:#241614;
-  --fast-moon:#251C18;
-  --fast-line:#7A3A33;
-  --recite:#EDE8DC;
-  --recite-dim:#26241E;
-  --recite-line:#565140;
-  --moonc:#A9A294;
-  --moonc-dim:#221F19;
-  --moonc-line:#4A463B;
-  --leap:#D9564C;
-  --leap-dim:#2C1A17;
+  --moon-dark:#191D21;
+  --moon-edge:#646C73;
+  --moon-lit:#ECEAE2;
+  --paper:#242A2F;
+  --panel:#2B3238;
+  --raised:#343C43;
+  --ink:#E6E4DB;
+  --ink-soft:#D5D3C9;
+  --quiet:#98A0A2;
+  --line:#414A52;
+  --hair:#384047;
+  --fast:#DE9184;
+  --fast-dim:#4A3B34;
+  --fast-wash:#312E2E;
+  --fast-moon:#333438;
+  --fast-line:#7E5A50;
+  --both-dim:#6B4C3D;
+  --both-line:#9A6C5D;
+  --rec-dim:#3B4650;
+  --rec-line:#6C767F;
+  --recite:#E6E4DB;
+  --recite-dim:#323940;
+  --recite-line:#5E666E;
+  --moonc:#A9B0B1;
+  --moonc-dim:#2E353B;
+  --moonc-line:#505860;
+  --leap:#DE9184;
+  --leap-dim:#3A302E;
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
@@ -110,8 +119,9 @@ input:focus-visible,.chip:focus-visible{outline:2px solid var(--fast);
 .band .legend i{font-style:normal;display:inline-block;width:.75rem;
   height:.25rem;margin-right:.35rem;vertical-align:.1rem}
 .band .legend i.f{background:var(--fast)}
-.band .legend i.r{background:none;width:auto;height:auto;
-  color:var(--recite);font-size:.8rem;line-height:1;vertical-align:-.05rem}
+.band .legend i.r{background:none;width:.75rem;height:.75rem;
+  vertical-align:-.13rem}
+.band .legend i.r .star{width:.75rem;height:.75rem;display:block}
 .band .legend i.t{background:var(--fast-dim);border:1px solid var(--ink);
   height:.62rem;width:.62rem}
 .band-scroll{overflow-x:auto}
@@ -126,9 +136,11 @@ input:focus-visible,.chip:focus-visible{outline:2px solid var(--fast);
 .disc.is-fast .n{color:var(--fast);font-weight:600}
 .disc .tick{height:3px;margin-top:.2rem;background:transparent}
 .disc.is-fast .tick{background:var(--fast)}
-.disc .dot{height:.7rem;line-height:.7rem;font-size:.62rem;margin-top:.1rem;
-  color:transparent}
-.disc.is-recite .dot{color:var(--recite)}
+.disc .dot{height:.62rem;margin-top:.14rem}
+.disc .dot .star{display:block;margin:0 auto;width:.62rem;height:.62rem;
+  visibility:hidden}
+.disc.is-recite .dot .star{visibility:visible}
+.star path{fill:var(--recite)}
 .disc.is-today{background:var(--fast-dim);outline:1px solid var(--ink)}
 .disc.is-today .cap{color:var(--ink);letter-spacing:.04em}
 .disc.is-today .n{color:var(--ink);font-weight:700}
@@ -145,8 +157,15 @@ h2{font-size:1rem;font-weight:600;letter-spacing:.02em;margin:2.25rem 0 .5rem}
 .card{background:var(--panel);border:1px solid var(--line);
   border-top:2px solid var(--line);padding:.8rem .85rem .9rem;
   display:flex;flex-direction:column;align-items:center;text-align:center}
+/* Three states, by what falls on the day. Recitation alone is an ink wash,
+   a fast day is a cinnabar one, and a recitation that lands on a fast day —
+   the heaviest of the three — takes the cinnabar deeper still. */
+.card.is-recite{background:var(--rec-dim);border-color:var(--rec-line);
+  border-top-color:var(--recite)}
 .card.is-fast{background:var(--fast-dim);border-color:var(--fast-line);
   border-top-color:var(--fast)}
+.card.is-fast.is-recite{background:var(--both-dim);
+  border-color:var(--both-line);border-top-color:var(--fast)}
 .card .rel{font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;
   color:var(--quiet)}
 .card.is-today .rel{color:var(--ink);font-weight:700}
@@ -154,7 +173,10 @@ h2{font-size:1rem;font-weight:600;letter-spacing:.02em;margin:2.25rem 0 .5rem}
   font-variant-numeric:tabular-nums}
 .card .lunar{margin-top:.6rem;padding-top:.6rem;width:100%;
   border-top:1px solid var(--hair);font-size:.88rem;color:var(--quiet)}
-.card.is-fast .lunar{border-top-color:var(--fast-line)}
+.card.is-recite .lunar,.card.is-recite .events{border-top-color:var(--rec-line)}
+.card.is-fast .lunar,.card.is-fast .events{border-top-color:var(--fast-line)}
+.card.is-fast.is-recite .lunar,
+.card.is-fast.is-recite .events{border-top-color:var(--both-line)}
 .card .lunar .lbl{font-size:.72rem;letter-spacing:.12em;
   text-transform:uppercase}
 .card .lunar .big{display:block;font-size:1.25rem;color:var(--ink);
@@ -172,7 +194,6 @@ h2{font-size:1rem;font-weight:600;letter-spacing:.02em;margin:2.25rem 0 .5rem}
   color:var(--recite)}
 .card .events{list-style:none;margin:.65rem 0 0;padding:.55rem 0 0;
   width:100%;border-top:1px solid var(--hair)}
-.card.is-fast .events{border-top-color:var(--fast-line)}
 .card .events li{font-size:.82rem;color:var(--ink-soft);margin-top:.3rem}
 .card .events li:first-child{margin-top:0}
 
@@ -560,6 +581,12 @@ body.no-recite .recite-only{display:none}
       d.getFullYear();
   }
 
+  /* A pole star: four rays, long and drawn in, rather than a fat pentagram */
+  var STAR =
+    '<svg class="star" viewBox="0 0 100 100" aria-hidden="true">' +
+    '<path d="M50 0 Q56.5 43.5 100 50 Q56.5 56.5 50 100 ' +
+    'Q43.5 56.5 0 50 Q43.5 43.5 50 0 Z"/></svg>';
+
   /* the moon, drawn from the lunar day number ----------------------- */
   function moonSvg(day, len, size) {
     var r = size / 2 - 1, f = ((day - 1) % (len || 30)) / (len || 30);
@@ -612,7 +639,7 @@ body.no-recite .recite-only{display:none}
         '" style="animation-delay:' + ((k - start) * 18) + 'ms" title="' +
         label + '"><div class="cap">' + (isToday ? "&#9660;" : "") + "</div>" +
         moonSvg(day.dayNum, day.cycle, 22) +
-        '<div class="tick"></div><div class="dot">&#9733;</div>' +
+        '<div class="tick"></div><div class="dot">' + STAR + "</div>" +
         '<div class="n">' + parse(day.date).getDate() + "</div></div>";
     }
     document.getElementById("band-discs").innerHTML = html;
@@ -633,8 +660,8 @@ body.no-recite .recite-only{display:none}
       "<span>Gregorian dates</span>" +
       '<span><i class="t"></i>today</span>' +
       '<span><i class="f"></i>fast day</span>' +
-      (reciteOn() ? '<span><i class="r">&#9733;</i>precept recitation</span>'
-        : "");
+      (reciteOn() ? '<span><i class="r">' + STAR +
+        "</i>precept recitation</span>" : "");
   }
 
   /* the next seven days, today first --------------------------------- */
@@ -655,6 +682,7 @@ body.no-recite .recite-only{display:none}
         return "<li>" + esc(e) + "</li>";
       }).join("");
       html += '<article class="card' + (d.fast ? " is-fast" : "") +
+        (reciting(d) ? " is-recite" : "") +
         (!outOfRange && n === 0 ? " is-today" : "") + '">' +
         '<div class="rel">' + rel + "</div>" +
         '<div class="greg">' + shortDate(d.date) + "</div>" +

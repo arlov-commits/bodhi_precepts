@@ -98,8 +98,15 @@ to the defaults silently.
 
 Sumi: ink on paper, cinnabar for what matters. Warm paper ground, hairline
 rules, a lot of empty space, and two inks only — black for the substance,
-seal red for the fast days. Dark is the same hand as a rubbing: pale strokes
-on a dark ground, with the red lifted enough to hold against it.
+seal red for the fast days. Dark is evening ink: diluted 墨 is never black but
+a blue-grey, so the ground is slate rather than soot, the strokes are warm
+paper, and the cinnabar drops back to the dustier clay it dries to.
+
+A day card is coloured by what falls on it, so the overlaps read at a glance:
+an ordinary day is bare, a Precept Recitation on its own is a cool ink wash, a
+fast day is a cinnabar one, and a recitation landing on a fast day — the
+heaviest of the three — takes the cinnabar deeper still. Recitation days are
+marked in the moon band with a four-pointed pole star.
 
 The icon beside the gear cycles three themes — auto, light, dark — and the
 choice is kept with the rest. Auto follows the **device clock**, not the
