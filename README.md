@@ -119,7 +119,7 @@ data came off the DRBA printed calendar or the HKO tables.
 The gear opens a Settings view, which decides which days carry the Precept
 Recitation flag. It is reckoned one of four ways:
 
-- **By lunar day** (the default), which then takes the two days themselves,
+- **By lunar day**, which then takes the two days themselves,
   typed in: 1 and 15 by default, the new moon and the full. Any day from 1 to
   30 will do; leaving a box blank gives a single recitation a month, and
   leaving both blank drops the flag. Day 30 means a month of 29 days has none.
@@ -127,8 +127,8 @@ Recitation flag. It is reckoned one of four ways:
   instead of a fixed number — the 29th or the 30th as the month falls, so it
   never skips a short month the way day 30 does. Turning it back off returns
   the box to whatever number it held, or to 15.
-- **Every other Saturday** or **every other Sunday**, for an assembly that
-  gathers at weekends: every fourteenth day either side of a reference date,
+- **Every other Saturday** (the default) or **every other Sunday**, for an
+  assembly that gathers at weekends: every fourteenth day either side of a reference date,
   12 September 2026 by default. The fortnight never skips — anchoring on the
   nearer moon instead would stretch to three weeks whenever the moons drift,
   and keeping the rhythm matters more. The trade is that a fixed fortnight
@@ -146,7 +146,7 @@ where all of it is kept. A new setting goes second from the bottom, above
 *Where this is kept*, which stays the tail of the page.
 
 Settings also carries how many day cards the Today view shows, counting today
-as the first — seven by default, any whole number from 1 to 366.
+as the first — eight by default, any whole number from 1 to 366.
 
 Which day is today is rechecked every minute rather than read once at load, so
 a page left open overnight — the usual state of a phone — moves on at midnight
@@ -156,15 +156,17 @@ chose follows along; one they did choose stays where they put it.
 Whether a leap month carries the long fast is a switch there too, off by
 default; the dataset's one leap month, the leap 5th of 2028, is 29 days.
 
-The week start — any of the seven days, or none — draws a break where each new
-week begins, on both Today and Upcoming, so a run of fast days can be read
+The week start — any of the seven days, or none, Saturday by default — draws a
+break where each new week begins, on both Today and Upcoming, so a run of fast days can be read
 against a working week. Rows are grouped by the week they fall in rather than
 by adjacency, so the break still lands correctly between two filtered rows
 that sit weeks apart.
 
-Upcoming's filters gather rather than replace one another: each chip is its
-own toggle, a day shows if any chosen chip matches it, and with none chosen
-every day shows. **Show dharma events** sits apart from them and is not a
+Upcoming's table opens on every day in the dataset, with the dharma events
+off; the filters above it say what it is, so it carries no heading of its own.
+The filters gather rather than replace one another: each chip is its own
+toggle, a day shows if any chosen chip matches it, and with none chosen every
+day shows. **Show dharma events** sits apart from them and is not a
 filter at all — it decides whether the events are drawn, and they arrive not as
 a column but as a second line under the day, wearing that day's colour and
 hatch so the two read as one block.
@@ -173,6 +175,12 @@ These settings, the theme, and Upcoming's filters and start date are kept in
 `localStorage` under `bodhi.settings`. Nothing is sent anywhere, and storage
 failures (private mode, or a browser that blocks it over `file://`) fall back
 to the defaults silently.
+
+What a reader who has set nothing gets: weeks beginning on Saturday, eight day
+cards, Precept Recitation on every other Saturday, leap months carrying no
+long fast, and Upcoming showing every day with the events hidden. The footer
+says the recitation is theirs to set, since it is the one flag whose days are
+a choice rather than a rule.
 
 ## The look
 

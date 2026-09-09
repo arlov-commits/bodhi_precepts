@@ -427,7 +427,7 @@ body.no-recite .recite-only{display:none}
       </div>
     </div>
 
-    <h2 id="cards-heading">The next seven days</h2>
+    <h2 id="cards-heading">The next eight days</h2>
     <div class="cards" id="cards"></div>
   </main>
 
@@ -435,15 +435,14 @@ body.no-recite .recite-only{display:none}
   <main id="view-record" class="hidden">
     <div class="upcoming" id="upcoming"></div>
 
-    <h2>Every day in the dataset</h2>
     <div class="filters">
-      <button class="chip" type="button" data-filter="all" aria-pressed="false">All days</button>
-      <button class="chip" type="button" data-filter="fast" aria-pressed="true">Fast days</button>
+      <button class="chip" type="button" data-filter="all" aria-pressed="true">All days</button>
+      <button class="chip" type="button" data-filter="fast" aria-pressed="false">Fast days</button>
       <button class="chip" type="button" data-filter="moon" aria-pressed="false">New and full moons</button>
       <button class="chip recite-only" type="button" data-filter="recite" aria-pressed="false">Precept Recitation</button>
       <button class="chip" type="button" data-filter="long" aria-pressed="false">Long fasting months</button>
       <span class="filter-sep" aria-hidden="true"></span>
-      <button class="chip" type="button" id="opt-events" aria-pressed="true">Show dharma events</button>
+      <button class="chip" type="button" id="opt-events" aria-pressed="false">Show dharma events</button>
       <label class="jump">Start at
         <input type="date" id="from-date">
       </label>
@@ -599,6 +598,10 @@ body.no-recite .recite-only{display:none}
     <p>Lunar dates come from the Hong Kong Observatory conversion tables.
       Dharma events and everything up to 31 January 2027 come from the DRBA
       printed calendar for 2026.</p>
+    <p>Precept Recitation (<span class="han">布薩</span>) begins here as every
+      other Saturday. Which days carry it — two lunar days a month, a
+      fortnight of Saturdays or of Sundays, or none at all — is a setting,
+      under the gear.</p>
     <p>The six fast days are the 8th, 14th, 15th, 23rd and the last two days
       of each lunar month, following <span class="han">佛說四天王經</span>
       (Fo shuo si tianwang jing, Taisho T15n0590). The long fasting months
@@ -652,10 +655,10 @@ body.no-recite .recite-only{display:none}
   var CARDS_MIN = 1, CARDS_MAX = 366;
   var WEEK_STARTS = ["none", "0", "1", "2", "3", "4", "5", "6"];
   var RECITE_MODES = ["lunar", "sat", "sun", "none"];
-  var DEFAULTS = { reciteMode: "lunar", reciteDayA: 1, reciteDayB: 15,
+  var DEFAULTS = { reciteMode: "sat", reciteDayA: 1, reciteDayB: 15,
                    reciteAnchor: "2026-09-12", leapLongFast: false,
-                   filters: ["fast"], showEvents: true, theme: "auto",
-                   cardCount: 7, weekStart: "0" };
+                   filters: [], showEvents: false, theme: "auto",
+                   cardCount: 8, weekStart: "6" };
   var settings = {
     reciteMode: DEFAULTS.reciteMode,
     reciteDayA: DEFAULTS.reciteDayA,
