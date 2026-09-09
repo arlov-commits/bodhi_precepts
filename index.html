@@ -497,6 +497,21 @@ body.no-recite .recite-only{display:none}
     </div>
 
     <div class="setting">
+      <h3>Leap months</h3>
+      <p>A leap month repeats a month of the year. Whether the repeat carries
+        the long fast with it is a reading rather than a rule, and the DRBA
+        2023 calendar points the other way — its leap 2nd month got no repeat
+        of the monthly memorial and no repeat of Guan Yin's birthday — so it
+        is off here until it can be confirmed at CTTB.</p>
+      <label class="switch">
+        <input type="checkbox" id="opt-leap">
+        <span class="track" aria-hidden="true"></span>
+        <span>Count a leap month as a long fasting month</span>
+      </label>
+      <p class="state" id="opt-leap-state"></p>
+    </div>
+
+    <div class="setting">
       <h3>Week start</h3>
       <p>Draws a break where each new week begins, on both Today and
         Upcoming, so a run of fast days can be read against a working week.</p>
@@ -545,9 +560,6 @@ body.no-recite .recite-only{display:none}
       (Fo shuo si tianwang jing, Taisho T15n0590). The long fasting months
       are the 1st, 5th and 9th. New and full moon follow the calendar
       convention, day 1 and day 15, not the astronomical instant.</p>
-    <p>A leap month is counted as a long fasting month here and flagged
-      wherever it appears. That reading is provisional and still to be
-      confirmed.</p>
   </footer>
 </div>
 
@@ -597,13 +609,15 @@ body.no-recite .recite-only{display:none}
   var WEEK_STARTS = ["none", "0", "1", "2", "3", "4", "5", "6"];
   var RECITE_MODES = ["lunar", "sat", "sun", "none"];
   var DEFAULTS = { reciteMode: "lunar", reciteDayA: 1, reciteDayB: 15,
-                   reciteAnchor: "2026-09-12", filter: "fast", theme: "auto",
-                   cardCount: 7, weekStart: "0" };
+                   reciteAnchor: "2026-09-12", leapLongFast: false,
+                   filter: "fast", theme: "auto", cardCount: 7,
+                   weekStart: "0" };
   var settings = {
     reciteMode: DEFAULTS.reciteMode,
     reciteDayA: DEFAULTS.reciteDayA,
     reciteDayB: DEFAULTS.reciteDayB,
     reciteAnchor: DEFAULTS.reciteAnchor,
+    leapLongFast: DEFAULTS.leapLongFast,
     filter: DEFAULTS.filter,
     theme: DEFAULTS.theme,
     cardCount: DEFAULTS.cardCount,
@@ -637,6 +651,8 @@ body.no-recite .recite-only{display:none}
         settings.reciteDayB = clampDay(saved.reciteDayB);
       if (/^\d{4}-\d{2}-\d{2}$/.test(saved.reciteAnchor))
         settings.reciteAnchor = saved.reciteAnchor;
+      if (typeof saved.leapLongFast === "boolean")
+        settings.leapLongFast = saved.leapLongFast;
       if (FILTERS.indexOf(saved.filter) > -1) settings.filter = saved.filter;
       if (THEMES.indexOf(saved.theme) > -1) settings.theme = saved.theme;
       settings.cardCount = clampCards(saved.cardCount);
@@ -705,6 +721,12 @@ body.no-recite .recite-only{display:none}
     var gap = (parse(d.date) - parse(settings.reciteAnchor)) / 86400000;
     return Math.round(gap) % 14 === 0;
   }
+  /* A leap month repeats a month of the year. Whether the repeat carries the
+     long fast with it is a reading rather than a rule, so it is a setting. */
+  function longFasting(d) {
+    return d.longFast && (settings.leapLongFast || !d.leap);
+  }
+
   function reciteOn() {
     if (settings.reciteMode === "none") return false;
     if (settings.reciteMode !== "lunar") return true;
@@ -915,9 +937,9 @@ body.no-recite .recite-only{display:none}
       }).join("");
       html += '<article class="card' + (d.fast ? " is-fast" : "") +
         (reciting(d) ? " is-recite" : "") +
-        (d.longFast ? " is-long" : "") +
+        (longFasting(d) ? " is-long" : "") +
         (!outOfRange && n === 0 ? " is-today" : "") + '"' +
-        (d.longFast ? ' title="Long fasting month"' : "") + ">" +
+        (longFasting(d) ? ' title="Long fasting month"' : "") + ">" +
         '<div class="rel">' + rel + "</div>" +
         '<div class="greg">' + shortDate(d.date) + "</div>" +
         '<div class="lunar"><span class="lbl">lunar</span>' +
@@ -949,13 +971,21 @@ body.no-recite .recite-only{display:none}
         '<span class="lu">' + lunarCell(d) + "</span></li>";
     }).join("") + "</ul>";
   }
-  var nextLong = null, nextLeap = null;
-  for (var i = cursor; i < days.length; i++) {
-    if (!nextLong && days[i].longFast && days[i].dayNum === 1) nextLong = days[i];
-    if (!nextLeap && days[i].leap && days[i].dayNum === 1) nextLeap = days[i];
-    if (nextLong && nextLeap) break;
+  /* Recomputed on each render: whether a leap month counts as a long fast
+     is a setting, so which month comes next can change under it. */
+  /* From the start of the month today is in, not from today, or a month
+     already under way would be reported as though it were not coming. */
+  function firstWhere(test) {
+    var start = cursor;
+    while (start > 0 && days[start].dayNum !== 1) start--;
+    for (var i = start; i < days.length; i++)
+      if (days[i].dayNum === 1 && test(days[i])) return days[i];
+    return null;
   }
   function renderUpcoming() {
+    var nextLong = firstWhere(longFasting);
+    var nextLeap = firstWhere(function (d) { return d.leap; });
+    var here = days[cursor].date;
     document.getElementById("upcoming").innerHTML =
       "<section><h3>Next eight fast days</h3>" +
       ul(listOf(function (d) { return d.fast; }, 8)) + "</section>" +
@@ -963,12 +993,15 @@ body.no-recite .recite-only{display:none}
         "<section><h3>Next Precept Recitations</h3>" +
         ul(listOf(reciting, 6)) + "</section>" : "") +
       "<section><h3>Long fasting months</h3>" +
-      (nextLong ? "<p>Next begins " + shortDate(nextLong.date) + ", " +
-        nextLong.monthLabel + ".</p>" : "<p>None left in the dataset.</p>") +
-      (nextLeap ? "<p>A leap month begins " + shortDate(nextLeap.date) +
-        " (" + nextLeap.monthLabel + "). It is counted here and flagged; " +
-        "that reading is still to be confirmed.</p>" :
-        "<p>No leap month in the dataset.</p>") +
+      (nextLong ? "<p>" + (nextLong.date <= here ? "Now in the " : "Next is the ") +
+        nextLong.monthLabel + ", from " + shortDate(nextLong.date) + ".</p>"
+        : "<p>None left in the dataset.</p>") +
+      (nextLeap ? "<p>The " + nextLeap.monthLabel +
+        (nextLeap.date <= here ? " runs from " : " begins ") +
+        shortDate(nextLeap.date) + ", " +
+        (settings.leapLongFast ? "counted here as a long fast."
+          : "not counted here as a long fast.") + "</p>" :
+        "<p>No leap month ahead in the dataset.</p>") +
       "</section>";
   }
 
@@ -984,7 +1017,7 @@ body.no-recite .recite-only{display:none}
     if (settings.filter === "fast") return d.fast;
     if (settings.filter === "moon") return !!d.moon;
     if (settings.filter === "recite") return reciting(d);
-    if (settings.filter === "long") return d.longFast;
+    if (settings.filter === "long") return longFasting(d);
     if (settings.filter === "event") return !!d.event;
     return true;
   }
@@ -1008,14 +1041,14 @@ body.no-recite .recite-only{display:none}
       /* The year lives on the week heading. With weeks off there is no
          heading to carry it, so it stays on the row. */
       return lead + "<tr class=" + '"' + (d.fast ? "is-fast " : "") +
-        (d.longFast ? "is-long " : "") +
+        (longFasting(d) ? "is-long " : "") +
         (d.moon ? "is-moon" : "") + '">' +
         '<td class="num">' +
         (week ? dayMonth(d.date) : shortDate(d.date)) + "</td>" +
         '<td class="wd">' + d.weekday + "</td>" +
         '<td class="han">' + lunarCell(d) + "</td>" +
         "<td>" +
-        (d.longFast ? '<span class="longfast">Long Fast</span>' : "") +
+        (longFasting(d) ? '<span class="longfast">Long Fast</span>' : "") +
         (d.fast ? '<span class="yes han">齋</span>' : "") + "</td>" +
         '<td class="recite-only">' +
         (reciting(d) ? '<span class="star-ic" title="Precept Recitation">' +
@@ -1120,6 +1153,7 @@ body.no-recite .recite-only{display:none}
   var lunarOpts = document.getElementById("lunar-opts");
   var fortnightOpts = document.getElementById("fortnight-opts");
   var anchorInput = document.getElementById("opt-anchor");
+  var leapBox = document.getElementById("opt-leap");
   var dayA = document.getElementById("opt-day-a");
   var dayB = document.getElementById("opt-day-b");
   var cardsInput = document.getElementById("opt-cards");
@@ -1150,6 +1184,12 @@ body.no-recite .recite-only{display:none}
     fortnightOpts.classList.toggle("hidden",
       FORTNIGHT.indexOf(settings.reciteMode) < 0);
     anchorInput.value = settings.reciteAnchor;
+    leapBox.checked = settings.leapLongFast;
+    document.getElementById("opt-leap-state").textContent =
+      settings.leapLongFast
+        ? "On. A leap 1st, 5th or 9th month carries the long fast."
+        : "Off. A leap month is still flagged as leap, but carries no long "
+          + "fast.";
     dayA.value = settings.reciteDayA === null ? "" : settings.reciteDayA;
     dayB.value = settings.reciteDayB === null ? "" : settings.reciteDayB;
     cardsInput.value = settings.cardCount;
@@ -1201,6 +1241,11 @@ body.no-recite .recite-only{display:none}
     saveSettings();
     applySettings();
   });
+  leapBox.addEventListener("change", function () {
+    settings.leapLongFast = leapBox.checked;
+    saveSettings();
+    applySettings();
+  });
   weekSel.addEventListener("change", function () {
     settings.weekStart = weekSel.value;
     saveSettings();
@@ -1211,6 +1256,7 @@ body.no-recite .recite-only{display:none}
     settings.reciteDayA = DEFAULTS.reciteDayA;
     settings.reciteDayB = DEFAULTS.reciteDayB;
     settings.reciteAnchor = DEFAULTS.reciteAnchor;
+    settings.leapLongFast = DEFAULTS.leapLongFast;
     settings.filter = DEFAULTS.filter;
     settings.theme = DEFAULTS.theme;
     settings.cardCount = DEFAULTS.cardCount;

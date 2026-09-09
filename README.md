@@ -61,11 +61,12 @@ data came off the DRBA printed calendar or the HKO tables.
   descend on the 8th and 23rd, princes on the 14th and 29th, and the kings
   themselves on the 15th and 30th.
 - **Three long fasting months**: the 1st, 5th and 9th lunar months.
-- **Leap months** are counted as long fasting months and flagged everywhere
-  they appear. This reading is provisional. The DRBA 2023 calendar points the
-  other way — its leap 2nd month got no repeat of the monthly memorial and no
-  repeat of Guan Yin's birthday — so it is worth confirming at CTTB before
-  2028-06-23, when the next one starts.
+- **Leap months** are flagged as leap wherever they appear. Whether the
+  repeat also carries the long fast is a reading rather than a rule, so it is
+  a setting, off by default: the DRBA 2023 calendar points the other way — its
+  leap 2nd month got no repeat of the monthly memorial and no repeat of Guan
+  Yin's birthday — and it is worth confirming at CTTB before 2028-06-23, when
+  the next one starts.
 - **Quarter moons** follow from the same convention: a quarter cycle either
   side of the full moon puts them at lunar 8 and 23, which are already two of
   the six fast days. They show as the disc alone, unnamed and without the
@@ -111,6 +112,9 @@ Recitation flag. It is reckoned one of four ways:
 
 Settings also carries how many day cards the Today view shows, counting today
 as the first — seven by default, any whole number from 1 to 366.
+
+Whether a leap month carries the long fast is a switch there too, off by
+default; the dataset's one leap month, the leap 5th of 2028, is 29 days.
 
 The week start — any of the seven days, or none — draws a break where each new
 week begins, on both Today and Upcoming, so a run of fast days can be read
