@@ -89,7 +89,7 @@ last day of the lunar month (the default), day 30, 29, 28, 1, or none. Turning
 both off drops the flag, its filter and its column from every view. Choosing a
 fixed day 29 or 30 means shorter months simply have none.
 
-These settings, and the record's filter and start date, are kept in
+These settings, the theme, and the record's filter and start date are kept in
 `localStorage` under `bodhi.settings`. Nothing is sent anywhere, and storage
 failures (private mode, or a browser that blocks it over `file://`) fall back
 to the defaults silently.
@@ -98,7 +98,13 @@ to the defaults silently.
 
 Sumi: ink on paper, cinnabar for what matters. Warm paper ground, hairline
 rules, a lot of empty space, and two inks only — black for the substance,
-seal red for the fast days.
+seal red for the fast days. Dark is the same hand as a rubbing: pale strokes
+on a dark ground, with the red lifted enough to hold against it.
+
+The icon beside the gear cycles three themes — auto, light, dark — and the
+choice is kept with the rest. Auto follows the **device clock**, not the
+system setting: light from 6am to 6pm, dark outside it, rechecked while the
+page is left open.
 
 Lunar dates are written month then day throughout — `7月28日`, and `閏5月1日`
 in a leap month. Gregorian dates stay in the Western order, and a span names

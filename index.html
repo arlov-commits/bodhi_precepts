@@ -9,6 +9,10 @@
    black for the substance, seal red for the fast days — on a warm ground,
    hairline rules, and a lot of empty paper. */
 :root{
+  color-scheme:light;
+  --moon-dark:#2E2A24;
+  --moon-edge:#8C867A;
+  --moon-lit:#FBFAF6;
   --paper:#F6F3EC;
   --panel:#FBFAF6;
   --raised:#FFFFFF;
@@ -20,6 +24,7 @@
   --fast:#96231D;
   --fast-dim:#EDD6CE;
   --fast-wash:#F8EDE9;
+  --fast-moon:#F4EFE7;
   --fast-line:#C08A7E;
   --recite:#2E2A24;
   --recite-dim:#EFECE2;
@@ -31,6 +36,35 @@
   --leap-dim:#F7EAE6;
   --sans:"Optima","Avenir Next","Gill Sans MT","Gill Sans","Trebuchet MS",sans-serif;
   --han:"Songti SC","STSong","Noto Serif CJK SC","Noto Serif SC","SimSun",serif;
+}
+/* The same ink at night: a rubbing rather than a page — pale strokes on a
+   dark ground, with the seal red lifted enough to hold against it. */
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --moon-dark:#0C0B09;
+  --moon-edge:#5E5849;
+  --moon-lit:#EDE8DC;
+  --paper:#141310;
+  --panel:#1C1A16;
+  --raised:#242118;
+  --ink:#EDE8DC;
+  --ink-soft:#CBC4B4;
+  --quiet:#948D7E;
+  --line:#36322A;
+  --hair:#2A2721;
+  --fast:#D9564C;
+  --fast-dim:#3A201C;
+  --fast-wash:#241614;
+  --fast-moon:#251C18;
+  --fast-line:#7A3A33;
+  --recite:#EDE8DC;
+  --recite-dim:#26241E;
+  --recite-line:#565140;
+  --moonc:#A9A294;
+  --moonc-dim:#221F19;
+  --moonc-line:#4A463B;
+  --leap:#D9564C;
+  --leap-dim:#2C1A17;
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
@@ -84,6 +118,8 @@ input:focus-visible,.chip:focus-visible{outline:2px solid var(--fast);
 .discs{display:flex;gap:.2rem;align-items:flex-start}
 .disc{flex:1 1 0;min-width:0;text-align:center;padding:.15rem .1rem .25rem}
 .disc svg{display:block;margin:0 auto;width:100%;max-width:1.45rem;height:auto}
+.disc svg .rim{fill:var(--moon-dark);stroke:var(--moon-edge)}
+.disc svg .lit{fill:var(--moon-lit)}
 .disc .cap{height:.6rem;font-size:.55rem;line-height:.6rem;color:transparent}
 .disc .n{font-size:.62rem;color:var(--quiet);margin-top:.25rem;
   font-variant-numeric:tabular-nums}
@@ -163,7 +199,7 @@ tbody tr.is-fast{background:var(--fast-wash)}
 td .aside{font-family:var(--sans);font-size:.8rem;color:var(--quiet);
   margin-left:.4rem}
 tbody tr.is-moon{background:var(--moonc-dim)}
-tbody tr.is-fast.is-moon{background:#F4EFE7}
+tbody tr.is-fast.is-moon{background:var(--fast-moon)}
 td.han{font-family:var(--han);font-size:1.05rem}
 td.num{font-variant-numeric:tabular-nums}
 td .yes{color:var(--fast);font-weight:600}
@@ -246,6 +282,7 @@ body.no-recite .recite-only{display:none}
       <button type="button" id="nav-record">The record</button>
       <button type="button" id="nav-settings" class="gear" title="Settings"
         aria-label="Settings"><span aria-hidden="true">&#9881;</span></button>
+      <button type="button" id="theme-toggle" class="gear"></button>
     </nav>
   </header>
 
@@ -342,9 +379,10 @@ body.no-recite .recite-only{display:none}
 
     <div class="setting">
       <h3>Where this is kept</h3>
-      <p>These settings, and the filters chosen on the record, are saved in
-        this browser only, under the key <code>bodhi.settings</code>. Nothing
-        is sent anywhere. Clearing your browser data resets them.</p>
+      <p>These settings, the theme picked from the masthead, and the filters
+        chosen on the record are saved in this browser only, under the key
+        <code>bodhi.settings</code>. Nothing is sent anywhere. Clearing your
+        browser data resets them.</p>
       <button class="chip" type="button" id="opt-reset">Reset to defaults</button>
     </div>
   </main>
@@ -407,11 +445,14 @@ body.no-recite .recite-only{display:none}
   var SETTINGS_KEY = "bodhi.settings";
   var OTHER_DAYS = ["last", "30", "29", "28", "1", "none"];
   var FILTERS = ["all", "fast", "moon", "recite", "long", "event"];
-  var DEFAULTS = { recite15: true, reciteOther: "last", filter: "fast" };
+  var THEMES = ["auto", "light", "dark"];
+  var DEFAULTS = { recite15: true, reciteOther: "last", filter: "fast",
+                   theme: "auto" };
   var settings = {
     recite15: DEFAULTS.recite15,
     reciteOther: DEFAULTS.reciteOther,
     filter: DEFAULTS.filter,
+    theme: DEFAULTS.theme,
     from: null
   };
   (function () {
@@ -423,6 +464,7 @@ body.no-recite .recite-only{display:none}
       if (OTHER_DAYS.indexOf(saved.reciteOther) > -1)
         settings.reciteOther = saved.reciteOther;
       if (FILTERS.indexOf(saved.filter) > -1) settings.filter = saved.filter;
+      if (THEMES.indexOf(saved.theme) > -1) settings.theme = saved.theme;
       if (typeof saved.from === "string" && index[saved.from] !== undefined)
         settings.from = saved.from;
     } catch (err) { /* private mode, or file:// with storage blocked */ }
@@ -431,6 +473,40 @@ body.no-recite .recite-only{display:none}
     try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); }
     catch (err) { /* nothing to do but keep the session's choice */ }
   }
+  /* Three themes, cycled from the masthead. Auto follows the device clock
+     rather than the system setting: light between 6am and 6pm, dark outside
+     it, rechecked while the page is left open. */
+  var THEME_ICON = { auto: "◐", light: "☀", dark: "☾" };
+  var THEME_LABEL = {
+    auto: "Theme: auto, by the clock",
+    light: "Theme: light",
+    dark: "Theme: dark"
+  };
+  function resolvedTheme() {
+    if (settings.theme !== "auto") return settings.theme;
+    var h = new Date().getHours();
+    return h >= 6 && h < 18 ? "light" : "dark";
+  }
+  var themeBtn = document.getElementById("theme-toggle");
+  function applyTheme() {
+    document.documentElement.setAttribute("data-theme", resolvedTheme());
+    themeBtn.innerHTML = '<span aria-hidden="true">' +
+      THEME_ICON[settings.theme] + "</span>";
+    var label = THEME_LABEL[settings.theme] + " — click to change";
+    themeBtn.title = label;
+    themeBtn.setAttribute("aria-label", label);
+  }
+  themeBtn.addEventListener("click", function () {
+    settings.theme =
+      THEMES[(THEMES.indexOf(settings.theme) + 1) % THEMES.length];
+    saveSettings();
+    applyTheme();
+  });
+  applyTheme();
+  setInterval(function () {
+    if (settings.theme === "auto") applyTheme();
+  }, 60000);
+
   function reciteOn() {
     return settings.recite15 || settings.reciteOther !== "none";
   }
@@ -496,9 +572,8 @@ body.no-recite .recite-only{display:none}
     return '<svg width="' + size + '" height="' + size + '" viewBox="' +
       (-size / 2) + " " + (-size / 2) + " " + size + " " + size +
       '" aria-hidden="true">' +
-      '<circle class="rim" r="' + r + '" fill="#2E2A24" stroke="#8C867A" ' +
-      'stroke-width="0.8"/>' +
-      '<path d="' + path + '" fill="#FBFAF6"/></svg>';
+      '<circle class="rim" r="' + r + '" stroke-width="0.8"/>' +
+      '<path class="lit" d="' + path + '"/></svg>';
   }
 
   /* which day are we on --------------------------------------------- */
@@ -801,10 +876,12 @@ body.no-recite .recite-only{display:none}
     settings.recite15 = DEFAULTS.recite15;
     settings.reciteOther = DEFAULTS.reciteOther;
     settings.filter = DEFAULTS.filter;
+    settings.theme = DEFAULTS.theme;
     settings.from = null;
     from = days[cursor].date;
     fromInput.value = from;
     saveSettings();
+    applyTheme();
     applySettings();
   });
   applySettings();
