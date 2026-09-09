@@ -155,7 +155,12 @@ in a leap month. Gregorian dates stay in the Western order, and a span names
 the year once unless it turns over: *26 Aug to 23 Sep 2026*, but *14 Dec 2026
 to 11 Jan 2027*.
 
-Upcoming centres every heading and cell, and shares its columns out by
+Upcoming's two lists run on one grid rather than a row each, so their four
+columns — Gregorian date, weekday, moon, lunar date — line up down the panel
+instead of each row placing its own. The moon cell is drawn whether or not a
+moon falls there, or the column would come and go.
+
+Its table centres every heading and cell, and shares its columns out by
 proportion rather than letting whichever row holds the longest text decide.
 The lunar date is set as two unbreakable pieces, so a narrow column can only
 ever break at 月, and each number sits in a box of the same width, which puts

@@ -279,15 +279,24 @@ td .rec{color:var(--recite);font-weight:600}
   border:1px solid var(--line);border-top:2px solid var(--ink)}
 .upcoming h3{margin:0 0 .5rem;font-size:.9rem;font-weight:600;
   letter-spacing:.03em}
-.upcoming ul{list-style:none;margin:0;padding:0;font-size:.9rem}
-.upcoming li{padding:.22rem 0;border-bottom:1px solid var(--hair);
-  display:flex;justify-content:space-between;gap:.75rem}
-.upcoming li:last-child{border-bottom:0}
-.upcoming li .han{font-family:var(--han)}
-.upcoming li span:last-child{color:var(--quiet);display:flex;
-  align-items:center;gap:.4rem}
-.upcoming li .wd{font-style:normal;color:var(--quiet);margin-left:.35rem}
-.upcoming li .moon-ic{width:1rem;flex:0 0 auto;vertical-align:0}
+/* One grid for the whole list rather than a row each, so the four columns
+   line up down the panel. No column gap, or the rules would break with it. */
+.upcoming ul{list-style:none;margin:0;padding:0;font-size:.9rem;
+  display:grid;grid-template-columns:auto 1fr 1.5rem auto;
+  align-items:stretch}
+.upcoming li{display:contents}
+/* Every cell full height and its own flex box, so the rule under a row runs
+   unbroken however tall or short the cell's content is. */
+.upcoming li > span{padding:.26rem 0;border-bottom:1px solid var(--hair);
+  display:flex;align-items:center}
+.upcoming li:last-child > span{border-bottom:0}
+.upcoming .when{font-variant-numeric:tabular-nums;white-space:nowrap}
+.upcoming .wd{justify-content:center;color:var(--quiet);padding-left:.5rem;
+  padding-right:.5rem}
+.upcoming .mn{justify-content:center}
+.upcoming .mn .moon-ic{width:1.05rem;vertical-align:0}
+.upcoming .lu{justify-content:flex-end;color:var(--quiet);white-space:nowrap;
+  font-family:var(--han)}
 .upcoming p{margin:.2rem 0 0;font-size:.9rem;color:var(--quiet)}
 .downloads{display:flex;flex-wrap:wrap;gap:.75rem;align-items:center;
   margin:1rem 0 1.5rem;font-size:.9rem}
@@ -700,11 +709,6 @@ body.no-recite .recite-only{display:none}
     return d.dayNum === settings.reciteDayA ||
            d.dayNum === settings.reciteDayB;
   }
-  /* what a recitation day is keyed to, for the upcoming list */
-  function reciteNote(d) {
-    if (FORTNIGHT.indexOf(settings.reciteMode) > -1) return "";
-    return d.lastOfMonth ? " · last" : "";
-  }
   /* the nearest date to `isoDate` falling on weekday `target` */
   function snapWeekday(isoDate, target) {
     var dt = parse(isoDate);
@@ -909,13 +913,17 @@ body.no-recite .recite-only{display:none}
       if (pred(days[i])) out.push(days[i]);
     return out;
   }
-  /* Each entry names its weekday, and carries the moon where one falls on
-     it, which is what the separate list of moons used to be for. */
-  function ul(items, right) {
-    return "<ul>" + items.map(function (d) {
-      return "<li><span>" + shortDate(d.date) +
-        ' <i class="wd">' + d.weekday + "</i></span><span>" +
-        right(d) + (d.moon ? moonIcon(d) : "") + "</span></li>";
+  /* Four columns sharing one grid, so nothing staggers: the Gregorian date,
+     then the weekday and the moon in the space between, then the lunar date.
+     The moon cell is always emitted, empty or not, to hold the column. */
+  function ul(items) {
+    /* the grid and display:contents below strip the list roles, so say them */
+    return '<ul role="list">' + items.map(function (d) {
+      return '<li role="listitem"><span class="when">' + shortDate(d.date) +
+        "</span>" +
+        '<span class="wd">' + d.weekday + "</span>" +
+        '<span class="mn">' + (d.moon ? moonIcon(d) : "") + "</span>" +
+        '<span class="lu">' + lunarCell(d) + "</span></li>";
     }).join("") + "</ul>";
   }
   var nextLong = null, nextLeap = null;
@@ -927,15 +935,10 @@ body.no-recite .recite-only{display:none}
   function renderUpcoming() {
     document.getElementById("upcoming").innerHTML =
       "<section><h3>Next eight fast days</h3>" +
-      ul(listOf(function (d) { return d.fast; }, 8), function (d) {
-        return '<span class="han">' + lunarDate(d) + "</span>";
-      }) + "</section>" +
+      ul(listOf(function (d) { return d.fast; }, 8)) + "</section>" +
       (reciteOn() ?
         "<section><h3>Next Precept Recitations</h3>" +
-        ul(listOf(reciting, 6), function (d) {
-          return '<span class="han">' + lunarDate(d) + "</span>" +
-            reciteNote(d);
-        }) + "</section>" : "") +
+        ul(listOf(reciting, 6)) + "</section>" : "") +
       "<section><h3>Long fasting months</h3>" +
       (nextLong ? "<p>Next begins " + shortDate(nextLong.date) + ", " +
         nextLong.monthLabel + ".</p>" : "<p>None left in the dataset.</p>") +
