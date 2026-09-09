@@ -12,6 +12,8 @@ filesystem.
 | File | What it is |
 | --- | --- |
 | `index.html` | The whole app. Three views: **Today**, **Upcoming**, and **Settings** (the gear). |
+| `icon.svg` | The favicon: a cinnabar seal carrying a crescent and the pole star. |
+| `icon-32.png`, `apple-touch-icon.png` | Rasterised from `icon.svg`, for browsers that will not take an SVG icon and for an iOS home screen. |
 | `data.js` | The dataset as `window.DRBA_DATA`. Loaded by `index.html`; a plain script tag so it works over `file://`. |
 | `data.json` | The same records, indented, for anything that wants to read them programmatically. |
 | `data.csv` | The same records as CSV, UTF-8 **with BOM** so Excel on Windows keeps the diacritics. |
@@ -122,6 +124,11 @@ where all of it is kept. A new setting goes second from the bottom, above
 Settings also carries how many day cards the Today view shows, counting today
 as the first — seven by default, any whole number from 1 to 366.
 
+Which day is today is rechecked every minute rather than read once at load, so
+a page left open overnight — the usual state of a phone — moves on at midnight
+instead of holding yesterday. A start date on Upcoming that the reader never
+chose follows along; one they did choose stays where they put it.
+
 Whether a leap month carries the long fast is a switch there too, off by
 default; the dataset's one leap month, the leap 5th of 2028, is 29 days.
 
@@ -156,7 +163,10 @@ row or card already carries, on both Today and Upcoming. It reads as one
 continuous stretch rather than a run of separate days, and because it sits
 over the colour rather than replacing it, the marks for the single days inside
 it are undisturbed. The hatch is anchored to the table's own origin, so the
-diagonals do not restart at every row edge.
+diagonals do not restart at every row edge. That anchoring is measured from
+the laid-out rows, so it is redone when Upcoming is first shown and again
+after the window changes width — a phone turned on its side — or the rows
+would move out from under it.
 
 A day card is coloured by what falls on it, so the overlaps read at a glance:
 an ordinary day is bare, a Precept Recitation on its own is a cool ink wash, a
@@ -174,6 +184,17 @@ all but identical discs, and this tells them apart without another key: the
 disc under the halo is either wholly lit or wholly dark. On paper the halo is
 a soft grey; on the dark ground a grey halo is lost against an already-bright
 full moon, so there it becomes actual light spilling onto the ground.
+
+The favicon is a cinnabar seal carrying the two marks the app uses: the moon
+of the lunar month and the four-pointed pole star of the Precept Recitation.
+The seal is its own ground, so it needs no light and dark variant — it reads
+the same on either tab strip. `icon.svg` is the source; the two PNGs are
+rasterised from it.
+
+On a phone the browser's own chrome — the address bar, or the status bar in a
+standalone window — is tinted to the paper the page is on, and follows the
+theme as it changes. It is set from the `--paper` token itself rather than
+from a second copy of the colour, so the chrome cannot drift from the page.
 
 The icon beside the gear cycles three themes — auto, light, dark — and the
 choice is kept with the rest. Auto follows the **device clock**, not the

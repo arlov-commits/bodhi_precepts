@@ -4,6 +4,17 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Fast days</title>
+<!-- The browser's own chrome — the address bar on Android, the status bar in
+     a standalone window — is tinted to the paper the page is on. The app's
+     "auto" follows the device clock rather than the system setting, so this
+     cannot be left to a prefers-color-scheme media attribute: applyTheme()
+     rewrites it whenever the resolved theme changes. -->
+<!-- The light ground, for the moment before the script runs; after that
+     applyTheme() takes the value off the --paper token itself. -->
+<meta name="theme-color" id="theme-color" content="#F6F3EC">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="icon" href="icon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <style>
 /* Sumi: ink on paper, with cinnabar for what matters. Two inks only —
    black for the substance, seal red for the fast days — on a warm ground,
@@ -582,7 +593,7 @@ body.no-recite .recite-only{display:none}
 (function () {
   "use strict";
   var DATA = window.DRBA_DATA;
-  if (!DATA) {
+  if (!DATA || !DATA.days || !DATA.days.length) {
     document.getElementById("view-today").innerHTML =
       '<div class="notice">data.js did not load. Keep index.html, data.js, ' +
       'data.csv and data.json in the same folder.</div>';
@@ -647,6 +658,12 @@ body.no-recite .recite-only{display:none}
     if (!isFinite(n)) return null;
     return Math.min(30, Math.max(1, n));
   }
+  /* Shaped like a date and also a real one: "2026-99-99" passes a regex but
+     rolls over into something else entirely, so make it round-trip. */
+  function isDate(v) {
+    return typeof v === "string" && /^\d{4}-\d{2}-\d{2}$/.test(v) &&
+      iso(parse(v)) === v;
+  }
   function clampCards(n) {
     if (typeof n === "string" && !n.trim()) return DEFAULTS.cardCount;
     n = Math.round(Number(n));
@@ -665,8 +682,7 @@ body.no-recite .recite-only{display:none}
       if (saved.reciteDayB === "last") settings.reciteDayB = "last";
       else if (saved.hasOwnProperty("reciteDayB"))
         settings.reciteDayB = clampDay(saved.reciteDayB);
-      if (/^\d{4}-\d{2}-\d{2}$/.test(saved.reciteAnchor))
-        settings.reciteAnchor = saved.reciteAnchor;
+      if (isDate(saved.reciteAnchor)) settings.reciteAnchor = saved.reciteAnchor;
       if (typeof saved.leapLongFast === "boolean")
         settings.leapLongFast = saved.leapLongFast;
       if (Array.isArray(saved.filters))
@@ -702,8 +718,14 @@ body.no-recite .recite-only{display:none}
     return h >= 6 && h < 18 ? "light" : "dark";
   }
   var themeBtn = document.getElementById("theme-toggle");
+  var themeColor = document.getElementById("theme-color");
   function applyTheme() {
-    document.documentElement.setAttribute("data-theme", resolvedTheme());
+    var root = document.documentElement;
+    root.setAttribute("data-theme", resolvedTheme());
+    /* Read the ground back off the token rather than keeping a second copy
+       of it here, so the browser chrome cannot drift from the page. */
+    var paper = getComputedStyle(root).getPropertyValue("--paper").trim();
+    if (themeColor && paper) themeColor.setAttribute("content", paper);
     themeBtn.innerHTML = '<span aria-hidden="true">' +
       THEME_ICON[settings.theme] + "</span>";
     var label = THEME_LABEL[settings.theme] + " — click to change";
@@ -717,9 +739,6 @@ body.no-recite .recite-only{display:none}
     applyTheme();
   });
   applyTheme();
-  setInterval(function () {
-    if (settings.theme === "auto") applyTheme();
-  }, 60000);
 
   /* The date a day's week began, as an ISO string, or null when weeks are
      off. Rows are grouped by it, so a break also appears between two filtered
@@ -868,17 +887,22 @@ body.no-recite .recite-only{display:none}
   }
 
   /* which day are we on --------------------------------------------- */
-  var todayIso = iso(new Date());
-  var cursor = index[todayIso];
-  var outOfRange = cursor === undefined;
-  if (outOfRange) {
-    cursor = todayIso < days[0].date ? 0 : days.length - 1;
-    document.getElementById("range-notice").innerHTML =
-      '<div class="notice">Today is outside the dataset, which runs ' +
-      shortDate(DATA.meta.first) + " to " + shortDate(DATA.meta.last) +
-      ". Showing " + shortDate(days[cursor].date) +
-      ". Regenerate with build_data.py to extend it.</div>";
+  var todayIso, cursor, outOfRange;
+  /* Where the cursor sits, and the notice that goes with it. Rerun rather
+     than read once: the page can be left open across midnight. */
+  function locateToday() {
+    todayIso = iso(new Date());
+    var at = index[todayIso];
+    outOfRange = at === undefined;
+    cursor = outOfRange ? (todayIso < days[0].date ? 0 : days.length - 1) : at;
+    document.getElementById("range-notice").innerHTML = outOfRange
+      ? '<div class="notice">Today is outside the dataset, which runs ' +
+        shortDate(DATA.meta.first) + " to " + shortDate(DATA.meta.last) +
+        ". Showing " + shortDate(days[cursor].date) +
+        ". Regenerate with build_data.py to extend it.</div>"
+      : "";
   }
+  locateToday();
 
   /* the lunation band ------------------------------------------------ */
   /* A rolling window of days centred on today, rather than a lunar month,
@@ -1093,18 +1117,30 @@ body.no-recite .recite-only{display:none}
       rows += '<tr><td colspan="6">Showing the first 500. Move the start ' +
         "date forward, or open data.csv for the rest.</td></tr>";
     }
-    var body = document.getElementById("table-body");
-    body.innerHTML = rows;
-    alignHatch(body);
+    document.getElementById("table-body").innerHTML = rows;
+    alignHatch();
   }
 
   /* The hatch is drawn per row, so anchor each one to the table's own origin
-     or the diagonals would restart at every row edge. */
-  function alignHatch(body) {
+     or the diagonals would restart at every row edge. offsetTop reads 0 while
+     Upcoming is hidden and goes stale when the rows reflow, so this runs
+     again whenever the view is shown and after the window is resized, not
+     only when the table is built. */
+  function alignHatch() {
+    var body = document.getElementById("table-body");
+    if (!body.offsetParent) return;
     Array.prototype.forEach.call(body.querySelectorAll("tr.is-long"),
       function (tr) { tr.style.backgroundPosition = "0 " + -tr.offsetTop + "px"; });
   }
+  /* The rows reflow when the window changes width — a phone turned on its
+     side is the usual way — so re-anchor once the resize has settled. */
+  var hatchTimer = null;
+  window.addEventListener("resize", function () {
+    clearTimeout(hatchTimer);
+    hatchTimer = setTimeout(alignHatch, 120);
+  });
 
+  var eventsBtn = document.getElementById("opt-events");
   function markChips() {
     Array.prototype.forEach.call(
       document.querySelectorAll(".chip[data-filter]"), function (b) {
@@ -1130,7 +1166,6 @@ body.no-recite .recite-only{display:none}
         renderTable();
       });
     });
-  var eventsBtn = document.getElementById("opt-events");
   eventsBtn.addEventListener("click", function () {
     settings.showEvents = !settings.showEvents;
     saveSettings();
@@ -1146,7 +1181,7 @@ body.no-recite .recite-only{display:none}
   });
   document.getElementById("copy-visible").addEventListener("click",
     function (e) {
-      var rec = reciteOn();
+      var btn = e.currentTarget, rec = reciteOn();
       var head = "date\tweekday\tlunar_month\tlunar_day\tday_number\tfast\t" +
         (rec ? "recitation\t" : "") + "moon\tevent\n";
       var body = shown.map(function (d) {
@@ -1157,9 +1192,9 @@ body.no-recite .recite-only{display:none}
       }).join("\n");
       var text = head + body;
       var done = function () {
-        e.target.textContent = "Copied " + shown.length + " rows";
+        btn.textContent = "Copied " + shown.length + " rows";
         setTimeout(function () {
-          e.target.textContent = "Copy what is shown";
+          btn.textContent = "Copy what is shown";
         }, 2200);
       };
       var fallback = function () {
@@ -1170,7 +1205,7 @@ body.no-recite .recite-only{display:none}
         document.body.appendChild(ta);
         ta.select();
         try { document.execCommand("copy"); done(); }
-        catch (err) { e.target.textContent = "Copy blocked — use data.csv"; }
+        catch (err) { btn.textContent = "Copy blocked — use data.csv"; }
         document.body.removeChild(ta);
       };
       if (navigator.clipboard && window.isSecureContext) {
@@ -1188,6 +1223,7 @@ body.no-recite .recite-only{display:none}
         v === which ? "page" : "false");
     });
     window.scrollTo(0, 0);
+    if (which === "record") alignHatch();
   }
   VIEWS.forEach(function (v) {
     document.getElementById("nav-" + v).onclick = function () { show(v); };
@@ -1327,6 +1363,21 @@ body.no-recite .recite-only{display:none}
     applySettings();
   });
   applySettings();
+
+  /* One tick for both things the wall clock can change under a page that is
+     left open: which theme "auto" resolves to, and which day is today. */
+  setInterval(function () {
+    if (settings.theme === "auto") applyTheme();
+    var was = todayIso;
+    locateToday();
+    if (todayIso === was) return;
+    /* A start date the reader never chose follows today along. */
+    if (!settings.from) {
+      from = days[cursor].date;
+      fromInput.value = from;
+    }
+    applySettings();
+  }, 60000);
 
   document.getElementById("foot-meta").textContent =
     DATA.meta.count + " days, " + shortDate(DATA.meta.first) + " to " +

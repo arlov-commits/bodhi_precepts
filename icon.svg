@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- A cinnabar seal carrying the two marks the app uses: the moon of the
+       lunar month, and the four-pointed pole star of the Precept Recitation.
+       The seal is its own ground, so the icon reads the same on a light tab
+       strip and a dark one, and needs no light/dark variant. The crescent is
+       a paper disc with a cinnabar one bitten out of it.
+       icon-32.png and apple-touch-icon.png are rasterised from this file. -->
+  <rect width="64" height="64" rx="14" fill="#96231D"/>
+  <circle cx="30" cy="34" r="20.5" fill="#F8F4EC"/>
+  <circle cx="44.5" cy="27" r="19.5" fill="#96231D"/>
+  <path fill="#F8F4EC" d="M46.5,10.5Q47.9,16.1 53.5,17.5Q47.9,18.9 46.5,24.5Q45.1,18.9
+    39.5,17.5Q45.1,16.1 46.5,10.5z"/>
+</svg>
