@@ -1,12 +1,575 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Bodhi Precepts</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fast days</title>
+<style>
+:root{
+  --paper:#DEE2E1;
+  --panel:#F2F4F2;
+  --night:#1F2A2E;
+  --ink:#1E2622;
+  --quiet:#6E756F;
+  --line:#C2C8C4;
+  --ochre:#9C6412;
+  --ochre-soft:#EBDCC2;
+  --lapis:#2E4A72;
+  --lapis-soft:#D7DFEA;
+  --moon:#E9E5DA;
+  --sans:"Optima","Avenir Next","Gill Sans MT","Gill Sans","Trebuchet MS",sans-serif;
+  --han:"Songti SC","STSong","Noto Serif CJK SC","Noto Serif SC","SimSun",serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+  font-size:16px;line-height:1.5;
+}
+.wrap{max-width:56rem;margin:0 auto;padding:1.5rem 1.25rem 4rem}
+
+/* ---------------------------------------------------------- masthead */
+.masthead{display:flex;flex-wrap:wrap;gap:1rem;align-items:baseline;
+  justify-content:space-between;padding-bottom:.75rem;
+  border-bottom:1px solid var(--ink)}
+.brand{display:flex;align-items:baseline;gap:.6rem}
+.brand .han{font-family:var(--han);font-size:1.5rem;letter-spacing:.12em}
+.brand h1{font-size:1.3rem;font-weight:600;margin:0;letter-spacing:.01em}
+nav{display:flex;gap:.25rem}
+nav button{
+  font:inherit;font-size:.95rem;color:var(--quiet);background:none;
+  border:1px solid transparent;padding:.3rem .7rem;cursor:pointer;
+  border-radius:0;
+}
+nav button[aria-current="page"]{color:var(--ink);border-color:var(--ink);
+  background:var(--panel)}
+nav button:hover{color:var(--ink)}
+nav button:focus-visible,a:focus-visible,select:focus-visible,
+input:focus-visible,.chip:focus-visible{outline:2px solid var(--lapis);
+  outline-offset:2px}
+
+/* ------------------------------------------------------------- today */
+.today{padding:2rem 0 1.25rem;display:grid;
+  grid-template-columns:auto 1fr;gap:1.75rem;align-items:center}
+.glyph{font-family:var(--han);font-size:5.5rem;line-height:.9;
+  letter-spacing:.02em}
+.today .when{font-size:.95rem;color:var(--quiet);letter-spacing:.06em}
+.today .lunar{font-size:1.15rem;margin:.35rem 0 .8rem}
+.today .lunar .han{font-family:var(--han);font-size:1.35rem}
+.verdict{font-size:1.35rem;line-height:1.35;max-width:34ch}
+.verdict b{font-weight:600}
+.verdict.is-fast b{color:var(--ochre)}
+.marks{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.9rem}
+.mark{font-size:.8rem;letter-spacing:.08em;padding:.2rem .55rem;
+  border:1px solid var(--line);background:var(--panel)}
+.mark.fast{border-color:var(--ochre);background:var(--ochre-soft);
+  color:#5F3D07}
+.mark.moon{border-color:var(--lapis);background:var(--lapis-soft);
+  color:#22355A}
+.mark.leap{border-color:#9A5B3D;background:#F0DED4;color:#6E3A22}
+
+/* ------------------------------------------------------ lunation band */
+.band{background:var(--night);color:var(--moon);padding:1.1rem 1.1rem .9rem;
+  overflow-x:auto}
+.band .head{display:flex;justify-content:space-between;align-items:baseline;
+  gap:1rem;font-size:.85rem;letter-spacing:.06em;color:#9FB0B3;
+  margin-bottom:.7rem}
+.band .head .han{font-family:var(--han);color:var(--moon);font-size:1.05rem}
+.discs{display:flex;gap:.34rem;min-width:max-content}
+.disc{width:1.55rem;text-align:center;background:none;border:0;padding:0;
+  cursor:pointer;color:inherit;font:inherit}
+.disc svg{display:block;margin:0 auto}
+.disc .n{font-size:.62rem;color:#8C9C9F;margin-top:.25rem;
+  font-variant-numeric:tabular-nums}
+.disc.is-fast .n{color:var(--moon)}
+.disc .tick{height:3px;margin-top:.2rem;background:transparent}
+.disc.is-fast .tick{background:#C68A2E}
+.disc.is-today .n{color:#fff;font-weight:700}
+.disc.is-today svg circle.rim{stroke:#fff;stroke-width:1.4}
+@media (prefers-reduced-motion:no-preference){
+  .discs.animate .disc{animation:rise .5s both}
+}
+@keyframes rise{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+
+/* -------------------------------------------------------- day stream */
+h2{font-size:1rem;font-weight:600;letter-spacing:.02em;margin:2.25rem 0 .5rem}
+.stream{border-top:1px solid var(--line)}
+.day{display:grid;grid-template-columns:7.5rem 1fr auto;gap:1rem;
+  align-items:baseline;padding:.7rem .6rem;border-bottom:1px solid var(--line);
+  border-left:3px solid transparent}
+.day.is-fast{background:var(--ochre-soft);border-left-color:var(--ochre)}
+.day.is-moon{background:var(--lapis-soft);border-left-color:var(--lapis)}
+.day.is-fast.is-moon{background:linear-gradient(100deg,var(--ochre-soft) 55%,var(--lapis-soft) 55%)}
+.day .date{font-variant-numeric:tabular-nums}
+.day .date span{color:var(--quiet)}
+.day .lunar .han{font-family:var(--han);font-size:1.1rem}
+.day .lunar small{color:var(--quiet);margin-left:.4rem}
+.day .flags{text-align:right;font-size:.85rem;letter-spacing:.05em}
+.day .flags .f{color:var(--ochre)}
+.day .flags .m{color:var(--lapis)}
+.day .event{grid-column:2/-1;font-size:.85rem;color:var(--quiet);
+  margin-top:.15rem}
+
+/* ------------------------------------------------------------ record */
+.filters{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;
+  margin:.75rem 0 1rem}
+.chip{font:inherit;font-size:.85rem;letter-spacing:.04em;padding:.3rem .7rem;
+  border:1px solid var(--line);background:var(--panel);color:var(--quiet);
+  cursor:pointer}
+.chip[aria-pressed="true"]{border-color:var(--ink);color:var(--ink);
+  background:#fff}
+label.jump{font-size:.85rem;color:var(--quiet);margin-left:auto}
+input[type=date],select{font:inherit;font-size:.85rem;padding:.25rem .4rem;
+  border:1px solid var(--line);background:#fff;color:var(--ink)}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+caption{text-align:left;color:var(--quiet);font-size:.85rem;
+  padding-bottom:.5rem}
+th,td{text-align:left;padding:.42rem .5rem;border-bottom:1px solid var(--line);
+  vertical-align:top}
+thead th{position:sticky;top:0;background:var(--paper);
+  border-bottom:1px solid var(--ink);font-weight:600;font-size:.8rem;
+  letter-spacing:.05em}
+tbody tr.is-fast{background:var(--ochre-soft)}
+tbody tr.is-moon{background:var(--lapis-soft)}
+tbody tr.is-fast.is-moon{background:#E6E0DC}
+td.han{font-family:var(--han);font-size:1.05rem}
+td.num{font-variant-numeric:tabular-nums}
+.upcoming{display:grid;gap:1.25rem;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));
+  margin-bottom:1.5rem}
+.upcoming section{background:var(--panel);padding:.9rem 1rem;
+  border-top:2px solid var(--ink)}
+.upcoming h3{margin:0 0 .5rem;font-size:.9rem;font-weight:600;
+  letter-spacing:.03em}
+.upcoming ul{list-style:none;margin:0;padding:0;font-size:.9rem}
+.upcoming li{padding:.22rem 0;border-bottom:1px solid var(--line);
+  display:flex;justify-content:space-between;gap:.75rem}
+.upcoming li:last-child{border-bottom:0}
+.upcoming li .han{font-family:var(--han)}
+.upcoming p{margin:.2rem 0 0;font-size:.9rem;color:var(--quiet)}
+.downloads{display:flex;flex-wrap:wrap;gap:.75rem;align-items:center;
+  margin:1rem 0 1.5rem;font-size:.9rem}
+.downloads a{color:var(--lapis);text-decoration:underline;
+  text-underline-offset:2px}
+footer{margin-top:3rem;padding-top:1rem;border-top:1px solid var(--line);
+  font-size:.82rem;color:var(--quiet);max-width:60ch}
+footer p{margin:.4rem 0}
+footer .han{font-family:var(--han)}
+.hidden{display:none}
+.notice{background:#F0DED4;border-left:3px solid #9A5B3D;padding:.7rem .9rem;
+  font-size:.9rem;margin:1rem 0}
+@media (max-width:640px){
+  .today{grid-template-columns:1fr;gap:.75rem;padding-top:1.25rem}
+  .glyph{font-size:4.25rem}
+  .day{grid-template-columns:1fr auto;gap:.4rem}
+  .day .lunar{grid-column:1}
+  .day .date{grid-column:1;font-size:.9rem}
+  .day .flags{grid-column:2;grid-row:1/3}
+  th.opt,td.opt{display:none}
+}
+</style>
 </head>
 <body>
-  <h1>Bodhi Precepts</h1>
-  <p>Placeholder page. Content coming soon.</p>
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="brand">
+      <span class="han" aria-hidden="true">六齋日</span>
+      <h1>Fast days</h1>
+    </div>
+    <nav>
+      <button type="button" id="nav-today" aria-current="page">Today</button>
+      <button type="button" id="nav-record">The record</button>
+    </nav>
+  </header>
+
+  <!-- ======================================================= today -->
+  <main id="view-today">
+    <div id="range-notice"></div>
+
+    <div class="today">
+      <div class="glyph" id="t-glyph" aria-hidden="true"></div>
+      <div>
+        <div class="when" id="t-when"></div>
+        <div class="lunar" id="t-lunar"></div>
+        <p class="verdict" id="t-verdict"></p>
+        <div class="marks" id="t-marks"></div>
+      </div>
+    </div>
+
+    <div class="band">
+      <div class="head">
+        <span id="band-month"></span>
+        <span id="band-note"></span>
+      </div>
+      <div class="discs animate" id="band-discs"></div>
+    </div>
+
+    <h2>The next six days</h2>
+    <div class="stream" id="stream"></div>
+  </main>
+
+  <!-- ====================================================== record -->
+  <main id="view-record" class="hidden">
+    <div class="upcoming" id="upcoming"></div>
+
+    <h2>Every day in the dataset</h2>
+    <div class="filters">
+      <button class="chip" type="button" data-filter="all" aria-pressed="false">All days</button>
+      <button class="chip" type="button" data-filter="fast" aria-pressed="true">Fast days</button>
+      <button class="chip" type="button" data-filter="moon" aria-pressed="false">New and full moons</button>
+      <button class="chip" type="button" data-filter="long" aria-pressed="false">Long fasting months</button>
+      <button class="chip" type="button" data-filter="event" aria-pressed="false">Dharma events</button>
+      <label class="jump">Start at
+        <input type="date" id="from-date">
+      </label>
+    </div>
+
+    <table>
+      <caption id="table-caption"></caption>
+      <thead>
+        <tr>
+          <th scope="col">Date</th>
+          <th scope="col">Lunar month</th>
+          <th scope="col">Lunar day</th>
+          <th scope="col">Fast</th>
+          <th scope="col">Moon</th>
+          <th scope="col" class="opt">Notes</th>
+        </tr>
+      </thead>
+      <tbody id="table-body"></tbody>
+    </table>
+
+    <div class="downloads">
+      <span>Take the data:</span>
+      <a href="data.csv" download>data.csv</a>
+      <a href="data.json" download>data.json</a>
+      <button class="chip" type="button" id="copy-visible">Copy what is shown</button>
+    </div>
+  </main>
+
+  <footer>
+    <p id="foot-meta"></p>
+    <p>Lunar dates come from the Hong Kong Observatory conversion tables.
+      Dharma events and everything up to 31 January 2027 come from the DRBA
+      printed calendar for 2026.</p>
+    <p>The six fast days are the 8th, 14th, 15th, 23rd and the last two days
+      of each lunar month, following <span class="han">佛說四天王經</span>
+      (Fo shuo si tianwang jing, Taisho T15n0590). The long fasting months
+      are the 1st, 5th and 9th. New and full moon follow the calendar
+      convention, day 1 and day 15, not the astronomical instant.</p>
+    <p>A leap month is counted as a long fasting month here and flagged
+      wherever it appears. That reading is provisional and still to be
+      confirmed.</p>
+  </footer>
+</div>
+
+<script src="data.js"></script>
+<script>
+(function () {
+  "use strict";
+  var DATA = window.DRBA_DATA;
+  if (!DATA) {
+    document.getElementById("view-today").innerHTML =
+      '<div class="notice">data.js did not load. Keep index.html, data.js, ' +
+      'data.csv and data.json in the same folder.</div>';
+    return;
+  }
+  var days = DATA.days;
+  var index = {};
+  days.forEach(function (d, i) { index[d.date] = i; });
+
+  var MONTHS = ["January","February","March","April","May","June","July",
+                "August","September","October","November","December"];
+  var WEEK = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday",
+              "Saturday"];
+
+  function iso(d) {
+    return d.getFullYear() + "-" +
+      String(d.getMonth() + 1).padStart(2, "0") + "-" +
+      String(d.getDate()).padStart(2, "0");
+  }
+  function parse(s) {
+    var p = s.split("-");
+    return new Date(+p[0], +p[1] - 1, +p[2]);
+  }
+  function longDate(s) {
+    var d = parse(s);
+    return WEEK[d.getDay()] + " " + d.getDate() + " " +
+      MONTHS[d.getMonth()] + " " + d.getFullYear();
+  }
+  function shortDate(s) {
+    var d = parse(s);
+    return d.getDate() + " " + MONTHS[d.getMonth()].slice(0, 3) + " " +
+      d.getFullYear();
+  }
+
+  /* the moon, drawn from the lunar day number ----------------------- */
+  function moonSvg(day, len, size) {
+    var r = size / 2 - 1, f = ((day - 1) % (len || 30)) / (len || 30);
+    var k = Math.cos(2 * Math.PI * f), rx = Math.abs(k) * r;
+    var outer = f < 0.5 ? 1 : 0;
+    var inner = k > 0 ? (f < 0.5 ? 0 : 1) : (f < 0.5 ? 1 : 0);
+    var path = "M0," + (-r) + " A" + r + "," + r + " 0 0," + outer +
+               " 0," + r + " A" + rx + "," + r + " 0 0," + inner +
+               " 0," + (-r);
+    return '<svg width="' + size + '" height="' + size + '" viewBox="' +
+      (-size / 2) + " " + (-size / 2) + " " + size + " " + size +
+      '" aria-hidden="true">' +
+      '<circle class="rim" r="' + r + '" fill="#0F1619" stroke="#3C4A4E" ' +
+      'stroke-width="0.8"/>' +
+      '<path d="' + path + '" fill="#E9E5DA"/></svg>';
+  }
+
+  /* which day are we on --------------------------------------------- */
+  var todayIso = iso(new Date());
+  var cursor = index[todayIso];
+  var outOfRange = cursor === undefined;
+  if (outOfRange) {
+    cursor = todayIso < days[0].date ? 0 : days.length - 1;
+    document.getElementById("range-notice").innerHTML =
+      '<div class="notice">Today is outside the dataset, which runs ' +
+      shortDate(DATA.meta.first) + " to " + shortDate(DATA.meta.last) +
+      ". Showing " + shortDate(days[cursor].date) +
+      ". Regenerate with build_data.py to extend it.</div>";
+  }
+
+  /* today panel ------------------------------------------------------ */
+  var t = days[cursor];
+  document.getElementById("t-glyph").textContent = t.dayCn;
+  document.getElementById("t-when").textContent = longDate(t.date);
+  document.getElementById("t-lunar").innerHTML =
+    '<span class="han">' + t.monthCn + "</span> " + t.monthLabel +
+    ' &nbsp;·&nbsp; <span class="han">' + t.dayCn + "</span> day " + t.dayNum;
+
+  function nextFastAfter(i) {
+    for (var j = i + 1; j < days.length; j++) if (days[j].fast) return j;
+    return -1;
+  }
+  var verdict = document.getElementById("t-verdict");
+  if (t.fast) {
+    verdict.className = "verdict is-fast";
+    verdict.innerHTML = "Today is <b>a fast day</b>.";
+  } else {
+    var nf = nextFastAfter(cursor);
+    var gap = nf < 0 ? null : (parse(days[nf].date) - parse(t.date)) / 86400000;
+    verdict.className = "verdict";
+    verdict.innerHTML = "Not a fast day. " + (nf < 0 ? "" :
+      "The next is " + (gap === 1 ? "tomorrow" :
+        "in " + gap + " days, " + shortDate(days[nf].date)) + ".");
+  }
+  var marks = document.getElementById("t-marks");
+  var m = [];
+  if (t.moon) m.push('<span class="mark moon">' +
+    (t.moon === "new" ? "New moon" : "Full moon") + "</span>");
+  if (t.longFast) m.push('<span class="mark fast">Long fasting month</span>');
+  if (t.leap) m.push('<span class="mark leap">Leap month — flagged</span>');
+  if (t.event) m.push('<span class="mark">' + t.event + "</span>");
+  marks.innerHTML = m.join("");
+
+  /* the lunation band ------------------------------------------------ */
+  function drawBand(i) {
+    var d = days[i], start = i;
+    while (start > 0 && days[start].dayNum !== 1) start--;
+    var len = days[start].monthLength ||
+      (days[start].dayNum === 1 ? 30 : null);
+    var discs = [], html = "";
+    for (var j = start; j < days.length && (j === start ||
+         days[j].dayNum !== 1); j++) discs.push(j);
+    discs.forEach(function (k, n) {
+      var day = days[k];
+      html += '<button type="button" class="disc' +
+        (day.fast ? " is-fast" : "") +
+        (day.date === d.date ? " is-today" : "") +
+        '" data-i="' + k + '" style="animation-delay:' + (n * 18) + 'ms" ' +
+        'title="' + shortDate(day.date) + " — " + day.dayCn + " day " +
+        day.dayNum + (day.fast ? ", fast day" : "") + '">' +
+        moonSvg(day.dayNum, discs.length, 22) +
+        '<div class="tick"></div><div class="n">' + day.dayNum + "</div>" +
+        "</button>";
+    });
+    document.getElementById("band-discs").innerHTML = html;
+    document.getElementById("band-month").innerHTML =
+      '<span class="han">' + d.monthCn + "</span> " + d.monthLabel +
+      ", " + discs.length + " days" + (d.leap ? " · leap" : "");
+    document.getElementById("band-note").textContent =
+      discs.filter(function (k) { return days[k].fast; }).length +
+      " fast days this month";
+  }
+  drawBand(cursor);
+
+  /* the next six days ------------------------------------------------ */
+  var stream = "";
+  for (var s = cursor + 1; s <= cursor + 6 && s < days.length; s++) {
+    var d = days[s];
+    stream += '<div class="day' + (d.fast ? " is-fast" : "") +
+      (d.moon ? " is-moon" : "") + '">' +
+      '<div class="date">' + WEEK[parse(d.date).getDay()].slice(0, 3) +
+      " <span>" + shortDate(d.date) + "</span></div>" +
+      '<div class="lunar"><span class="han">' + d.dayCn + "</span>" +
+      "<small>day " + d.dayNum + " of " + d.monthLabel + "</small></div>" +
+      '<div class="flags">' +
+      (d.fast ? '<span class="f">fast day</span>' : "") +
+      (d.fast && d.moon ? " · " : "") +
+      (d.moon ? '<span class="m">' + d.moon + " moon</span>" : "") +
+      "</div>" +
+      (d.event ? '<div class="event">' + d.event + "</div>" : "") +
+      "</div>";
+  }
+  document.getElementById("stream").innerHTML = stream;
+
+  /* upcoming lists --------------------------------------------------- */
+  function listOf(pred, n) {
+    var out = [];
+    for (var i = cursor; i < days.length && out.length < n; i++)
+      if (pred(days[i])) out.push(days[i]);
+    return out;
+  }
+  function ul(items, right) {
+    return "<ul>" + items.map(function (d) {
+      return "<li><span>" + shortDate(d.date) + "</span><span>" +
+        right(d) + "</span></li>";
+    }).join("") + "</ul>";
+  }
+  var nextLong = null, nextLeap = null;
+  for (var i = cursor; i < days.length; i++) {
+    if (!nextLong && days[i].longFast && days[i].dayNum === 1) nextLong = days[i];
+    if (!nextLeap && days[i].leap && days[i].dayNum === 1) nextLeap = days[i];
+    if (nextLong && nextLeap) break;
+  }
+  document.getElementById("upcoming").innerHTML =
+    "<section><h3>Next eight fast days</h3>" +
+    ul(listOf(function (d) { return d.fast; }, 8), function (d) {
+      return '<span class="han">' + d.dayCn + "</span> day " + d.dayNum;
+    }) + "</section>" +
+    "<section><h3>Next moons</h3>" +
+    ul(listOf(function (d) { return d.moon; }, 6), function (d) {
+      return d.moon + " moon";
+    }) + "</section>" +
+    "<section><h3>Long fasting months</h3>" +
+    (nextLong ? "<p>Next begins " + shortDate(nextLong.date) + ", " +
+      nextLong.monthLabel + ".</p>" : "<p>None left in the dataset.</p>") +
+    (nextLeap ? "<p>A leap month begins " + shortDate(nextLeap.date) +
+      " (" + nextLeap.monthLabel + "). It is counted here and flagged; " +
+      "that reading is still to be confirmed.</p>" :
+      "<p>No leap month in the dataset.</p>") +
+    "</section>";
+
+  /* the table -------------------------------------------------------- */
+  var filter = "fast", from = days[cursor].date;
+  var fromInput = document.getElementById("from-date");
+  fromInput.value = from;
+  fromInput.min = days[0].date;
+  fromInput.max = days[days.length - 1].date;
+
+  function passes(d) {
+    if (d.date < from) return false;
+    if (filter === "fast") return d.fast;
+    if (filter === "moon") return !!d.moon;
+    if (filter === "long") return d.longFast;
+    if (filter === "event") return !!d.event;
+    return true;
+  }
+  var shown = [];
+  function renderTable() {
+    shown = days.filter(passes);
+    var cap = shown.length + " days" +
+      (filter === "all" ? "" : " matching this filter") +
+      ", from " + shortDate(from) + " to " +
+      shortDate(days[days.length - 1].date) + ".";
+    document.getElementById("table-caption").textContent = cap;
+    var rows = shown.slice(0, 500).map(function (d) {
+      return "<tr class=" + '"' + (d.fast ? "is-fast " : "") +
+        (d.moon ? "is-moon" : "") + '">' +
+        '<td class="num">' + shortDate(d.date) + " <span style=color:var(--quiet)>" +
+        d.weekday + "</span></td>" +
+        '<td class="han">' + d.monthCn + ' <span style="font-family:var(--sans);font-size:.85rem;color:var(--quiet)">' +
+        d.monthLabel + (d.longFast ? " · long fast" : "") + "</span></td>" +
+        '<td class="han">' + d.dayCn + ' <span style="font-family:var(--sans);font-size:.85rem;color:var(--quiet)">' +
+        d.dayNum + "</span></td>" +
+        "<td>" + (d.fast ? "yes" : "") + "</td>" +
+        "<td>" + (d.moon || "") + "</td>" +
+        '<td class="opt">' + (d.event || "") +
+        (d.leap ? (d.event ? " · " : "") + "leap month" : "") + "</td>" +
+        "</tr>";
+    }).join("");
+    if (shown.length > 500) {
+      rows += '<tr><td colspan="6">Showing the first 500. Move the start ' +
+        "date forward, or open data.csv for the rest.</td></tr>";
+    }
+    document.getElementById("table-body").innerHTML = rows;
+  }
+  renderTable();
+
+  Array.prototype.forEach.call(document.querySelectorAll(".chip[data-filter]"),
+    function (btn) {
+      btn.addEventListener("click", function () {
+        filter = btn.dataset.filter;
+        Array.prototype.forEach.call(
+          document.querySelectorAll(".chip[data-filter]"), function (b) {
+            b.setAttribute("aria-pressed", b === btn ? "true" : "false");
+          });
+        renderTable();
+      });
+    });
+  fromInput.addEventListener("change", function () {
+    if (fromInput.value) { from = fromInput.value; renderTable(); }
+  });
+  document.getElementById("copy-visible").addEventListener("click",
+    function (e) {
+      var head = "date\tweekday\tlunar_month\tlunar_day\tday_number\tfast\tmoon\tevent\n";
+      var body = shown.map(function (d) {
+        return [d.date, d.weekday, d.monthCn, d.dayCn, d.dayNum,
+                d.fast ? "yes" : "", d.moon, d.event].join("\t");
+      }).join("\n");
+      var text = head + body;
+      var done = function () {
+        e.target.textContent = "Copied " + shown.length + " rows";
+        setTimeout(function () {
+          e.target.textContent = "Copy what is shown";
+        }, 2200);
+      };
+      var fallback = function () {
+        var ta = document.createElement("textarea");
+        ta.value = text;
+        ta.style.position = "fixed";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand("copy"); done(); }
+        catch (err) { e.target.textContent = "Copy blocked — use data.csv"; }
+        document.body.removeChild(ta);
+      };
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(done, fallback);
+      } else { fallback(); }
+    });
+
+  /* clicking a disc moves the day panel ------------------------------ */
+  document.getElementById("band-discs").addEventListener("click",
+    function (e) {
+      var b = e.target.closest(".disc");
+      if (b) drawBand(+b.dataset.i);
+    });
+
+  /* views ------------------------------------------------------------ */
+  function show(which) {
+    var isToday = which === "today";
+    document.getElementById("view-today").classList.toggle("hidden", !isToday);
+    document.getElementById("view-record").classList.toggle("hidden", isToday);
+    document.getElementById("nav-today").setAttribute("aria-current",
+      isToday ? "page" : "false");
+    document.getElementById("nav-record").setAttribute("aria-current",
+      isToday ? "false" : "page");
+    window.scrollTo(0, 0);
+  }
+  document.getElementById("nav-today").onclick = function () { show("today"); };
+  document.getElementById("nav-record").onclick = function () { show("record"); };
+
+  document.getElementById("foot-meta").textContent =
+    DATA.meta.count + " days, " + shortDate(DATA.meta.first) + " to " +
+    shortDate(DATA.meta.last) + ". Built from DRBA_Calendar.xlsx on " +
+    shortDate(DATA.meta.generated) + ".";
+})();
+</script>
 </body>
 </html>
