@@ -12,13 +12,36 @@ filesystem.
 | File | What it is |
 | --- | --- |
 | `index.html` | The whole app. Three views: **Today**, **Upcoming**, and **Settings** (the gear). |
+| `manifest.webmanifest` | Makes it installable: the name, the icons and the standalone display. |
+| `sw.js` | The service worker. Keeps a copy of the app so an installed one opens offline. |
 | `icon.svg` | The favicon: a cinnabar seal carrying a crescent and the pole star. |
-| `icon-32.png`, `apple-touch-icon.png` | Rasterised from `icon.svg`, for browsers that will not take an SVG icon and for an iOS home screen. |
+| `icon-32.png`, `apple-touch-icon.png`, `icon-192.png`, `icon-512.png`, `icon-maskable-512.png` | Rasterised from `icon.svg`, for browsers that will not take an SVG icon and for the home screens. |
 | `data.js` | The dataset as `window.DRBA_DATA`. Loaded by `index.html`; a plain script tag so it works over `file://`. |
 | `data.json` | The same records, indented, for anything that wants to read them programmatically. |
 | `data.csv` | The same records as CSV, UTF-8 **with BOM** so Excel on Windows keeps the diacritics. |
 | `build_data.py` | Regenerates all three from `DRBA_Calendar.xlsx`. |
 | `DRBA_Calendar.xlsx` | The source workbook. Still the place to change rules or extend dates. |
+
+## Installing it
+
+It is a progressive web app, so it installs from the browser on all three —
+no store, no download.
+
+- **Android, and Chrome or Edge on a PC**: Settings has an **Install** button
+  when the browser offers one, and the browser's own menu or address bar will
+  offer it too.
+- **iPhone and iPad**: Safari has no install prompt, so use the Share button
+  and **Add to Home Screen**. Settings says so when it sees an iOS browser.
+- **Anything else**: look for Install or Add to Home Screen in the browser's
+  menu.
+
+Once installed it opens in its own window, without the browser around it, and
+works with no connection at all — `sw.js` keeps a copy of the page, the
+dataset and the icons on the device. A new version replaces that copy in the
+background and appears at the next launch.
+
+Opening `index.html` straight off the filesystem still works and always will;
+there is simply no service worker there, and none is wanted.
 
 ## Regenerating
 

@@ -18,7 +18,14 @@ A single-page calendar of the six fast days, built from a DRBA spreadsheet.
   script and re-run it.
 - `README.md` documents the rules, the settings and the look. Keep it in step
   with the code in the same commit.
-- `icon.svg` is the favicon source; the two PNGs are rasterised from it.
+- `icon.svg` is the favicon source; every PNG is rasterised from it by
+  `mkicon` scripts kept in the scratchpad — redraw the SVG and re-render them
+  together, never edit a PNG.
+- It is an installable PWA. `manifest.webmanifest` and `sw.js` are part of the
+  shipped app: a file added to the app must also be added to `SHELL` in
+  `sw.js`, or an installed copy will not have it offline. `CACHE` there only
+  needs bumping to force clients to drop what they hold; ordinary edits land
+  on their own, because each response is refreshed as it is served.
 
 Anything that is a reading rather than a rule (which days carry Precept
 Recitation, whether a leap month carries the long fast) belongs in Settings
@@ -52,6 +59,9 @@ looking right.
   the page gets left open across midnight.
 - **Colours come from the tokens**, not from a second copy. The browser
   `theme-color` reads `--paper` back off the root for this reason.
+- **The service worker must not exist over `file://`.** Registration is
+  guarded on the protocol, and the install panel falls back to telling the
+  reader where their browser hides the command.
 - Contrast is checked in both themes. Note that the row check reports
   transparent backgrounds as black, so a low number there may be an artifact
   of the harness rather than a real failure — measure against the real ground

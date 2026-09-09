@@ -15,6 +15,13 @@
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="icon" href="icon-32.png" sizes="32x32" type="image/png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
+<!-- Installable: kept on a home screen or in a dock, opened without the
+     browser around it, and working with no connection once it is there. -->
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Fast days">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <style>
 /* Sumi: ink on paper, with cinnabar for what matters. Two inks only —
    black for the substance, seal red for the fast days — on a warm ground,
@@ -563,6 +570,16 @@ body.no-recite .recite-only{display:none}
         <span>Count a leap month as a long fasting month</span>
       </label>
       <p class="state" id="opt-leap-state"></p>
+    </div>
+
+    <div class="setting">
+      <h3>Install</h3>
+      <p>Fast days can sit on a home screen or in a dock like any other app
+        and open without the browser around it. Once it is installed the
+        calendar is on the device, so it opens with no connection at all.</p>
+      <button class="chip" type="button" id="opt-install" hidden>
+        Install Fast days</button>
+      <p class="state" id="opt-install-state"></p>
     </div>
 
     <div class="setting">
@@ -1362,6 +1379,70 @@ body.no-recite .recite-only{display:none}
     applyTheme();
     applySettings();
   });
+  /* installing -------------------------------------------------------- */
+  /* Chromium browsers hand over a prompt of their own, which the button
+     below fires. Safari never does, so iOS gets told where the command
+     lives instead, and anything else is pointed at its own menu. */
+  var installBtn = document.getElementById("opt-install");
+  var installState = document.getElementById("opt-install-state");
+  var installPrompt = null, justInstalled = false;
+  /* Running as the installed app rather than in a tab. Installing from a tab
+     leaves that tab a tab, so this stays false there even once it is done —
+     which is what justInstalled is for. */
+  function standalone() {
+    return (window.matchMedia &&
+            window.matchMedia("(display-mode: standalone)").matches) ||
+           navigator.standalone === true;
+  }
+  function iosLike() {
+    var ua = navigator.userAgent || "";
+    /* an iPad on recent iPadOS calls itself a Mac, and gives itself away by
+       reporting a touch screen */
+    return /iPad|iPhone|iPod/.test(ua) ||
+      (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+  }
+  function showInstall() {
+    var done = standalone() || justInstalled;
+    var can = !!installPrompt && !done;
+    installBtn.hidden = !can;
+    installState.textContent =
+      standalone() ? "Installed — this is it."
+      : justInstalled ? "Installed. Open it from the home screen or the dock."
+      : can ? ""
+      : iosLike()
+        ? "On iPhone and iPad: the Share button, then Add to Home Screen."
+        : "Your browser installs from its own menu — look for Install, or " +
+          "Add to Home Screen.";
+  }
+  window.addEventListener("beforeinstallprompt", function (e) {
+    e.preventDefault();
+    installPrompt = e;
+    showInstall();
+  });
+  window.addEventListener("appinstalled", function () {
+    installPrompt = null;
+    justInstalled = true;
+    showInstall();
+  });
+  installBtn.addEventListener("click", function () {
+    if (!installPrompt) return;
+    installPrompt.prompt();
+    installPrompt.userChoice.then(function () {
+      installPrompt = null;
+      showInstall();
+    });
+  });
+  showInstall();
+
+  /* Kept for offline, so an installed copy opens with no connection. There
+     is no service worker over file://, and none is wanted: the page is
+     already on the disk. */
+  if ("serviceWorker" in navigator && location.protocol !== "file:") {
+    window.addEventListener("load", function () {
+      navigator.serviceWorker.register("sw.js")["catch"](function () {});
+    });
+  }
+
   applySettings();
 
   /* One tick for both things the wall clock can change under a page that is
