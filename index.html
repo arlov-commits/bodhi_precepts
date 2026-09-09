@@ -157,7 +157,6 @@ input:focus-visible,.chip:focus-visible{outline:2px solid var(--fast);
 .disc.is-today{background:var(--fast-dim);outline:1px solid var(--ink)}
 .disc.is-today .cap{color:var(--ink);letter-spacing:.04em}
 .disc.is-today .n{color:var(--ink);font-weight:700}
-.disc.is-today svg circle.rim{stroke:var(--ink);stroke-width:1.4}
 @media (prefers-reduced-motion:no-preference){
   .discs.animate .disc{animation:rise .5s both}
 }
@@ -230,6 +229,8 @@ h2{font-size:1rem;font-weight:600;letter-spacing:.02em;margin:2.25rem 0 .5rem}
   cursor:pointer}
 .chip[aria-pressed="true"]{border-color:var(--fast);color:var(--fast);
   background:var(--raised)}
+.filter-sep{width:1px;align-self:stretch;background:var(--line);
+  margin:0 .15rem}
 label.jump{font-size:.85rem;color:var(--quiet);margin-left:auto}
 input[type=date],input[type=number],select{font:inherit;font-size:.85rem;
   padding:.25rem .4rem;border:1px solid var(--line);background:var(--raised);
@@ -245,12 +246,12 @@ thead th{position:sticky;top:0;background:var(--paper);
   letter-spacing:.05em;white-space:nowrap}
 /* Widths on the headings alone, so the columns share the table evenly
    instead of being sized by whichever row holds the longest text. */
-thead th:nth-child(1){width:14%}
-thead th:nth-child(2){width:9%}
-thead th:nth-child(3){width:14%}
-thead th:nth-child(4){width:16%}
-thead th:nth-child(5){width:15%}
-thead th:nth-child(6){width:10%}
+thead th:nth-child(1){width:20%}
+thead th:nth-child(2){width:11%}
+thead th:nth-child(3){width:18%}
+thead th:nth-child(4){width:20%}
+thead th:nth-child(5){width:18%}
+thead th:nth-child(6){width:13%}
 /* The lunar date: two unbreakable pieces that stack in one column. */
 .lun{display:inline-block;text-align:left}
 .lun .lp{display:inline-block;white-space:nowrap}
@@ -269,6 +270,11 @@ td .longfast{color:var(--ink-soft);font-size:.75rem;letter-spacing:.05em;
    so a long fasting month reads as one stretch without displacing the marks
    for the single days inside it. */
 tbody tr.is-long,.card.is-long{background-image:var(--hatch)}
+/* A day's events sit under it, sharing its colour, with the day's own rule
+   held back so the two read as one block. */
+tbody tr.has-event td{border-bottom:0}
+tbody tr.event-row td{padding:0 .5rem .4rem;font-size:.8rem;
+  color:var(--ink-soft);line-height:1.35}
 tbody tr.weekbreak-row td{padding:1.15rem .4rem .3rem;
   border-bottom:1px solid var(--ink);font-size:.7rem;letter-spacing:.14em;
   text-transform:uppercase;color:var(--quiet)}
@@ -358,7 +364,6 @@ body.no-recite .recite-only{display:none}
   .discs{min-width:max-content;gap:.34rem}
   .disc{flex:0 0 1.55rem}
   .disc svg{max-width:1.55rem}
-  th.opt,td.opt{display:none}
   label.jump{margin-left:0}
   /* Narrow enough that the longest heading and the Long Fast label were
      setting the column widths on their own; shrink them so the shares hold. */
@@ -417,7 +422,8 @@ body.no-recite .recite-only{display:none}
       <button class="chip" type="button" data-filter="moon" aria-pressed="false">New and full moons</button>
       <button class="chip recite-only" type="button" data-filter="recite" aria-pressed="false">Precept Recitation</button>
       <button class="chip" type="button" data-filter="long" aria-pressed="false">Long fasting months</button>
-      <button class="chip" type="button" data-filter="event" aria-pressed="false">Dharma events</button>
+      <span class="filter-sep" aria-hidden="true"></span>
+      <button class="chip" type="button" id="opt-events" aria-pressed="true">Show dharma events</button>
       <label class="jump">Start at
         <input type="date" id="from-date">
       </label>
@@ -433,7 +439,6 @@ body.no-recite .recite-only{display:none}
           <th scope="col">Fast</th>
           <th scope="col" class="recite-only">Recitation</th>
           <th scope="col">Moon</th>
-          <th scope="col" class="opt">Notes</th>
         </tr>
       </thead>
       <tbody id="table-body"></tbody>
@@ -450,6 +455,38 @@ body.no-recite .recite-only{display:none}
   <!-- ==================================================== settings -->
   <main id="view-settings" class="hidden">
     <h2>Settings</h2>
+    <!-- Ordered by how often a setting is touched, the rarest last. A new
+         one goes second from the bottom, above "Where this is kept", which
+         stays the tail of the page. -->
+
+    <div class="setting">
+      <h3>Week start</h3>
+      <p>Draws a break where each new week begins, on both Today and
+        Upcoming, so a run of fast days can be read against a working week.</p>
+      <div class="field">
+        <label for="opt-week">Weeks begin on</label>
+        <select id="opt-week">
+          <option value="0">Sunday</option>
+          <option value="1">Monday</option>
+          <option value="2">Tuesday</option>
+          <option value="3">Wednesday</option>
+          <option value="4">Thursday</option>
+          <option value="5">Friday</option>
+          <option value="6">Saturday</option>
+          <option value="none">None — no break</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="setting">
+      <h3>Days on the Today view</h3>
+      <p>How many day cards to show, counting today as the first.</p>
+      <div class="field">
+        <label for="opt-cards">Number of days</label>
+        <input type="number" id="opt-cards" min="1" max="366" step="1">
+      </div>
+      <p class="state" id="opt-cards-state"></p>
+    </div>
 
     <div class="setting">
       <h3>Precept Recitation days</h3>
@@ -479,8 +516,14 @@ body.no-recite .recite-only{display:none}
           <input type="number" class="day" id="opt-day-b" min="1" max="30"
             step="1">
         </div>
-        <p class="hint">Leave either blank for a single day a month. A month
-          of 29 days has no day 30.</p>
+        <label class="switch">
+          <input type="checkbox" id="opt-day-b-last">
+          <span class="track" aria-hidden="true"></span>
+          <span>Make the second the last day of the month</span>
+        </label>
+        <p class="hint">The last day is the 29th or the 30th as the month
+          falls. Leave either blank for a single day a month; a month of 29
+          days has no day 30.</p>
       </div>
 
       <div class="suboptions" id="fortnight-opts">
@@ -509,35 +552,6 @@ body.no-recite .recite-only{display:none}
         <span>Count a leap month as a long fasting month</span>
       </label>
       <p class="state" id="opt-leap-state"></p>
-    </div>
-
-    <div class="setting">
-      <h3>Week start</h3>
-      <p>Draws a break where each new week begins, on both Today and
-        Upcoming, so a run of fast days can be read against a working week.</p>
-      <div class="field">
-        <label for="opt-week">Weeks begin on</label>
-        <select id="opt-week">
-          <option value="0">Sunday</option>
-          <option value="1">Monday</option>
-          <option value="2">Tuesday</option>
-          <option value="3">Wednesday</option>
-          <option value="4">Thursday</option>
-          <option value="5">Friday</option>
-          <option value="6">Saturday</option>
-          <option value="none">None — no break</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="setting">
-      <h3>Days on the Today view</h3>
-      <p>How many day cards to show, counting today as the first.</p>
-      <div class="field">
-        <label for="opt-cards">Number of days</label>
-        <input type="number" id="opt-cards" min="1" max="366" step="1">
-      </div>
-      <p class="state" id="opt-cards-state"></p>
     </div>
 
     <div class="setting">
@@ -603,22 +617,23 @@ body.no-recite .recite-only{display:none}
 
   /* settings ---------------------------------------------------------- */
   var SETTINGS_KEY = "bodhi.settings";
-  var FILTERS = ["all", "fast", "moon", "recite", "long", "event"];
+  var FILTERS = ["fast", "moon", "recite", "long"];
   var THEMES = ["auto", "light", "dark"];
   var CARDS_MIN = 1, CARDS_MAX = 366;
   var WEEK_STARTS = ["none", "0", "1", "2", "3", "4", "5", "6"];
   var RECITE_MODES = ["lunar", "sat", "sun", "none"];
   var DEFAULTS = { reciteMode: "lunar", reciteDayA: 1, reciteDayB: 15,
                    reciteAnchor: "2026-09-12", leapLongFast: false,
-                   filter: "fast", theme: "auto", cardCount: 7,
-                   weekStart: "0" };
+                   filters: ["fast"], showEvents: true, theme: "auto",
+                   cardCount: 7, weekStart: "0" };
   var settings = {
     reciteMode: DEFAULTS.reciteMode,
     reciteDayA: DEFAULTS.reciteDayA,
     reciteDayB: DEFAULTS.reciteDayB,
     reciteAnchor: DEFAULTS.reciteAnchor,
     leapLongFast: DEFAULTS.leapLongFast,
-    filter: DEFAULTS.filter,
+    filters: DEFAULTS.filters.slice(),
+    showEvents: DEFAULTS.showEvents,
     theme: DEFAULTS.theme,
     cardCount: DEFAULTS.cardCount,
     weekStart: DEFAULTS.weekStart,
@@ -647,13 +662,19 @@ body.no-recite .recite-only{display:none}
         settings.reciteMode = saved.reciteMode;
       if (saved.hasOwnProperty("reciteDayA"))
         settings.reciteDayA = clampDay(saved.reciteDayA);
-      if (saved.hasOwnProperty("reciteDayB"))
+      if (saved.reciteDayB === "last") settings.reciteDayB = "last";
+      else if (saved.hasOwnProperty("reciteDayB"))
         settings.reciteDayB = clampDay(saved.reciteDayB);
       if (/^\d{4}-\d{2}-\d{2}$/.test(saved.reciteAnchor))
         settings.reciteAnchor = saved.reciteAnchor;
       if (typeof saved.leapLongFast === "boolean")
         settings.leapLongFast = saved.leapLongFast;
-      if (FILTERS.indexOf(saved.filter) > -1) settings.filter = saved.filter;
+      if (Array.isArray(saved.filters))
+        settings.filters = saved.filters.filter(function (f) {
+          return FILTERS.indexOf(f) > -1;
+        });
+      if (typeof saved.showEvents === "boolean")
+        settings.showEvents = saved.showEvents;
       if (THEMES.indexOf(saved.theme) > -1) settings.theme = saved.theme;
       settings.cardCount = clampCards(saved.cardCount);
       if (WEEK_STARTS.indexOf(saved.weekStart) > -1)
@@ -735,8 +756,12 @@ body.no-recite .recite-only{display:none}
   function reciting(d) {
     if (FORTNIGHT.indexOf(settings.reciteMode) > -1) return fortnightly(d);
     if (settings.reciteMode === "none") return false;
+    if (settings.reciteDayB === "last" && d.lastOfMonth) return true;
     return d.dayNum === settings.reciteDayA ||
            d.dayNum === settings.reciteDayB;
+  }
+  function dayName(v) {
+    return v === "last" ? "the last day" : "day " + v;
   }
   /* the nearest date to `isoDate` falling on weekday `target` */
   function snapWeekday(isoDate, target) {
@@ -984,7 +1009,6 @@ body.no-recite .recite-only{display:none}
   }
   function renderUpcoming() {
     var nextLong = firstWhere(longFasting);
-    var nextLeap = firstWhere(function (d) { return d.leap; });
     var here = days[cursor].date;
     document.getElementById("upcoming").innerHTML =
       "<section><h3>Next eight fast days</h3>" +
@@ -996,12 +1020,6 @@ body.no-recite .recite-only{display:none}
       (nextLong ? "<p>" + (nextLong.date <= here ? "Now in the " : "Next is the ") +
         nextLong.monthLabel + ", from " + shortDate(nextLong.date) + ".</p>"
         : "<p>None left in the dataset.</p>") +
-      (nextLeap ? "<p>The " + nextLeap.monthLabel +
-        (nextLeap.date <= here ? " runs from " : " begins ") +
-        shortDate(nextLeap.date) + ", " +
-        (settings.leapLongFast ? "counted here as a long fast."
-          : "not counted here as a long fast.") + "</p>" :
-        "<p>No leap month ahead in the dataset.</p>") +
       "</section>";
   }
 
@@ -1012,20 +1030,26 @@ body.no-recite .recite-only{display:none}
   fromInput.min = days[0].date;
   fromInput.max = days[days.length - 1].date;
 
+  var MATCH = {
+    fast: function (d) { return d.fast; },
+    moon: function (d) { return !!d.moon; },
+    recite: reciting,
+    long: longFasting
+  };
+  /* The filters gather rather than replace each other: a day shows if any
+     chosen one matches it, and with none chosen every day shows. */
   function passes(d) {
     if (d.date < from) return false;
-    if (settings.filter === "fast") return d.fast;
-    if (settings.filter === "moon") return !!d.moon;
-    if (settings.filter === "recite") return reciting(d);
-    if (settings.filter === "long") return longFasting(d);
-    if (settings.filter === "event") return !!d.event;
-    return true;
+    if (!settings.filters.length) return true;
+    return settings.filters.some(function (f) { return MATCH[f](d); });
   }
   var shown = [];
   function renderTable() {
     shown = days.filter(passes);
     var cap = shown.length + " days" +
-      (settings.filter === "all" ? "" : " matching this filter") +
+      (settings.filters.length
+        ? " matching " + (settings.filters.length > 1 ? "these filters"
+            : "this filter") : "") +
       ", from " + shortDate(from) + " to " +
       shortDate(days[days.length - 1].date) + ".";
     document.getElementById("table-caption").textContent = cap;
@@ -1035,14 +1059,22 @@ body.no-recite .recite-only{display:none}
          a year, so the heading is where it lives. */
       var week = weekOf(d.date), lead = "";
       if (week && week !== prevWeek)
-        lead = '<tr class="weekbreak-row"><td colspan="7">' +
+        lead = '<tr class="weekbreak-row"><td colspan="6">' +
           weekLabel(week, true) + "</td></tr>";
       prevWeek = week;
       /* The year lives on the week heading. With weeks off there is no
          heading to carry it, so it stays on the row. */
-      return lead + "<tr class=" + '"' + (d.fast ? "is-fast " : "") +
-        (longFasting(d) ? "is-long " : "") +
-        (d.moon ? "is-moon" : "") + '">' +
+      /* The events hang under the day as a second row wearing the same
+         classes, so they take that day's colour and hatch and read as part
+         of it rather than as a line of their own. */
+      var evs = settings.showEvents ? eventsOf(d) : [];
+      var klass = (d.fast ? "is-fast " : "") +
+        (longFasting(d) ? "is-long " : "") + (d.moon ? "is-moon" : "");
+      var tail = evs.length ? '<tr class="event-row ' + klass + '">' +
+        '<td colspan="6">' + evs.map(esc).join(" &nbsp;·&nbsp; ") +
+        "</td></tr>" : "";
+      return lead + '<tr class="' + klass + (evs.length ? " has-event" : "") +
+        '">' +
         '<td class="num">' +
         (week ? dayMonth(d.date) : shortDate(d.date)) + "</td>" +
         '<td class="wd">' + d.weekday + "</td>" +
@@ -1055,13 +1087,10 @@ body.no-recite .recite-only{display:none}
           STAR + "</span>" : "") + "</td>" +
         '<td class="moon-cell">' +
         (moonLabel(d) ? moonIcon(d) : "") + "</td>" +
-        '<td class="opt">' + eventsOf(d).map(function (e) {
-          return "<div>" + esc(e) + "</div>";
-        }).join("") + (d.leap ? "<div>leap month</div>" : "") + "</td>" +
-        "</tr>";
+        "</tr>" + tail;
     }).join("");
     if (shown.length > 500) {
-      rows += '<tr><td colspan="7">Showing the first 500. Move the start ' +
+      rows += '<tr><td colspan="6">Showing the first 500. Move the start ' +
         "date forward, or open data.csv for the rest.</td></tr>";
     }
     var body = document.getElementById("table-body");
@@ -1079,19 +1108,35 @@ body.no-recite .recite-only{display:none}
   function markChips() {
     Array.prototype.forEach.call(
       document.querySelectorAll(".chip[data-filter]"), function (b) {
-        b.setAttribute("aria-pressed",
-          b.dataset.filter === settings.filter ? "true" : "false");
+        var on = b.dataset.filter === "all" ? !settings.filters.length
+          : settings.filters.indexOf(b.dataset.filter) > -1;
+        b.setAttribute("aria-pressed", on ? "true" : "false");
       });
+    eventsBtn.setAttribute("aria-pressed",
+      settings.showEvents ? "true" : "false");
   }
   Array.prototype.forEach.call(document.querySelectorAll(".chip[data-filter]"),
     function (btn) {
       btn.addEventListener("click", function () {
-        settings.filter = btn.dataset.filter;
+        var f = btn.dataset.filter;
+        if (f === "all") settings.filters = [];
+        else {
+          var at = settings.filters.indexOf(f);
+          if (at > -1) settings.filters.splice(at, 1);
+          else settings.filters.push(f);
+        }
         saveSettings();
         markChips();
         renderTable();
       });
     });
+  var eventsBtn = document.getElementById("opt-events");
+  eventsBtn.addEventListener("click", function () {
+    settings.showEvents = !settings.showEvents;
+    saveSettings();
+    markChips();
+    renderTable();
+  });
   fromInput.addEventListener("change", function () {
     if (!fromInput.value) return;
     from = fromInput.value;
@@ -1156,6 +1201,7 @@ body.no-recite .recite-only{display:none}
   var leapBox = document.getElementById("opt-leap");
   var dayA = document.getElementById("opt-day-a");
   var dayB = document.getElementById("opt-day-b");
+  var dayBLast = document.getElementById("opt-day-b-last");
   var cardsInput = document.getElementById("opt-cards");
   var weekSel = document.getElementById("opt-week");
 
@@ -1166,19 +1212,20 @@ body.no-recite .recite-only{display:none}
       return "Flagged: every other " +
         WEEK[parse(settings.reciteAnchor).getDay()] + ", in step with " +
         shortDate(settings.reciteAnchor) + ".";
-    var days2 = [settings.reciteDayA, settings.reciteDayB]
+    var chosen = [settings.reciteDayA, settings.reciteDayB]
       .filter(function (n) { return n !== null; });
-    if (!days2.length) return "Nothing is flagged as Precept Recitation.";
-    var short = days2.filter(function (n) { return n === 30; });
-    return "Flagged: day " + days2.join(" and day ") +
+    if (!chosen.length) return "Nothing is flagged as Precept Recitation.";
+    return "Flagged: " + chosen.map(dayName).join(" and ") +
       " of each lunar month." +
-      (short.length ? " A month of 29 days has no day 30." : "");
+      (chosen.indexOf(30) > -1 ? " A month of 29 days has no day 30." : "");
   }
 
   function applySettings() {
     var on = reciteOn();
     document.body.classList.toggle("no-recite", !on);
-    if (!on && settings.filter === "recite") settings.filter = "fast";
+    if (!on) settings.filters = settings.filters.filter(function (f) {
+      return f !== "recite";
+    });
     modeSel.value = settings.reciteMode;
     lunarOpts.classList.toggle("hidden", settings.reciteMode !== "lunar");
     fortnightOpts.classList.toggle("hidden",
@@ -1190,8 +1237,11 @@ body.no-recite .recite-only{display:none}
         ? "On. A leap 1st, 5th or 9th month carries the long fast."
         : "Off. A leap month is still flagged as leap, but carries no long "
           + "fast.";
+    var bLast = settings.reciteDayB === "last";
     dayA.value = settings.reciteDayA === null ? "" : settings.reciteDayA;
-    dayB.value = settings.reciteDayB === null ? "" : settings.reciteDayB;
+    dayB.value = bLast || settings.reciteDayB === null ? "" : settings.reciteDayB;
+    dayB.disabled = bLast;
+    dayBLast.checked = bLast;
     cardsInput.value = settings.cardCount;
     weekSel.value = settings.weekStart;
     document.getElementById("opt-state").textContent = stateText();
@@ -1236,6 +1286,13 @@ body.no-recite .recite-only{display:none}
       applySettings();
     });
   });
+  dayBLast.addEventListener("change", function () {
+    /* coming off "last", fall back to the default rather than to nothing */
+    settings.reciteDayB = dayBLast.checked ? "last"
+      : clampDay(dayB.value) === null ? DEFAULTS.reciteDayB : clampDay(dayB.value);
+    saveSettings();
+    applySettings();
+  });
   cardsInput.addEventListener("change", function () {
     settings.cardCount = clampCards(cardsInput.value);
     saveSettings();
@@ -1257,7 +1314,8 @@ body.no-recite .recite-only{display:none}
     settings.reciteDayB = DEFAULTS.reciteDayB;
     settings.reciteAnchor = DEFAULTS.reciteAnchor;
     settings.leapLongFast = DEFAULTS.leapLongFast;
-    settings.filter = DEFAULTS.filter;
+    settings.filters = DEFAULTS.filters.slice();
+    settings.showEvents = DEFAULTS.showEvents;
     settings.theme = DEFAULTS.theme;
     settings.cardCount = DEFAULTS.cardCount;
     settings.weekStart = DEFAULTS.weekStart;

@@ -97,6 +97,10 @@ Recitation flag. It is reckoned one of four ways:
   typed in: 1 and 15 by default, the new moon and the full. Any day from 1 to
   30 will do; leaving a box blank gives a single recitation a month, and
   leaving both blank drops the flag. Day 30 means a month of 29 days has none.
+  A switch under the boxes makes the second day **the last day of the month**
+  instead of a fixed number — the 29th or the 30th as the month falls, so it
+  never skips a short month the way day 30 does. Turning it back off returns
+  the box to whatever number it held, or to 15.
 - **Every other Saturday** or **every other Sunday**, for an assembly that
   gathers at weekends: every fourteenth day either side of a reference date,
   12 September 2026 by default. The fortnight never skips — anchoring on the
@@ -110,6 +114,11 @@ Recitation flag. It is reckoned one of four ways:
 - **Not at all**, which drops the flag, its filter and its column from every
   view.
 
+The page is ordered by how often a setting is touched, the rarest last: week
+start, days on the Today view, Precept Recitation days, leap months, and then
+where all of it is kept. A new setting goes second from the bottom, above
+*Where this is kept*, which stays the tail of the page.
+
 Settings also carries how many day cards the Today view shows, counting today
 as the first — seven by default, any whole number from 1 to 366.
 
@@ -122,7 +131,14 @@ against a working week. Rows are grouped by the week they fall in rather than
 by adjacency, so the break still lands correctly between two filtered rows
 that sit weeks apart.
 
-These settings, the theme, and Upcoming's filter and start date are kept in
+Upcoming's filters gather rather than replace one another: each chip is its
+own toggle, a day shows if any chosen chip matches it, and with none chosen
+every day shows. **Show dharma events** sits apart from them and is not a
+filter at all — it decides whether the events are drawn, and they arrive not as
+a column but as a second line under the day, wearing that day's colour and
+hatch so the two read as one block.
+
+These settings, the theme, and Upcoming's filters and start date are kept in
 `localStorage` under `bodhi.settings`. Nothing is sent anywhere, and storage
 failures (private mode, or a browser that blocks it over `file://`) fall back
 to the defaults silently.
@@ -147,6 +163,11 @@ an ordinary day is bare, a Precept Recitation on its own is a cool ink wash, a
 fast day is a cinnabar one, and a recitation landing on a fast day — the
 heaviest of the three — takes the cinnabar deeper still. Recitation days are
 marked in the moon band with a four-pointed pole star.
+
+Today's disc in the band is marked by the cell around it — a wash, a hairline
+box and a caret above the bold date — and not by the disc itself, which is
+drawn exactly like its neighbours so the phase is read the same way all along
+the band.
 
 The exact new and full moons carry a halo. The days either side of them are
 all but identical discs, and this tells them apart without another key: the
