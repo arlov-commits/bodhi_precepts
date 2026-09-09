@@ -89,6 +89,9 @@ last day of the lunar month (the default), day 30, 29, 28, 1, or none. Turning
 both off drops the flag, its filter and its column from every view. Choosing a
 fixed day 29 or 30 means shorter months simply have none.
 
+Settings also carries how many day cards the Today view shows, counting today
+as the first — seven by default, any whole number from 1 to 366.
+
 These settings, the theme, and the record's filter and start date are kept in
 `localStorage` under `bodhi.settings`. Nothing is sent anywhere, and storage
 failures (private mode, or a browser that blocks it over `file://`) fall back
@@ -107,6 +110,10 @@ an ordinary day is bare, a Precept Recitation on its own is a cool ink wash, a
 fast day is a cinnabar one, and a recitation landing on a fast day — the
 heaviest of the three — takes the cinnabar deeper still. Recitation days are
 marked in the moon band with a four-pointed pole star.
+
+The exact new and full moons carry a faint halo. The days either side of them
+are all but identical discs, and this tells them apart without another key:
+the disc under the halo is either wholly lit or wholly dark.
 
 The icon beside the gear cycles three themes — auto, light, dark — and the
 choice is kept with the rest. Auto follows the **device clock**, not the
