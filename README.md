@@ -69,8 +69,10 @@ data came off the DRBA printed calendar or the HKO tables.
 - **New and full moon** follow the calendar convention, day 1 and day 15,
   rather than the astronomical instant. The moon discs in the Today view are
   drawn from the day number, so the 15th shows as very nearly rather than
-  exactly full — that gap is the convention, not a bug. The discs span one
-  lunar month but are numbered by Gregorian day, so today is easy to find.
+  exactly full — that gap is the convention, not a bug. The discs are a
+  rolling window of 29 days centred on today, numbered by Gregorian day, so
+  today is easy to find; they carry nothing but the phase, the fast days, the
+  recitation days and today.
 - **Precept Recitation** (布薩, bùsà): the days the assembly gathers to recite
   the precepts. Two a month by default — the 15th, and the last day. Both are
   already fast days; the flag is an extra marking on top. Which days count is
@@ -94,10 +96,9 @@ to the defaults silently.
 
 ## The look
 
-Deep indigo with a faint lattice and lit knots, after the jewelled net of the
-Brahma heaven that gives 梵網經 its name — every knot a gem, every gem
-reflecting all the others. Jade marks fast days, amethyst Precept Recitation,
-moonlight the moons and today.
+Sumi: ink on paper, cinnabar for what matters. Warm paper ground, hairline
+rules, a lot of empty space, and two inks only — black for the substance,
+seal red for the fast days.
 
 ## Sources
 

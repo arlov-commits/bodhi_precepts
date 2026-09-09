@@ -5,54 +5,44 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Fast days</title>
 <style>
-/* Brahma Net (梵網經): the jewelled net of the Brahma heaven, where every
-   knot holds a gem and every gem reflects all the others. Deep indigo ground,
-   a faint lattice with lit knots, and cool jewel tones for the markings. */
+/* Sumi: ink on paper, with cinnabar for what matters. Two inks only —
+   black for the substance, seal red for the fast days — on a warm ground,
+   hairline rules, and a lot of empty paper. */
 :root{
-  color-scheme:dark;
-  --paper:#0E1320;
-  --panel:#161E2F;
-  --raised:#1D273B;
-  --night:#070B14;
-  --ink:#E9EDF8;
-  --quiet:#8B96B1;
-  --line:#2A3450;
-  --net:rgba(140,172,228,.055);
-  --knot:rgba(163,196,246,.11);
-  --fast:#5FCBB0;
-  --fast-dim:#14332F;
-  --fast-line:#2C6A5E;
-  --recite:#AC91E4;
-  --recite-dim:#241F42;
-  --recite-line:#5A4A8F;
-  --moonc:#9FC3F0;
-  --moonc-dim:#182541;
-  --moonc-line:#3C5A8C;
-  --leap:#E28FAA;
-  --leap-dim:#341F2C;
-  --moonlit:#E4EBFA;
+  --paper:#F6F3EC;
+  --panel:#FBFAF6;
+  --raised:#FFFFFF;
+  --ink:#1C1A16;
+  --ink-soft:#3E3A33;
+  --quiet:#7A756B;
+  --line:#D8D2C4;
+  --hair:#E6E1D5;
+  --fast:#9E2A24;
+  --fast-dim:#FAF0EC;
+  --fast-line:#D7B2AC;
+  --recite:#2E2A24;
+  --recite-dim:#EFECE2;
+  --recite-line:#B4AE9F;
+  --moonc:#5C574D;
+  --moonc-dim:#F0EDE4;
+  --moonc-line:#BDB7A8;
+  --leap:#9E2A24;
+  --leap-dim:#F7EAE6;
   --sans:"Optima","Avenir Next","Gill Sans MT","Gill Sans","Trebuchet MS",sans-serif;
   --han:"Songti SC","STSong","Noto Serif CJK SC","Noto Serif SC","SimSun",serif;
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{
-  margin:0;color:var(--ink);font-family:var(--sans);
+  margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
   font-size:16px;line-height:1.5;
-  background-color:var(--paper);
-  background-image:
-    radial-gradient(circle at 0 0,var(--knot) 1.1px,transparent 1.6px),
-    linear-gradient(var(--net) 1px,transparent 1px),
-    linear-gradient(90deg,var(--net) 1px,transparent 1px);
-  background-size:2.5rem 2.5rem;
-  background-attachment:fixed;
 }
 .wrap{max-width:56rem;margin:0 auto;padding:1.5rem 1.25rem 4rem}
 
 /* ---------------------------------------------------------- masthead */
 .masthead{display:flex;flex-wrap:wrap;gap:1rem;align-items:baseline;
   justify-content:space-between;padding-bottom:.75rem;
-  border-bottom:1px solid var(--line)}
+  border-bottom:1px solid var(--ink)}
 .brand{display:flex;align-items:baseline;gap:.6rem}
 .brand .han{font-family:var(--han);font-size:1.5rem;letter-spacing:.12em;
   color:var(--fast)}
@@ -63,90 +53,90 @@ nav button{
   border:1px solid transparent;padding:.3rem .7rem;cursor:pointer;
   border-radius:0;
 }
-nav button[aria-current="page"]{color:var(--ink);border-color:var(--line);
+nav button[aria-current="page"]{color:var(--ink);border-color:var(--ink);
   background:var(--panel)}
 nav button:hover{color:var(--ink)}
 nav button:focus-visible,a:focus-visible,select:focus-visible,
-input:focus-visible,.chip:focus-visible{outline:2px solid var(--moonc);
+input:focus-visible,.chip:focus-visible{outline:2px solid var(--fast);
   outline-offset:2px}
 
 /* ------------------------------------------------------ lunation band */
-.band{background:var(--night);color:var(--moonlit);border:1px solid var(--line);
-  padding:1.1rem 1.1rem .9rem;margin-top:1.5rem}
+.band{background:var(--panel);border:1px solid var(--line);
+  padding:.9rem 1.1rem 1rem;margin-top:1.5rem}
 .band .head{display:flex;justify-content:space-between;align-items:baseline;
-  gap:1rem;font-size:.85rem;letter-spacing:.06em;color:#7E8CAB;
-  margin-bottom:.7rem}
-.band .head .han{font-family:var(--han);color:var(--moonlit);font-size:1.05rem}
+  gap:1rem;font-size:.85rem;letter-spacing:.05em;color:var(--quiet);
+  margin-bottom:.5rem}
+.band .head .han{font-family:var(--han);color:var(--ink);font-size:1.05rem}
+.band .legend{display:flex;flex-wrap:nowrap;gap:1rem;margin-bottom:.8rem;
+  padding-bottom:.6rem;border-bottom:1px solid var(--hair);
+  font-size:.72rem;letter-spacing:.04em;color:var(--quiet);
+  overflow-x:auto;white-space:nowrap}
+.band .legend span{flex:0 0 auto}
+.band .legend i{font-style:normal;display:inline-block;width:.75rem;
+  height:.25rem;margin-right:.35rem;vertical-align:.1rem}
+.band .legend i.f{background:var(--fast)}
+.band .legend i.r{background:var(--recite);width:.34rem;height:.34rem;
+  border-radius:50%}
+.band .legend i.t{background:var(--fast-dim);border:1px solid var(--ink);
+  height:.62rem;width:.62rem}
 .band-scroll{overflow-x:auto}
 .discs{display:flex;gap:.2rem;align-items:flex-start}
 .disc{flex:1 1 0;min-width:0;text-align:center;padding:.15rem .1rem .25rem}
 .disc svg{display:block;margin:0 auto;width:100%;max-width:1.45rem;height:auto}
 .disc .cap{height:.6rem;font-size:.55rem;line-height:.6rem;color:transparent}
-.disc .n{font-size:.62rem;color:#6E7B98;margin-top:.25rem;
+.disc .n{font-size:.62rem;color:var(--quiet);margin-top:.25rem;
   font-variant-numeric:tabular-nums}
-.disc.is-fast .n{color:var(--fast)}
+.disc.is-fast .n{color:var(--fast);font-weight:600}
 .disc .tick{height:3px;margin-top:.2rem;background:transparent}
 .disc.is-fast .tick{background:var(--fast)}
 .disc .dot{height:.34rem;margin-top:.16rem;font-size:0}
 .disc.is-recite .dot{width:.34rem;margin-left:auto;margin-right:auto;
   border-radius:50%;background:var(--recite)}
-.disc.is-today{background:rgba(159,195,240,.14);
-  outline:1px solid rgba(159,195,240,.75)}
-.disc.is-today .cap{color:var(--moonlit);letter-spacing:.04em}
-.disc.is-today .n{color:#fff;font-weight:700}
-.disc.is-today svg circle.rim{stroke:var(--moonlit);stroke-width:1.6}
+.disc.is-today{background:var(--fast-dim);outline:1px solid var(--ink)}
+.disc.is-today .cap{color:var(--ink);letter-spacing:.04em}
+.disc.is-today .n{color:var(--ink);font-weight:700}
+.disc.is-today svg circle.rim{stroke:var(--ink);stroke-width:1.4}
 @media (prefers-reduced-motion:no-preference){
   .discs.animate .disc{animation:rise .5s both}
 }
 @keyframes rise{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
-.band .legend{display:flex;flex-wrap:wrap;gap:.9rem;margin-top:.7rem;
-  font-size:.72rem;letter-spacing:.05em;color:#7E8CAB}
-.band .legend i{font-style:normal;display:inline-block;width:.7rem;
-  height:.3rem;margin-right:.35rem;vertical-align:.06rem}
-.band .legend i.f{background:var(--fast)}
-.band .legend i.r{background:var(--recite);width:.34rem;height:.34rem;
-  border-radius:50%}
-.band .legend i.t{background:rgba(159,195,240,.14);
-  border:1px solid rgba(159,195,240,.75);height:.62rem;width:.62rem}
 
 /* --------------------------------------------------------- day cards */
 h2{font-size:1rem;font-weight:600;letter-spacing:.02em;margin:2.25rem 0 .5rem}
 .cards{display:grid;gap:.75rem;
   grid-template-columns:repeat(auto-fill,minmax(13.5rem,1fr))}
 .card{background:var(--panel);border:1px solid var(--line);
-  border-top:3px solid var(--line);padding:.75rem .85rem .85rem;
-  display:flex;flex-direction:column}
+  border-top:2px solid var(--line);padding:.8rem .85rem .9rem;
+  display:flex;flex-direction:column;align-items:center;text-align:center}
 .card.is-fast{background:var(--fast-dim);border-color:var(--fast-line);
   border-top-color:var(--fast)}
-.card.is-today{border-color:var(--moonc-line);border-top-color:var(--moonc);
-  box-shadow:0 0 0 1px rgba(159,195,240,.45)}
-.card .rel{font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;
+.card .rel{font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;
   color:var(--quiet)}
-.card.is-today .rel{color:var(--moonc);font-weight:700}
-.card .greg{font-size:1.02rem;margin-top:.1rem;
+.card.is-today .rel{color:var(--ink);font-weight:700}
+.card .greg{font-size:1.02rem;margin-top:.15rem;
   font-variant-numeric:tabular-nums}
-.card .lunar{margin-top:.55rem;padding-top:.55rem;
-  border-top:1px solid var(--line);font-size:.9rem;color:var(--quiet)}
+.card .lunar{margin-top:.6rem;padding-top:.6rem;width:100%;
+  border-top:1px solid var(--hair);font-size:.88rem;color:var(--quiet)}
 .card.is-fast .lunar{border-top-color:var(--fast-line)}
 .card .lunar .big{display:block;font-size:1.05rem;color:var(--ink);
-  margin-top:.1rem}
+  margin-top:.15rem}
 .card .lunar .han{font-family:var(--han);font-size:1.1rem;
   margin-left:.35rem;color:var(--quiet)}
-.tags{list-style:none;margin:.6rem 0 0;padding:0;display:flex;
-  flex-wrap:wrap;gap:.3rem}
-.tags li{font-size:.75rem;letter-spacing:.05em;padding:.16rem .45rem;
+.tags{list-style:none;margin:.65rem 0 0;padding:0;display:flex;
+  flex-wrap:wrap;gap:.3rem;justify-content:center}
+.tags li{font-size:.75rem;letter-spacing:.05em;padding:.16rem .5rem;
   border:1px solid var(--line);background:var(--raised);color:var(--quiet)}
-.tags li.fast{border-color:var(--fast-line);background:transparent;
+.tags li.fast{border-color:var(--fast);background:var(--raised);
   color:var(--fast)}
-.tags li.moon{border-color:var(--moonc);background:var(--moonc-dim);
+.tags li.moon{border-color:var(--moonc-line);background:var(--moonc-dim);
   color:var(--moonc)}
 .tags li.recite{border-color:var(--recite-line);background:var(--recite-dim);
   color:var(--recite)}
-.tags li.leap{border-color:var(--leap);background:var(--leap-dim);
-  color:var(--leap)}
-.card .events{list-style:none;margin:.6rem 0 0;padding:0}
-.card .events li{font-size:.82rem;color:var(--ink);
-  border-left:2px solid var(--moonc);padding-left:.5rem;margin-top:.35rem}
+.card .events{list-style:none;margin:.65rem 0 0;padding:.55rem 0 0;
+  width:100%;border-top:1px solid var(--hair)}
+.card.is-fast .events{border-top-color:var(--fast-line)}
+.card .events li{font-size:.82rem;color:var(--ink-soft);margin-top:.3rem}
+.card .events li:first-child{margin-top:0}
 
 /* ------------------------------------------------------------ record */
 .filters{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;
@@ -155,33 +145,33 @@ h2{font-size:1rem;font-weight:600;letter-spacing:.02em;margin:2.25rem 0 .5rem}
   border:1px solid var(--line);background:var(--panel);color:var(--quiet);
   cursor:pointer}
 .chip[aria-pressed="true"]{border-color:var(--fast);color:var(--fast);
-  background:var(--fast-dim)}
+  background:var(--raised)}
 label.jump{font-size:.85rem;color:var(--quiet);margin-left:auto}
 input[type=date],select{font:inherit;font-size:.85rem;padding:.25rem .4rem;
   border:1px solid var(--line);background:var(--raised);color:var(--ink)}
 table{border-collapse:collapse;width:100%;font-size:.9rem}
 caption{text-align:left;color:var(--quiet);font-size:.85rem;
   padding-bottom:.5rem}
-th,td{text-align:left;padding:.42rem .5rem;border-bottom:1px solid var(--line);
+th,td{text-align:left;padding:.42rem .5rem;border-bottom:1px solid var(--hair);
   vertical-align:top}
 thead th{position:sticky;top:0;background:var(--paper);
-  border-bottom:1px solid var(--fast-line);font-weight:600;font-size:.8rem;
+  border-bottom:1px solid var(--ink);font-weight:600;font-size:.8rem;
   letter-spacing:.05em}
 tbody tr.is-fast{background:var(--fast-dim)}
 tbody tr.is-moon{background:var(--moonc-dim)}
-tbody tr.is-fast.is-moon{background:#17293C}
+tbody tr.is-fast.is-moon{background:#F4EFE7}
 td.han{font-family:var(--han);font-size:1.05rem}
 td.num{font-variant-numeric:tabular-nums}
-td .yes{color:var(--fast)}
+td .yes{color:var(--fast);font-weight:600}
 td .rec{color:var(--recite);font-weight:600}
 .upcoming{display:grid;gap:1.25rem;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));
   margin-bottom:1.5rem}
 .upcoming section{background:var(--panel);padding:.9rem 1rem;
-  border:1px solid var(--line);border-top:2px solid var(--fast)}
+  border:1px solid var(--line);border-top:2px solid var(--ink)}
 .upcoming h3{margin:0 0 .5rem;font-size:.9rem;font-weight:600;
   letter-spacing:.03em}
 .upcoming ul{list-style:none;margin:0;padding:0;font-size:.9rem}
-.upcoming li{padding:.22rem 0;border-bottom:1px solid var(--line);
+.upcoming li{padding:.22rem 0;border-bottom:1px solid var(--hair);
   display:flex;justify-content:space-between;gap:.75rem}
 .upcoming li:last-child{border-bottom:0}
 .upcoming li .han{font-family:var(--han)}
@@ -189,36 +179,36 @@ td .rec{color:var(--recite);font-weight:600}
 .upcoming p{margin:.2rem 0 0;font-size:.9rem;color:var(--quiet)}
 .downloads{display:flex;flex-wrap:wrap;gap:.75rem;align-items:center;
   margin:1rem 0 1.5rem;font-size:.9rem}
-.downloads a{color:var(--moonc);text-decoration:underline;
+.downloads a{color:var(--fast);text-decoration:underline;
   text-underline-offset:2px}
 
 /* ---------------------------------------------------------- settings */
 nav button.gear{font-size:1.05rem;line-height:1;padding:.35rem .55rem}
 .setting{background:var(--panel);border:1px solid var(--line);
-  border-top:2px solid var(--recite);padding:1rem 1.1rem;margin:1rem 0;
+  border-top:2px solid var(--ink);padding:1rem 1.1rem;margin:1rem 0;
   max-width:40rem}
 .setting h3{margin:0 0 .35rem;font-size:.95rem;font-weight:600}
 .setting p{margin:.35rem 0 0;font-size:.88rem;color:var(--quiet)}
-.setting .han{font-family:var(--han)}
-.setting code{background:var(--raised);padding:.05rem .3rem;
-  font-size:.85em;color:var(--moonc)}
+.setting .han{font-family:var(--han);color:var(--fast)}
+.setting code{background:var(--raised);border:1px solid var(--hair);
+  padding:.05rem .3rem;font-size:.85em;color:var(--ink-soft)}
 .switch{display:flex;align-items:center;gap:.7rem;margin-top:.9rem;
   cursor:pointer;font-size:.92rem}
 .switch input{position:absolute;opacity:0;width:0;height:0}
-.switch .track{flex:0 0 auto;width:2.6rem;height:1.4rem;background:var(--night);
+.switch .track{flex:0 0 auto;width:2.6rem;height:1.4rem;background:var(--raised);
   border:1px solid var(--line);position:relative;transition:background .15s}
 .switch .track::after{content:"";position:absolute;top:.2rem;left:.2rem;
   width:.9rem;height:.9rem;background:var(--quiet);transition:transform .15s}
-.switch input:checked + .track{background:var(--recite-dim);
-  border-color:var(--recite)}
+.switch input:checked + .track{background:var(--fast-dim);
+  border-color:var(--fast)}
 .switch input:checked + .track::after{transform:translateX(1.2rem);
-  background:var(--recite)}
-.switch input:focus-visible + .track{outline:2px solid var(--moonc);
+  background:var(--fast)}
+.switch input:focus-visible + .track{outline:2px solid var(--fast);
   outline-offset:2px}
 .field{display:flex;flex-wrap:wrap;align-items:center;gap:.6rem;
   margin-top:.9rem;font-size:.92rem}
 .setting .state{color:var(--quiet);font-size:.85rem;letter-spacing:.04em;
-  border-left:2px solid var(--recite-line);padding-left:.6rem;margin-top:.9rem}
+  border-left:2px solid var(--fast);padding-left:.6rem;margin-top:.9rem}
 
 footer{margin-top:3rem;padding-top:1rem;border-top:1px solid var(--line);
   font-size:.82rem;color:var(--quiet);max-width:60ch}
@@ -229,6 +219,8 @@ body.no-recite .recite-only{display:none}
 .notice{background:var(--leap-dim);border-left:3px solid var(--leap);
   padding:.7rem .9rem;font-size:.9rem;margin:1rem 0;color:var(--ink)}
 @media (max-width:640px){
+  .band .legend{font-size:.62rem;gap:.6rem}
+  .band .legend i{margin-right:.25rem}
   .discs{min-width:max-content;gap:.34rem}
   .disc{flex:0 0 1.55rem}
   .disc svg{max-width:1.55rem}
@@ -262,10 +254,10 @@ body.no-recite .recite-only{display:none}
         <span id="band-month"></span>
         <span id="band-note"></span>
       </div>
+      <div class="legend" id="band-legend"></div>
       <div class="band-scroll">
         <div class="discs animate" id="band-discs"></div>
       </div>
-      <div class="legend" id="band-legend"></div>
     </div>
 
     <h2>The next seven days</h2>
@@ -393,6 +385,21 @@ body.no-recite .recite-only{display:none}
     d.lastOfMonth = next ? next.dayNum === 1 : false;
   });
 
+  /* Days in each day's own lunar month, for drawing the moon. The stored
+     monthLength is null for the partial month the dataset opens on and short
+     for the one it is cut off in, so measure between day 1s and assume 30
+     for the partial months at either end. */
+  (function () {
+    var starts = [];
+    days.forEach(function (d, i) { if (d.dayNum === 1) starts.push(i); });
+    days.forEach(function (d) { d.cycle = 30; });
+    starts.forEach(function (a, k) {
+      var b = k + 1 < starts.length ? starts[k + 1] : null;
+      if (b === null) return;
+      for (var j = a; j < b; j++) days[j].cycle = b - a;
+    });
+  })();
+
   /* settings ---------------------------------------------------------- */
   var SETTINGS_KEY = "bodhi.settings";
   var OTHER_DAYS = ["last", "30", "29", "28", "1", "none"];
@@ -474,9 +481,9 @@ body.no-recite .recite-only{display:none}
     return '<svg width="' + size + '" height="' + size + '" viewBox="' +
       (-size / 2) + " " + (-size / 2) + " " + size + " " + size +
       '" aria-hidden="true">' +
-      '<circle class="rim" r="' + r + '" fill="#070B14" stroke="#37456A" ' +
+      '<circle class="rim" r="' + r + '" fill="#2E2A24" stroke="#8C867A" ' +
       'stroke-width="0.8"/>' +
-      '<path d="' + path + '" fill="#E4EBFA"/></svg>';
+      '<path d="' + path + '" fill="#FBFAF6"/></svg>';
   }
 
   /* which day are we on --------------------------------------------- */
@@ -493,13 +500,17 @@ body.no-recite .recite-only{display:none}
   }
 
   /* the lunation band ------------------------------------------------ */
+  /* A rolling window of days centred on today, rather than a lunar month,
+     so today always sits in the middle. It slides at either end of the
+     dataset, where there is nothing left to centre on. */
+  var BAND_SPAN = 29;
   function drawBand() {
-    var d = days[cursor], start = cursor;
-    while (start > 0 && days[start].dayNum !== 1) start--;
-    var discs = [], html = "";
-    for (var j = start; j < days.length && (j === start ||
-         days[j].dayNum !== 1); j++) discs.push(j);
-    discs.forEach(function (k, n) {
+    var d = days[cursor];
+    var start = Math.max(0, Math.min(cursor - (BAND_SPAN - 1) / 2,
+      days.length - BAND_SPAN));
+    var end = Math.min(days.length, start + BAND_SPAN);
+    var html = "";
+    for (var k = start; k < end; k++) {
       var day = days[k], isToday = day.date === d.date;
       var label = shortDate(day.date) + " — lunar day " + day.dayNum + " " +
         day.dayCn + (day.fast ? ", fast day" : "") +
@@ -508,27 +519,32 @@ body.no-recite .recite-only{display:none}
       html += '<div class="disc' + (day.fast ? " is-fast" : "") +
         (reciting(day) ? " is-recite" : "") +
         (isToday ? " is-today" : "") +
-        '" style="animation-delay:' + (n * 18) + 'ms" title="' + label +
-        '"><div class="cap">' + (isToday ? "&#9660;" : "") + "</div>" +
-        moonSvg(day.dayNum, discs.length, 22) +
+        '" style="animation-delay:' + ((k - start) * 18) + 'ms" title="' +
+        label + '"><div class="cap">' + (isToday ? "&#9660;" : "") + "</div>" +
+        moonSvg(day.dayNum, day.cycle, 22) +
         '<div class="tick"></div><div class="dot"></div>' +
         '<div class="n">' + parse(day.date).getDate() + "</div></div>";
-    });
+    }
     document.getElementById("band-discs").innerHTML = html;
-    var firstDay = days[discs[0]], lastDay = days[discs[discs.length - 1]];
+    /* where the discs are too wide to fit, scroll today into the middle */
+    var scroller = document.querySelector(".band-scroll");
+    var todayEl = scroller.querySelector(".disc.is-today");
+    if (todayEl && scroller.scrollWidth > scroller.clientWidth) {
+      var tBox = todayEl.getBoundingClientRect();
+      var sBox = scroller.getBoundingClientRect();
+      scroller.scrollLeft += (tBox.left - sBox.left) -
+        (scroller.clientWidth - tBox.width) / 2;
+    }
     document.getElementById("band-month").innerHTML =
       "Lunar " + d.monthLabel + ' <span class="han">' + d.monthCn +
-      "</span> &nbsp;·&nbsp; " + shortDate(firstDay.date) + " to " +
-      shortDate(lastDay.date) + (d.leap ? " · leap" : "") +
-      (d.longFast ? " · long fasting month" : "");
+      "</span> &nbsp;·&nbsp; day " + d.dayNum;
     document.getElementById("band-note").textContent =
-      discs.filter(function (k) { return days[k].fast; }).length +
-      " fast days this month";
+      shortDate(days[start].date) + " to " + shortDate(days[end - 1].date);
     document.getElementById("band-legend").innerHTML =
-      "<span>dates below are Gregorian</span>" +
+      "<span>Gregorian dates</span>" +
       '<span><i class="t"></i>today</span>' +
       '<span><i class="f"></i>fast day</span>' +
-      (reciteOn() ? '<span><i class="r"></i>Precept Recitation</span>' : "");
+      (reciteOn() ? '<span><i class="r"></i>precept recitation</span>' : "");
   }
 
   /* the next seven days, today first --------------------------------- */
@@ -545,8 +561,6 @@ body.no-recite .recite-only{display:none}
       if (reciting(d)) tags += '<li class="recite">Precept Recitation</li>';
       if (d.moon) tags += '<li class="moon">' +
         (d.moon === "new" ? "New moon" : "Full moon") + "</li>";
-      if (d.longFast) tags += "<li>Long fasting month</li>";
-      if (d.leap) tags += '<li class="leap">Leap month</li>';
       var events = eventsOf(d).map(function (e) {
         return "<li>" + esc(e) + "</li>";
       }).join("");
