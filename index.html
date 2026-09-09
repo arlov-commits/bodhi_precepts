@@ -284,7 +284,10 @@ td .rec{color:var(--recite);font-weight:600}
   display:flex;justify-content:space-between;gap:.75rem}
 .upcoming li:last-child{border-bottom:0}
 .upcoming li .han{font-family:var(--han)}
-.upcoming li span:last-child{color:var(--quiet)}
+.upcoming li span:last-child{color:var(--quiet);display:flex;
+  align-items:center;gap:.4rem}
+.upcoming li .wd{font-style:normal;color:var(--quiet);margin-left:.35rem}
+.upcoming li .moon-ic{width:1rem;flex:0 0 auto;vertical-align:0}
 .upcoming p{margin:.2rem 0 0;font-size:.9rem;color:var(--quiet)}
 .downloads{display:flex;flex-wrap:wrap;gap:.75rem;align-items:center;
   margin:1rem 0 1.5rem;font-size:.9rem}
@@ -445,8 +448,8 @@ body.no-recite .recite-only{display:none}
         <label for="opt-mode">Reckon them</label>
         <select id="opt-mode">
           <option value="lunar">By lunar day</option>
-          <option value="sat">Nearest Saturday to each moon</option>
-          <option value="sun">Nearest Sunday to each moon</option>
+          <option value="sat">Every other Saturday</option>
+          <option value="sun">Every other Sunday</option>
           <option value="none">Not at all</option>
         </select>
       </div>
@@ -462,6 +465,16 @@ body.no-recite .recite-only{display:none}
         </div>
         <p class="hint">Leave either blank for a single day a month. A month
           of 29 days has no day 30.</p>
+      </div>
+
+      <div class="suboptions" id="fortnight-opts">
+        <div class="field">
+          <label for="opt-anchor">In step with</label>
+          <input type="date" id="opt-anchor">
+        </div>
+        <p class="hint">Every fourteenth day either side of this one, so
+          the fortnight never skips. It keeps its own rhythm rather than the
+          moon's, and drifts from the moon over the years.</p>
       </div>
 
       <p class="state" id="opt-state"></p>
@@ -568,12 +581,13 @@ body.no-recite .recite-only{display:none}
   var WEEK_STARTS = ["none", "0", "1", "2", "3", "4", "5", "6"];
   var RECITE_MODES = ["lunar", "sat", "sun", "none"];
   var DEFAULTS = { reciteMode: "lunar", reciteDayA: 1, reciteDayB: 15,
-                   filter: "fast", theme: "auto", cardCount: 7,
-                   weekStart: "0" };
+                   reciteAnchor: "2026-09-12", filter: "fast", theme: "auto",
+                   cardCount: 7, weekStart: "0" };
   var settings = {
     reciteMode: DEFAULTS.reciteMode,
     reciteDayA: DEFAULTS.reciteDayA,
     reciteDayB: DEFAULTS.reciteDayB,
+    reciteAnchor: DEFAULTS.reciteAnchor,
     filter: DEFAULTS.filter,
     theme: DEFAULTS.theme,
     cardCount: DEFAULTS.cardCount,
@@ -605,6 +619,8 @@ body.no-recite .recite-only{display:none}
         settings.reciteDayA = clampDay(saved.reciteDayA);
       if (saved.hasOwnProperty("reciteDayB"))
         settings.reciteDayB = clampDay(saved.reciteDayB);
+      if (/^\d{4}-\d{2}-\d{2}$/.test(saved.reciteAnchor))
+        settings.reciteAnchor = saved.reciteAnchor;
       if (FILTERS.indexOf(saved.filter) > -1) settings.filter = saved.filter;
       if (THEMES.indexOf(saved.theme) > -1) settings.theme = saved.theme;
       settings.cardCount = clampCards(saved.cardCount);
@@ -665,38 +681,37 @@ body.no-recite .recite-only{display:none}
     return "week of " + (withYear ? shortDate(weekIso) : dayMonth(weekIso));
   }
 
-  /* Where the assembly gathers at weekends, recitation lands on the Saturday
-     or Sunday nearest each new and full moon — never more than three days
-     off, so the two a month still fall a fortnight or so apart. */
-  var nearMoon = { sat: {}, sun: {} };
-  [["sat", 6], ["sun", 0]].forEach(function (pair) {
-    days.forEach(function (d) {
-      if (!d.moon) return;
-      var dt = parse(d.date);
-      var shift = (pair[1] - dt.getDay() + 7) % 7;
-      if (shift > 3) shift -= 7;
-      dt.setDate(dt.getDate() + shift);
-      nearMoon[pair[0]][iso(dt)] = d.moon;
-    });
-  });
-
+  /* Where the assembly gathers at weekends it keeps a fortnight, not the
+     moon: every fourteenth day from a reference date, so the rhythm never
+     skips. It drifts from the moon over the years, which is the trade. */
+  var FORTNIGHT = ["sat", "sun"];
+  function fortnightly(d) {
+    var gap = (parse(d.date) - parse(settings.reciteAnchor)) / 86400000;
+    return Math.round(gap) % 14 === 0;
+  }
   function reciteOn() {
     if (settings.reciteMode === "none") return false;
     if (settings.reciteMode !== "lunar") return true;
     return settings.reciteDayA !== null || settings.reciteDayB !== null;
   }
   function reciting(d) {
-    var near = nearMoon[settings.reciteMode];
-    if (near) return !!near[d.date];
+    if (FORTNIGHT.indexOf(settings.reciteMode) > -1) return fortnightly(d);
     if (settings.reciteMode === "none") return false;
     return d.dayNum === settings.reciteDayA ||
            d.dayNum === settings.reciteDayB;
   }
   /* what a recitation day is keyed to, for the upcoming list */
   function reciteNote(d) {
-    var near = nearMoon[settings.reciteMode];
-    if (near) return near[d.date] ? " · near " + near[d.date] : "";
+    if (FORTNIGHT.indexOf(settings.reciteMode) > -1) return "";
     return d.lastOfMonth ? " · last" : "";
+  }
+  /* the nearest date to `isoDate` falling on weekday `target` */
+  function snapWeekday(isoDate, target) {
+    var dt = parse(isoDate);
+    var shift = (target - dt.getDay() + 7) % 7;
+    if (shift > 3) shift -= 7;
+    dt.setDate(dt.getDate() + shift);
+    return iso(dt);
   }
 
   /* the spreadsheet packs same-day events into one cell, pipe separated */
@@ -894,10 +909,13 @@ body.no-recite .recite-only{display:none}
       if (pred(days[i])) out.push(days[i]);
     return out;
   }
+  /* Each entry names its weekday, and carries the moon where one falls on
+     it, which is what the separate list of moons used to be for. */
   function ul(items, right) {
     return "<ul>" + items.map(function (d) {
-      return "<li><span>" + shortDate(d.date) + "</span><span>" +
-        right(d) + "</span></li>";
+      return "<li><span>" + shortDate(d.date) +
+        ' <i class="wd">' + d.weekday + "</i></span><span>" +
+        right(d) + (d.moon ? moonIcon(d) : "") + "</span></li>";
     }).join("") + "</ul>";
   }
   var nextLong = null, nextLeap = null;
@@ -918,10 +936,6 @@ body.no-recite .recite-only{display:none}
           return '<span class="han">' + lunarDate(d) + "</span>" +
             reciteNote(d);
         }) + "</section>" : "") +
-      "<section><h3>Next moons</h3>" +
-      ul(listOf(function (d) { return d.moon; }, 6), function (d) {
-        return d.moon + " moon";
-      }) + "</section>" +
       "<section><h3>Long fasting months</h3>" +
       (nextLong ? "<p>Next begins " + shortDate(nextLong.date) + ", " +
         nextLong.monthLabel + ".</p>" : "<p>None left in the dataset.</p>") +
@@ -1077,6 +1091,8 @@ body.no-recite .recite-only{display:none}
   /* settings --------------------------------------------------------- */
   var modeSel = document.getElementById("opt-mode");
   var lunarOpts = document.getElementById("lunar-opts");
+  var fortnightOpts = document.getElementById("fortnight-opts");
+  var anchorInput = document.getElementById("opt-anchor");
   var dayA = document.getElementById("opt-day-a");
   var dayB = document.getElementById("opt-day-b");
   var cardsInput = document.getElementById("opt-cards");
@@ -1086,9 +1102,9 @@ body.no-recite .recite-only{display:none}
     if (settings.reciteMode === "none")
       return "Nothing is flagged as Precept Recitation.";
     if (settings.reciteMode !== "lunar")
-      return "Flagged: the " +
-        (settings.reciteMode === "sat" ? "Saturday" : "Sunday") +
-        " nearest each new and full moon, so never more than three days off.";
+      return "Flagged: every other " +
+        WEEK[parse(settings.reciteAnchor).getDay()] + ", in step with " +
+        shortDate(settings.reciteAnchor) + ".";
     var days2 = [settings.reciteDayA, settings.reciteDayB]
       .filter(function (n) { return n !== null; });
     if (!days2.length) return "Nothing is flagged as Precept Recitation.";
@@ -1104,6 +1120,9 @@ body.no-recite .recite-only{display:none}
     if (!on && settings.filter === "recite") settings.filter = "fast";
     modeSel.value = settings.reciteMode;
     lunarOpts.classList.toggle("hidden", settings.reciteMode !== "lunar");
+    fortnightOpts.classList.toggle("hidden",
+      FORTNIGHT.indexOf(settings.reciteMode) < 0);
+    anchorInput.value = settings.reciteAnchor;
     dayA.value = settings.reciteDayA === null ? "" : settings.reciteDayA;
     dayB.value = settings.reciteDayB === null ? "" : settings.reciteDayB;
     cardsInput.value = settings.cardCount;
@@ -1122,8 +1141,24 @@ body.no-recite .recite-only{display:none}
     renderUpcoming();
     renderTable();
   }
+  /* Saturday and Sunday are the same fortnight one day apart, so picking one
+     pulls the reference date onto that weekday rather than leaving the two
+     contradicting each other. */
+  function alignAnchor() {
+    var i = FORTNIGHT.indexOf(settings.reciteMode);
+    if (i > -1) settings.reciteAnchor =
+      snapWeekday(settings.reciteAnchor, i === 0 ? 6 : 0);
+  }
   modeSel.addEventListener("change", function () {
     settings.reciteMode = modeSel.value;
+    alignAnchor();
+    saveSettings();
+    applySettings();
+  });
+  anchorInput.addEventListener("change", function () {
+    if (!anchorInput.value) { applySettings(); return; }
+    settings.reciteAnchor = anchorInput.value;
+    alignAnchor();
     saveSettings();
     applySettings();
   });
@@ -1148,6 +1183,7 @@ body.no-recite .recite-only{display:none}
     settings.reciteMode = DEFAULTS.reciteMode;
     settings.reciteDayA = DEFAULTS.reciteDayA;
     settings.reciteDayB = DEFAULTS.reciteDayB;
+    settings.reciteAnchor = DEFAULTS.reciteAnchor;
     settings.filter = DEFAULTS.filter;
     settings.theme = DEFAULTS.theme;
     settings.cardCount = DEFAULTS.cardCount;

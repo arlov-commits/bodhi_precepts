@@ -76,8 +76,8 @@ data came off the DRBA printed calendar or the HKO tables.
 - **Precept Recitation** (布薩, bùsà): the days the assembly gathers to recite
   the precepts. Two a month by default — lunar 1 and 15, the new moon and the
   full. The 15th is already a fast day, so there the flag is an extra marking
-  on top; the 1st is not, nor is the nearest weekend, so those take the third
-  card colour. Which days count is a setting, not a fixed rule, so this is
+  on top; the 1st is not, nor is most of a fortnightly weekend, so those take
+  the third card colour. Which days count is a setting, not a fixed rule, so this is
   derived in the browser rather than stored in the dataset. The last day is found by looking ahead to the next
   day-1 rather than from `monthLength`, which is short for the truncated month
   at the end of the dataset.
@@ -91,13 +91,16 @@ Recitation flag. It is reckoned one of four ways:
   typed in: 1 and 15 by default, the new moon and the full. Any day from 1 to
   30 will do; leaving a box blank gives a single recitation a month, and
   leaving both blank drops the flag. Day 30 means a month of 29 days has none.
-- **Nearest Saturday** or **nearest Sunday to each moon**, for an assembly
-  that gathers at weekends: the Saturday or Sunday closest to each new and
-  full moon, never more than three days off. Over this dataset that lands on
-  every other Saturday 74 times in 83, stretching to three weeks the other 9,
-  where the moons drift far enough that the nearer weekend is the next one.
-  Recitation then usually falls on a day that is not a fast day, which is what
-  the third card colour is for.
+- **Every other Saturday** or **every other Sunday**, for an assembly that
+  gathers at weekends: every fourteenth day either side of a reference date,
+  12 September 2026 by default. The fortnight never skips — anchoring on the
+  nearer moon instead would stretch to three weeks whenever the moons drift,
+  and keeping the rhythm matters more. The trade is that a fixed fortnight
+  loses the moon over the years: across this dataset these days sit a mean of
+  2.9 days from a new or full moon in the first year and 3.7 in the last.
+  Picking Saturday or Sunday pulls the reference date onto that weekday, so
+  the two cannot contradict each other. Recitation then usually falls on a day
+  that is not a fast day, which is what the third card colour is for.
 - **Not at all**, which drops the flag, its filter and its column from every
   view.
 
