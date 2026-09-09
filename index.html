@@ -38,6 +38,9 @@
   --moonc-line:#BDB7A8;
   --leap:#9E2A24;
   --leap-dim:#F7EAE6;
+  --netline:rgba(28,26,22,.11);
+  --hatch:repeating-linear-gradient(45deg,var(--netline) 0 1px,transparent 1px 9px),
+          repeating-linear-gradient(-45deg,var(--netline) 0 1px,transparent 1px 9px);
   --sans:"Optima","Avenir Next","Gill Sans MT","Gill Sans","Trebuchet MS",sans-serif;
   --han:"Songti SC","STSong","Noto Serif CJK SC","Noto Serif SC","SimSun",serif;
 }
@@ -74,6 +77,7 @@
   --moonc-line:#505860;
   --leap:#DE9184;
   --leap-dim:#3A302E;
+  --netline:rgba(233,231,222,.11);
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
@@ -128,15 +132,15 @@ input:focus-visible,.chip:focus-visible{outline:2px solid var(--fast);
 .discs{display:flex;gap:.2rem;align-items:flex-start}
 .disc{flex:1 1 0;min-width:0;text-align:center;padding:.15rem .1rem .25rem}
 .disc svg{display:block;margin:0 auto;width:100%;max-width:1.45rem;height:auto}
-.disc svg .rim{fill:var(--moon-dark);stroke:var(--moon-edge)}
-.disc svg .lit{fill:var(--moon-lit)}
+.moon .rim{fill:var(--moon-dark);stroke:var(--moon-edge)}
+.moon .lit{fill:var(--moon-lit)}
 /* The exact new and full moons carry a faint halo. Days either side of them
    are all but identical discs, and this separates them without another key:
    the disc under the halo is either wholly lit or wholly dark. */
-.disc.is-phase svg{filter:drop-shadow(0 0 2px var(--moonc))}
+.is-phase > svg{filter:drop-shadow(0 0 2px var(--moonc))}
 /* On the dark ground a grey halo is lost against an already-bright full
    moon, so there the halo becomes actual light spilling onto the ground. */
-:root[data-theme="dark"] .disc.is-phase svg{
+:root[data-theme="dark"] .is-phase > svg{
   filter:drop-shadow(0 0 3px #FFFDF6) drop-shadow(0 0 6px rgba(255,253,246,.5))}
 .disc .cap{height:.6rem;font-size:.55rem;line-height:.6rem;color:transparent}
 .disc .n{font-size:.62rem;color:var(--quiet);margin-top:.25rem;
@@ -162,17 +166,17 @@ input:focus-visible,.chip:focus-visible{outline:2px solid var(--fast);
 h2{font-size:1rem;font-weight:600;letter-spacing:.02em;margin:2.25rem 0 .5rem}
 .cards{display:grid;gap:.75rem;
   grid-template-columns:repeat(auto-fill,minmax(13.5rem,1fr))}
-.card{background:var(--panel);border:1px solid var(--line);
+.card{background-color:var(--panel);border:1px solid var(--line);
   border-top:2px solid var(--line);padding:.8rem .85rem .9rem;
   display:flex;flex-direction:column;align-items:center;text-align:center}
 /* Three states, by what falls on the day. Recitation alone is an ink wash,
    a fast day is a cinnabar one, and a recitation that lands on a fast day —
    the heaviest of the three — takes the cinnabar deeper still. */
-.card.is-recite{background:var(--rec-dim);border-color:var(--rec-line);
+.card.is-recite{background-color:var(--rec-dim);border-color:var(--rec-line);
   border-top-color:var(--recite)}
-.card.is-fast{background:var(--fast-dim);border-color:var(--fast-line);
+.card.is-fast{background-color:var(--fast-dim);border-color:var(--fast-line);
   border-top-color:var(--fast)}
-.card.is-fast.is-recite{background:var(--both-dim);
+.card.is-fast.is-recite{background-color:var(--both-dim);
   border-color:var(--both-line);border-top-color:var(--fast)}
 .card .rel{font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;
   color:var(--quiet)}
@@ -233,14 +237,26 @@ th,td{text-align:left;padding:.42rem .5rem;border-bottom:1px solid var(--hair);
 thead th{position:sticky;top:0;background:var(--paper);
   border-bottom:1px solid var(--ink);font-weight:600;font-size:.8rem;
   letter-spacing:.05em}
-tbody tr.is-fast{background:var(--fast-wash)}
-td .aside{font-family:var(--sans);font-size:.8rem;color:var(--quiet);
-  margin-left:.4rem}
+tbody tr.is-fast{background-color:var(--fast-wash)}
+td.wd{color:var(--quiet);font-size:.85rem}
+td.moon-cell{width:1.9rem}
+.moon-ic{display:inline-block;width:1.15rem;vertical-align:-.25rem}
+.moon-ic svg{display:block;width:100%;height:auto}
+.star-ic{display:inline-block;width:.8rem;vertical-align:-.05rem}
+.star-ic svg{display:block;width:100%;height:auto}
+td .longfast,td .yes{display:block}
+td .longfast{color:var(--ink-soft);font-size:.75rem;letter-spacing:.05em;
+  text-transform:uppercase;white-space:nowrap}
+/* Indra's net: a hatch laid over whatever colour the row already carries,
+   so a long fasting month reads as one stretch without displacing the marks
+   for the single days inside it. */
+tbody tr.is-long,.card.is-long{background-image:var(--hatch)}
 tbody tr.weekbreak-row td{padding:1.15rem .5rem .3rem;
   border-bottom:1px solid var(--ink);font-size:.7rem;letter-spacing:.14em;
   text-transform:uppercase;color:var(--quiet)}
-tbody tr.is-moon{background:var(--moonc-dim)}
-tbody tr.is-fast.is-moon{background:var(--fast-moon)}
+tbody tr.weekbreak-row:first-child td{padding-top:.35rem}
+tbody tr.is-moon{background-color:var(--moonc-dim)}
+tbody tr.is-fast.is-moon{background-color:var(--fast-moon)}
 td.han{font-family:var(--han);font-size:1.05rem}
 td.num{font-variant-numeric:tabular-nums}
 td .yes{color:var(--fast);font-weight:600}
@@ -368,7 +384,8 @@ body.no-recite .recite-only{display:none}
       <thead>
         <tr>
           <th scope="col">Date</th>
-          <th scope="col">Lunar date</th>
+          <th scope="col">Day</th>
+          <th scope="col">Lunar</th>
           <th scope="col">Fast</th>
           <th scope="col" class="recite-only">Recitation</th>
           <th scope="col">Moon</th>
@@ -599,9 +616,8 @@ body.no-recite .recite-only{display:none}
     d.setDate(d.getDate() - (d.getDay() - +settings.weekStart + 7) % 7);
     return iso(d);
   }
-  function weekLabel(weekIso) {
-    var d = parse(weekIso);
-    return "week of " + d.getDate() + " " + MONTHS[d.getMonth()].slice(0, 3);
+  function weekLabel(weekIso, withYear) {
+    return "week of " + (withYear ? shortDate(weekIso) : dayMonth(weekIso));
   }
 
   function reciteOn() {
@@ -651,6 +667,10 @@ body.no-recite .recite-only{display:none}
     if (da.getFullYear() !== db.getFullYear()) head += " " + da.getFullYear();
     return head + " to " + shortDate(b);
   }
+  function dayMonth(s) {
+    var d = parse(s);
+    return d.getDate() + " " + MONTHS[d.getMonth()].slice(0, 3);
+  }
   function shortDate(s) {
     var d = parse(s);
     return d.getDate() + " " + MONTHS[d.getMonth()].slice(0, 3) + " " +
@@ -672,11 +692,16 @@ body.no-recite .recite-only{display:none}
     var path = "M0," + (-r) + " A" + r + "," + r + " 0 0," + outer +
                " 0," + r + " A" + rx + "," + r + " 0 0," + inner +
                " 0," + (-r);
-    return '<svg width="' + size + '" height="' + size + '" viewBox="' +
-      (-size / 2) + " " + (-size / 2) + " " + size + " " + size +
-      '" aria-hidden="true">' +
+    return '<svg class="moon" width="' + size + '" height="' + size +
+      '" viewBox="' + (-size / 2) + " " + (-size / 2) + " " + size + " " +
+      size + '" aria-hidden="true">' +
       '<circle class="rim" r="' + r + '" stroke-width="0.8"/>' +
       '<path class="lit" d="' + path + '"/></svg>';
+  }
+  /* the same disc the band draws, at the size the table needs */
+  function moonIcon(d) {
+    return '<span class="moon-ic is-phase" title="' + d.moon + ' moon">' +
+      moonSvg(d.dayNum, d.cycle, 22) + "</span>";
   }
 
   /* which day are we on --------------------------------------------- */
@@ -771,7 +796,9 @@ body.no-recite .recite-only{display:none}
       }).join("");
       html += '<article class="card' + (d.fast ? " is-fast" : "") +
         (reciting(d) ? " is-recite" : "") +
-        (!outOfRange && n === 0 ? " is-today" : "") + '">' +
+        (d.longFast ? " is-long" : "") +
+        (!outOfRange && n === 0 ? " is-today" : "") + '"' +
+        (d.longFast ? ' title="Long fasting month"' : "") + ">" +
         '<div class="rel">' + rel + "</div>" +
         '<div class="greg">' + shortDate(d.date) + "</div>" +
         '<div class="lunar"><span class="lbl">lunar</span>' +
@@ -854,31 +881,48 @@ body.no-recite .recite-only{display:none}
     document.getElementById("table-caption").textContent = cap;
     var prevWeek = null;
     var rows = shown.slice(0, 500).map(function (d) {
+      /* Every group is headed, the first included: the rows no longer carry
+         a year, so the heading is where it lives. */
       var week = weekOf(d.date), lead = "";
-      if (week && prevWeek && week !== prevWeek)
-        lead = '<tr class="weekbreak-row"><td colspan="6">' +
-          weekLabel(week) + "</td></tr>";
+      if (week && week !== prevWeek)
+        lead = '<tr class="weekbreak-row"><td colspan="7">' +
+          weekLabel(week, true) + "</td></tr>";
       prevWeek = week;
+      /* The year lives on the week heading. With weeks off there is no
+         heading to carry it, so it stays on the row. */
       return lead + "<tr class=" + '"' + (d.fast ? "is-fast " : "") +
+        (d.longFast ? "is-long " : "") +
         (d.moon ? "is-moon" : "") + '">' +
-        '<td class="num">' + shortDate(d.date) + " <span style=color:var(--quiet)>" +
-        d.weekday + "</span></td>" +
-        '<td class="han">' + lunarDate(d) +
-        (d.longFast ? ' <span class="aside">long fast</span>' : "") + "</td>" +
-        '<td>' + (d.fast ? '<span class="yes">yes</span>' : "") + "</td>" +
+        '<td class="num">' +
+        (week ? dayMonth(d.date) : shortDate(d.date)) + "</td>" +
+        '<td class="wd">' + d.weekday + "</td>" +
+        '<td class="han">' + lunarDate(d) + "</td>" +
+        "<td>" +
+        (d.longFast ? '<span class="longfast">Long Fast</span>' : "") +
+        (d.fast ? '<span class="yes">yes</span>' : "") + "</td>" +
         '<td class="recite-only">' +
-        (reciting(d) ? '<span class="rec">yes</span>' : "") + "</td>" +
-        "<td>" + (d.moon || "") + "</td>" +
+        (reciting(d) ? '<span class="star-ic" title="Precept Recitation">' +
+          STAR + "</span>" : "") + "</td>" +
+        '<td class="moon-cell">' + (d.moon ? moonIcon(d) : "") + "</td>" +
         '<td class="opt">' + eventsOf(d).map(function (e) {
           return "<div>" + esc(e) + "</div>";
         }).join("") + (d.leap ? "<div>leap month</div>" : "") + "</td>" +
         "</tr>";
     }).join("");
     if (shown.length > 500) {
-      rows += '<tr><td colspan="6">Showing the first 500. Move the start ' +
+      rows += '<tr><td colspan="7">Showing the first 500. Move the start ' +
         "date forward, or open data.csv for the rest.</td></tr>";
     }
-    document.getElementById("table-body").innerHTML = rows;
+    var body = document.getElementById("table-body");
+    body.innerHTML = rows;
+    alignHatch(body);
+  }
+
+  /* The hatch is drawn per row, so anchor each one to the table's own origin
+     or the diagonals would restart at every row edge. */
+  function alignHatch(body) {
+    Array.prototype.forEach.call(body.querySelectorAll("tr.is-long"),
+      function (tr) { tr.style.backgroundPosition = "0 " + -tr.offsetTop + "px"; });
   }
 
   function markChips() {

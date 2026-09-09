@@ -111,6 +111,13 @@ seal red for the fast days. Dark is evening ink: diluted 墨 is never black but
 a blue-grey, so the ground is slate rather than soot, the strokes are warm
 paper, and the cinnabar drops back to the dustier clay it dries to.
 
+A long fasting month is a hatch — Indra's net — laid over whatever colour the
+row or card already carries, on both Today and Upcoming. It reads as one
+continuous stretch rather than a run of separate days, and because it sits
+over the colour rather than replacing it, the marks for the single days inside
+it are undisturbed. The hatch is anchored to the table's own origin, so the
+diagonals do not restart at every row edge.
+
 A day card is coloured by what falls on it, so the overlaps read at a glance:
 an ordinary day is bare, a Precept Recitation on its own is a cool ink wash, a
 fast day is a cinnabar one, and a recitation landing on a fast day — the
@@ -132,6 +139,12 @@ Lunar dates are written month then day throughout — `7月28日`, and `閏5月1
 in a leap month. Gregorian dates stay in the Western order, and a span names
 the year once unless it turns over: *26 Aug to 23 Sep 2026*, but *14 Dec 2026
 to 11 Jan 2027*.
+
+On Upcoming the year sits on the week heading rather than on every row; with
+weeks off there is no heading to carry it, so it stays on the row. The Fast
+column does double duty: **Long Fast** for a day inside a long fasting month,
+and the day's own fast marked under it. Recitation is the pole star and the
+moon is the same disc the band draws, halo and all.
 
 ## Sources
 
