@@ -16,6 +16,8 @@
   --ochre-soft:#EBDCC2;
   --lapis:#2E4A72;
   --lapis-soft:#D7DFEA;
+  --jade:#3A6152;
+  --jade-soft:#D6E3DC;
   --moon:#E9E5DA;
   --sans:"Optima","Avenir Next","Gill Sans MT","Gill Sans","Trebuchet MS",sans-serif;
   --han:"Songti SC","STSong","Noto Serif CJK SC","Noto Serif SC","SimSun",serif;
@@ -66,49 +68,84 @@ input:focus-visible,.chip:focus-visible{outline:2px solid var(--lapis);
   color:#5F3D07}
 .mark.moon{border-color:var(--lapis);background:var(--lapis-soft);
   color:#22355A}
+.mark.recite{border-color:var(--jade);background:var(--jade-soft);
+  color:#254237}
 .mark.leap{border-color:#9A5B3D;background:#F0DED4;color:#6E3A22}
 
 /* ------------------------------------------------------ lunation band */
-.band{background:var(--night);color:var(--moon);padding:1.1rem 1.1rem .9rem;
-  overflow-x:auto}
+.band{background:var(--night);color:var(--moon);padding:1.1rem 1.1rem .9rem}
 .band .head{display:flex;justify-content:space-between;align-items:baseline;
   gap:1rem;font-size:.85rem;letter-spacing:.06em;color:#9FB0B3;
   margin-bottom:.7rem}
 .band .head .han{font-family:var(--han);color:var(--moon);font-size:1.05rem}
-.discs{display:flex;gap:.34rem;min-width:max-content}
-.disc{width:1.55rem;text-align:center;background:none;border:0;padding:0;
-  cursor:pointer;color:inherit;font:inherit}
-.disc svg{display:block;margin:0 auto}
+.band-scroll{overflow-x:auto}
+.discs{display:flex;gap:.2rem;align-items:flex-start}
+.disc{flex:1 1 0;min-width:0;text-align:center;padding:.15rem .1rem .25rem}
+.disc svg{display:block;margin:0 auto;width:100%;max-width:1.45rem;height:auto}
+.disc .cap{height:.55rem;font-size:.5rem;line-height:.55rem;color:transparent}
 .disc .n{font-size:.62rem;color:#8C9C9F;margin-top:.25rem;
   font-variant-numeric:tabular-nums}
 .disc.is-fast .n{color:var(--moon)}
 .disc .tick{height:3px;margin-top:.2rem;background:transparent}
 .disc.is-fast .tick{background:#C68A2E}
+.disc .dot{height:.3rem;margin-top:.16rem;font-size:0}
+.disc.is-recite .dot{background:#7FB59E;
+  clip-path:polygon(50% 0,100% 100%,0 100%)}
+.disc.is-today{background:rgba(255,255,255,.11);
+  outline:1px solid rgba(255,255,255,.6)}
+.disc.is-today .cap{color:#fff;letter-spacing:.04em}
 .disc.is-today .n{color:#fff;font-weight:700}
-.disc.is-today svg circle.rim{stroke:#fff;stroke-width:1.4}
+.disc.is-today svg circle.rim{stroke:#fff;stroke-width:1.6}
+.band .legend{display:flex;flex-wrap:wrap;gap:.9rem;margin-top:.7rem;
+  font-size:.72rem;letter-spacing:.05em;color:#9FB0B3}
+.band .legend i{font-style:normal;display:inline-block;width:.7rem;
+  height:.3rem;margin-right:.3rem;vertical-align:.06rem}
+.band .legend i.f{background:#C68A2E}
+.band .legend i.r{background:#7FB59E;
+  clip-path:polygon(50% 0,100% 100%,0 100%)}
+.band .legend i.t{background:transparent;border:1px solid rgba(255,255,255,.6);
+  height:.62rem;width:.62rem}
 @media (prefers-reduced-motion:no-preference){
   .discs.animate .disc{animation:rise .5s both}
 }
 @keyframes rise{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
 
-/* -------------------------------------------------------- day stream */
+/* --------------------------------------------------------- day cards */
 h2{font-size:1rem;font-weight:600;letter-spacing:.02em;margin:2.25rem 0 .5rem}
-.stream{border-top:1px solid var(--line)}
-.day{display:grid;grid-template-columns:7.5rem 1fr auto;gap:1rem;
-  align-items:baseline;padding:.7rem .6rem;border-bottom:1px solid var(--line);
-  border-left:3px solid transparent}
-.day.is-fast{background:var(--ochre-soft);border-left-color:var(--ochre)}
-.day.is-moon{background:var(--lapis-soft);border-left-color:var(--lapis)}
-.day.is-fast.is-moon{background:linear-gradient(100deg,var(--ochre-soft) 55%,var(--lapis-soft) 55%)}
-.day .date{font-variant-numeric:tabular-nums}
-.day .date span{color:var(--quiet)}
-.day .lunar .han{font-family:var(--han);font-size:1.1rem}
-.day .lunar small{color:var(--quiet);margin-left:.4rem}
-.day .flags{text-align:right;font-size:.85rem;letter-spacing:.05em}
-.day .flags .f{color:var(--ochre)}
-.day .flags .m{color:var(--lapis)}
-.day .event{grid-column:2/-1;font-size:.85rem;color:var(--quiet);
-  margin-top:.15rem}
+.cards{display:grid;gap:.75rem;
+  grid-template-columns:repeat(auto-fill,minmax(13.5rem,1fr))}
+.card{background:var(--panel);border:1px solid var(--line);
+  border-top:3px solid var(--line);padding:.75rem .85rem .85rem;
+  display:flex;flex-direction:column}
+.card.is-fast{background:var(--ochre-soft);border-top-color:var(--ochre);
+  border-color:#D6C6A8}
+.card.is-today{border-top-color:var(--ink);border-color:var(--ink)}
+.card.is-today.is-fast{border-top-color:var(--ochre)}
+.card .rel{font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--quiet)}
+.card.is-today .rel{color:var(--ink);font-weight:700}
+.card .greg{font-size:1.02rem;margin-top:.1rem;
+  font-variant-numeric:tabular-nums}
+.card .lunar{margin-top:.55rem;padding-top:.55rem;
+  border-top:1px solid var(--line);font-size:.9rem;color:var(--quiet)}
+.card.is-fast .lunar{border-top-color:#D6C6A8}
+.card .lunar .big{display:block;font-size:1.05rem;color:var(--ink);
+  margin-top:.1rem}
+.card .lunar .han{font-family:var(--han);font-size:1.1rem;
+  margin-left:.35rem;color:var(--quiet)}
+.tags{list-style:none;margin:.6rem 0 0;padding:0;display:flex;
+  flex-wrap:wrap;gap:.3rem}
+.tags li{font-size:.75rem;letter-spacing:.05em;padding:.16rem .45rem;
+  border:1px solid var(--line);background:#fff}
+.tags li.fast{border-color:var(--ochre);background:#fff;color:#5F3D07}
+.tags li.moon{border-color:var(--lapis);background:var(--lapis-soft);
+  color:#22355A}
+.tags li.recite{border-color:var(--jade);background:var(--jade-soft);
+  color:#254237}
+.card .plain{margin-top:.6rem;font-size:.8rem;color:var(--quiet);
+  letter-spacing:.04em}
+.card .event{margin-top:.6rem;font-size:.82rem;color:var(--ink);
+  border-left:2px solid var(--line);padding-left:.5rem}
 
 /* ------------------------------------------------------------ record */
 .filters{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;
@@ -134,6 +171,8 @@ tbody tr.is-moon{background:var(--lapis-soft)}
 tbody tr.is-fast.is-moon{background:#E6E0DC}
 td.han{font-family:var(--han);font-size:1.05rem}
 td.num{font-variant-numeric:tabular-nums}
+td .yes{color:var(--ochre)}
+td .rec{color:var(--jade);font-weight:600}
 .upcoming{display:grid;gap:1.25rem;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));
   margin-bottom:1.5rem}
 .upcoming section{background:var(--panel);padding:.9rem 1rem;
@@ -150,20 +189,41 @@ td.num{font-variant-numeric:tabular-nums}
   margin:1rem 0 1.5rem;font-size:.9rem}
 .downloads a{color:var(--lapis);text-decoration:underline;
   text-underline-offset:2px}
+/* ---------------------------------------------------------- settings */
+nav button.gear{font-size:1.05rem;line-height:1;padding:.35rem .55rem}
+.setting{background:var(--panel);border-top:2px solid var(--ink);
+  padding:1rem 1.1rem;margin:1rem 0;max-width:40rem}
+.setting h3{margin:0 0 .35rem;font-size:.95rem;font-weight:600}
+.setting p{margin:.35rem 0 0;font-size:.88rem;color:var(--quiet)}
+.setting .han{font-family:var(--han)}
+.switch{display:flex;align-items:center;gap:.7rem;margin-top:.85rem;
+  cursor:pointer;font-size:.92rem}
+.switch input{position:absolute;opacity:0;width:0;height:0}
+.switch .track{flex:0 0 auto;width:2.6rem;height:1.4rem;background:#fff;
+  border:1px solid var(--line);position:relative;transition:background .15s}
+.switch .track::after{content:"";position:absolute;top:.2rem;left:.2rem;
+  width:.9rem;height:.9rem;background:var(--quiet);transition:transform .15s}
+.switch input:checked + .track{background:var(--jade-soft);
+  border-color:var(--jade)}
+.switch input:checked + .track::after{transform:translateX(1.2rem);
+  background:var(--jade)}
+.switch input:focus-visible + .track{outline:2px solid var(--lapis);
+  outline-offset:2px}
+.setting .state{color:var(--quiet);font-size:.85rem;letter-spacing:.05em}
 footer{margin-top:3rem;padding-top:1rem;border-top:1px solid var(--line);
   font-size:.82rem;color:var(--quiet);max-width:60ch}
 footer p{margin:.4rem 0}
 footer .han{font-family:var(--han)}
 .hidden{display:none}
+body.no-recite .recite-only{display:none}
 .notice{background:#F0DED4;border-left:3px solid #9A5B3D;padding:.7rem .9rem;
   font-size:.9rem;margin:1rem 0}
 @media (max-width:640px){
   .today{grid-template-columns:1fr;gap:.75rem;padding-top:1.25rem}
   .glyph{font-size:4.25rem}
-  .day{grid-template-columns:1fr auto;gap:.4rem}
-  .day .lunar{grid-column:1}
-  .day .date{grid-column:1;font-size:.9rem}
-  .day .flags{grid-column:2;grid-row:1/3}
+  .discs{min-width:max-content;gap:.34rem}
+  .disc{flex:0 0 1.55rem}
+  .disc svg{max-width:1.55rem}
   th.opt,td.opt{display:none}
 }
 </style>
@@ -179,6 +239,8 @@ footer .han{font-family:var(--han)}
     <nav>
       <button type="button" id="nav-today" aria-current="page">Today</button>
       <button type="button" id="nav-record">The record</button>
+      <button type="button" id="nav-settings" class="gear" title="Settings"
+        aria-label="Settings"><span aria-hidden="true">&#9881;</span></button>
     </nav>
   </header>
 
@@ -201,11 +263,14 @@ footer .han{font-family:var(--han)}
         <span id="band-month"></span>
         <span id="band-note"></span>
       </div>
-      <div class="discs animate" id="band-discs"></div>
+      <div class="band-scroll">
+        <div class="discs animate" id="band-discs"></div>
+      </div>
+      <div class="legend" id="band-legend"></div>
     </div>
 
-    <h2>The next six days</h2>
-    <div class="stream" id="stream"></div>
+    <h2>The next seven days</h2>
+    <div class="cards" id="cards"></div>
   </main>
 
   <!-- ====================================================== record -->
@@ -217,6 +282,7 @@ footer .han{font-family:var(--han)}
       <button class="chip" type="button" data-filter="all" aria-pressed="false">All days</button>
       <button class="chip" type="button" data-filter="fast" aria-pressed="true">Fast days</button>
       <button class="chip" type="button" data-filter="moon" aria-pressed="false">New and full moons</button>
+      <button class="chip recite-only" type="button" data-filter="recite" aria-pressed="false">Precept Recitation</button>
       <button class="chip" type="button" data-filter="long" aria-pressed="false">Long fasting months</button>
       <button class="chip" type="button" data-filter="event" aria-pressed="false">Dharma events</button>
       <label class="jump">Start at
@@ -232,6 +298,7 @@ footer .han{font-family:var(--han)}
           <th scope="col">Lunar month</th>
           <th scope="col">Lunar day</th>
           <th scope="col">Fast</th>
+          <th scope="col" class="recite-only">Recitation</th>
           <th scope="col">Moon</th>
           <th scope="col" class="opt">Notes</th>
         </tr>
@@ -244,6 +311,33 @@ footer .han{font-family:var(--han)}
       <a href="data.csv" download>data.csv</a>
       <a href="data.json" download>data.json</a>
       <button class="chip" type="button" id="copy-visible">Copy what is shown</button>
+    </div>
+  </main>
+
+  <!-- ==================================================== settings -->
+  <main id="view-settings" class="hidden">
+    <h2>Settings</h2>
+
+    <div class="setting">
+      <h3>Precept Recitation days</h3>
+      <p>Flag the 15th and the last day of each lunar month as Precept
+        Recitation (<span class="han">布薩</span>, bùsà) days, in every view.
+        These are the two days the monastic assembly gathers to recite the
+        precepts.</p>
+      <label class="switch">
+        <input type="checkbox" id="opt-recite">
+        <span class="track" aria-hidden="true"></span>
+        <span>Show Precept Recitation</span>
+      </label>
+      <p class="state" id="opt-recite-state"></p>
+    </div>
+
+    <div class="setting">
+      <h3>Where this is kept</h3>
+      <p>Settings are saved in this browser only, under the key
+        <code>bodhi.settings</code>. Nothing is sent anywhere. Clearing your
+        browser data resets them.</p>
+      <button class="chip" type="button" id="opt-reset">Reset to defaults</button>
     </div>
   </main>
 
@@ -277,6 +371,35 @@ footer .han{font-family:var(--han)}
   var days = DATA.days;
   var index = {};
   days.forEach(function (d, i) { index[d.date] = i; });
+
+  /* precept recitation: lunar 15, and the last day of the lunar month.
+     The last day is found by lookahead rather than from monthLength, which
+     is short for the truncated month at the end of the dataset. */
+  days.forEach(function (d, i) {
+    var next = days[i + 1];
+    d.lastOfMonth = next ? next.dayNum === 1 : false;
+    d.recite = d.dayNum === 15 || d.lastOfMonth;
+  });
+
+  /* settings ---------------------------------------------------------- */
+  var SETTINGS_KEY = "bodhi.settings";
+  var DEFAULTS = { recite: true };
+  var settings = (function () {
+    var s = { recite: DEFAULTS.recite };
+    try {
+      var raw = localStorage.getItem(SETTINGS_KEY);
+      if (raw) {
+        var saved = JSON.parse(raw);
+        if (typeof saved.recite === "boolean") s.recite = saved.recite;
+      }
+    } catch (err) { /* private mode, or file:// with storage blocked */ }
+    return s;
+  })();
+  function saveSettings() {
+    try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); }
+    catch (err) { /* nothing to do but keep the session's choice */ }
+  }
+  function reciting(d) { return settings.recite && d.recite; }
 
   var MONTHS = ["January","February","March","April","May","June","July",
                 "August","September","October","November","December"];
@@ -338,8 +461,9 @@ footer .han{font-family:var(--han)}
   document.getElementById("t-glyph").textContent = t.dayCn;
   document.getElementById("t-when").textContent = longDate(t.date);
   document.getElementById("t-lunar").innerHTML =
-    '<span class="han">' + t.monthCn + "</span> " + t.monthLabel +
-    ' &nbsp;·&nbsp; <span class="han">' + t.dayCn + "</span> day " + t.dayNum;
+    "Lunar " + t.monthLabel + ' <span class="han">' + t.monthCn + "</span>" +
+    ' &nbsp;·&nbsp; day ' + t.dayNum + ' <span class="han">' + t.dayCn +
+    "</span>";
 
   function nextFastAfter(i) {
     for (var j = i + 1; j < days.length; j++) if (days[j].fast) return j;
@@ -357,65 +481,83 @@ footer .han{font-family:var(--han)}
       "The next is " + (gap === 1 ? "tomorrow" :
         "in " + gap + " days, " + shortDate(days[nf].date)) + ".");
   }
-  var marks = document.getElementById("t-marks");
-  var m = [];
-  if (t.moon) m.push('<span class="mark moon">' +
-    (t.moon === "new" ? "New moon" : "Full moon") + "</span>");
-  if (t.longFast) m.push('<span class="mark fast">Long fasting month</span>');
-  if (t.leap) m.push('<span class="mark leap">Leap month — flagged</span>');
-  if (t.event) m.push('<span class="mark">' + t.event + "</span>");
-  marks.innerHTML = m.join("");
+  function renderMarks() {
+    var m = [];
+    if (reciting(t)) m.push('<span class="mark recite">Precept Recitation' +
+      "</span>");
+    if (t.moon) m.push('<span class="mark moon">' +
+      (t.moon === "new" ? "New moon" : "Full moon") + "</span>");
+    if (t.longFast) m.push('<span class="mark fast">Long fasting month</span>');
+    if (t.leap) m.push('<span class="mark leap">Leap month — flagged</span>');
+    if (t.event) m.push('<span class="mark">' + t.event + "</span>");
+    document.getElementById("t-marks").innerHTML = m.join("");
+  }
 
   /* the lunation band ------------------------------------------------ */
-  function drawBand(i) {
-    var d = days[i], start = i;
+  function drawBand() {
+    var d = days[cursor], start = cursor;
     while (start > 0 && days[start].dayNum !== 1) start--;
-    var len = days[start].monthLength ||
-      (days[start].dayNum === 1 ? 30 : null);
     var discs = [], html = "";
     for (var j = start; j < days.length && (j === start ||
          days[j].dayNum !== 1); j++) discs.push(j);
     discs.forEach(function (k, n) {
-      var day = days[k];
-      html += '<button type="button" class="disc' +
-        (day.fast ? " is-fast" : "") +
-        (day.date === d.date ? " is-today" : "") +
-        '" data-i="' + k + '" style="animation-delay:' + (n * 18) + 'ms" ' +
-        'title="' + shortDate(day.date) + " — " + day.dayCn + " day " +
-        day.dayNum + (day.fast ? ", fast day" : "") + '">' +
+      var day = days[k], isToday = day.date === d.date;
+      var label = shortDate(day.date) + " — day " + day.dayNum + " " +
+        day.dayCn + (day.fast ? ", fast day" : "") +
+        (reciting(day) ? ", Precept Recitation" : "") +
+        (isToday ? " (today)" : "");
+      html += '<div class="disc' + (day.fast ? " is-fast" : "") +
+        (reciting(day) ? " is-recite" : "") +
+        (isToday ? " is-today" : "") +
+        '" style="animation-delay:' + (n * 18) + 'ms" title="' + label +
+        '"><div class="cap">' + (isToday ? "&#9660;" : "") + "</div>" +
         moonSvg(day.dayNum, discs.length, 22) +
-        '<div class="tick"></div><div class="n">' + day.dayNum + "</div>" +
-        "</button>";
+        '<div class="tick"></div><div class="dot"></div>' +
+        '<div class="n">' + day.dayNum + "</div></div>";
     });
     document.getElementById("band-discs").innerHTML = html;
     document.getElementById("band-month").innerHTML =
-      '<span class="han">' + d.monthCn + "</span> " + d.monthLabel +
-      ", " + discs.length + " days" + (d.leap ? " · leap" : "");
+      "Lunar " + d.monthLabel + ' <span class="han">' + d.monthCn +
+      "</span>, " + discs.length + " days" + (d.leap ? " · leap" : "");
     document.getElementById("band-note").textContent =
       discs.filter(function (k) { return days[k].fast; }).length +
       " fast days this month";
+    document.getElementById("band-legend").innerHTML =
+      '<span><i class="t"></i>today</span>' +
+      '<span><i class="f"></i>fast day</span>' +
+      (settings.recite ? '<span><i class="r"></i>Precept Recitation</span>'
+        : "");
   }
-  drawBand(cursor);
 
-  /* the next six days ------------------------------------------------ */
-  var stream = "";
-  for (var s = cursor + 1; s <= cursor + 6 && s < days.length; s++) {
-    var d = days[s];
-    stream += '<div class="day' + (d.fast ? " is-fast" : "") +
-      (d.moon ? " is-moon" : "") + '">' +
-      '<div class="date">' + WEEK[parse(d.date).getDay()].slice(0, 3) +
-      " <span>" + shortDate(d.date) + "</span></div>" +
-      '<div class="lunar"><span class="han">' + d.dayCn + "</span>" +
-      "<small>day " + d.dayNum + " of " + d.monthLabel + "</small></div>" +
-      '<div class="flags">' +
-      (d.fast ? '<span class="f">fast day</span>' : "") +
-      (d.fast && d.moon ? " · " : "") +
-      (d.moon ? '<span class="m">' + d.moon + " moon</span>" : "") +
-      "</div>" +
-      (d.event ? '<div class="event">' + d.event + "</div>" : "") +
-      "</div>";
+  /* the next seven days, today first --------------------------------- */
+  function renderCards() {
+    var html = "";
+    for (var s = cursor; s < cursor + 7 && s < days.length; s++) {
+      var d = days[s], n = s - cursor;
+      var rel = outOfRange ? WEEK[parse(d.date).getDay()]
+        : n === 0 ? "Today"
+        : n === 1 ? "Tomorrow"
+        : WEEK[parse(d.date).getDay()];
+      var tags = "";
+      if (d.fast) tags += '<li class="fast">Fast day</li>';
+      if (reciting(d)) tags += '<li class="recite">Precept Recitation</li>';
+      if (d.moon) tags += '<li class="moon">' +
+        (d.moon === "new" ? "New moon" : "Full moon") + "</li>";
+      html += '<article class="card' + (d.fast ? " is-fast" : "") +
+        (!outOfRange && n === 0 ? " is-today" : "") + '">' +
+        '<div class="rel">' + rel + "</div>" +
+        '<div class="greg">' + shortDate(d.date) + "</div>" +
+        '<div class="lunar">Lunar ' + d.monthLabel +
+        ' <span class="han">' + d.monthCn + "</span>" +
+        '<span class="big">Day ' + d.dayNum +
+        '<span class="han">' + d.dayCn + "</span></span></div>" +
+        (tags ? '<ul class="tags">' + tags + "</ul>"
+              : '<div class="plain">Ordinary day</div>') +
+        (d.event ? '<div class="event">' + d.event + "</div>" : "") +
+        "</article>";
+    }
+    document.getElementById("cards").innerHTML = html;
   }
-  document.getElementById("stream").innerHTML = stream;
 
   /* upcoming lists --------------------------------------------------- */
   function listOf(pred, n) {
@@ -436,23 +578,30 @@ footer .han{font-family:var(--han)}
     if (!nextLeap && days[i].leap && days[i].dayNum === 1) nextLeap = days[i];
     if (nextLong && nextLeap) break;
   }
-  document.getElementById("upcoming").innerHTML =
-    "<section><h3>Next eight fast days</h3>" +
-    ul(listOf(function (d) { return d.fast; }, 8), function (d) {
-      return '<span class="han">' + d.dayCn + "</span> day " + d.dayNum;
-    }) + "</section>" +
-    "<section><h3>Next moons</h3>" +
-    ul(listOf(function (d) { return d.moon; }, 6), function (d) {
-      return d.moon + " moon";
-    }) + "</section>" +
-    "<section><h3>Long fasting months</h3>" +
-    (nextLong ? "<p>Next begins " + shortDate(nextLong.date) + ", " +
-      nextLong.monthLabel + ".</p>" : "<p>None left in the dataset.</p>") +
-    (nextLeap ? "<p>A leap month begins " + shortDate(nextLeap.date) +
-      " (" + nextLeap.monthLabel + "). It is counted here and flagged; " +
-      "that reading is still to be confirmed.</p>" :
-      "<p>No leap month in the dataset.</p>") +
-    "</section>";
+  function renderUpcoming() {
+    document.getElementById("upcoming").innerHTML =
+      "<section><h3>Next eight fast days</h3>" +
+      ul(listOf(function (d) { return d.fast; }, 8), function (d) {
+        return "day " + d.dayNum + ' <span class="han">' + d.dayCn + "</span>";
+      }) + "</section>" +
+      (settings.recite ?
+        "<section><h3>Next Precept Recitations</h3>" +
+        ul(listOf(function (d) { return d.recite; }, 6), function (d) {
+          return d.dayNum === 15 ? "15th" : "last day";
+        }) + "</section>" : "") +
+      "<section><h3>Next moons</h3>" +
+      ul(listOf(function (d) { return d.moon; }, 6), function (d) {
+        return d.moon + " moon";
+      }) + "</section>" +
+      "<section><h3>Long fasting months</h3>" +
+      (nextLong ? "<p>Next begins " + shortDate(nextLong.date) + ", " +
+        nextLong.monthLabel + ".</p>" : "<p>None left in the dataset.</p>") +
+      (nextLeap ? "<p>A leap month begins " + shortDate(nextLeap.date) +
+        " (" + nextLeap.monthLabel + "). It is counted here and flagged; " +
+        "that reading is still to be confirmed.</p>" :
+        "<p>No leap month in the dataset.</p>") +
+      "</section>";
+  }
 
   /* the table -------------------------------------------------------- */
   var filter = "fast", from = days[cursor].date;
@@ -465,6 +614,7 @@ footer .han{font-family:var(--han)}
     if (d.date < from) return false;
     if (filter === "fast") return d.fast;
     if (filter === "moon") return !!d.moon;
+    if (filter === "recite") return reciting(d);
     if (filter === "long") return d.longFast;
     if (filter === "event") return !!d.event;
     return true;
@@ -486,19 +636,20 @@ footer .han{font-family:var(--han)}
         d.monthLabel + (d.longFast ? " · long fast" : "") + "</span></td>" +
         '<td class="han">' + d.dayCn + ' <span style="font-family:var(--sans);font-size:.85rem;color:var(--quiet)">' +
         d.dayNum + "</span></td>" +
-        "<td>" + (d.fast ? "yes" : "") + "</td>" +
+        '<td>' + (d.fast ? '<span class="yes">yes</span>' : "") + "</td>" +
+        '<td class="recite-only">' +
+        (reciting(d) ? '<span class="rec">yes</span>' : "") + "</td>" +
         "<td>" + (d.moon || "") + "</td>" +
         '<td class="opt">' + (d.event || "") +
         (d.leap ? (d.event ? " · " : "") + "leap month" : "") + "</td>" +
         "</tr>";
     }).join("");
     if (shown.length > 500) {
-      rows += '<tr><td colspan="6">Showing the first 500. Move the start ' +
+      rows += '<tr><td colspan="7">Showing the first 500. Move the start ' +
         "date forward, or open data.csv for the rest.</td></tr>";
     }
     document.getElementById("table-body").innerHTML = rows;
   }
-  renderTable();
 
   Array.prototype.forEach.call(document.querySelectorAll(".chip[data-filter]"),
     function (btn) {
@@ -516,10 +667,14 @@ footer .han{font-family:var(--han)}
   });
   document.getElementById("copy-visible").addEventListener("click",
     function (e) {
-      var head = "date\tweekday\tlunar_month\tlunar_day\tday_number\tfast\tmoon\tevent\n";
+      var rec = settings.recite;
+      var head = "date\tweekday\tlunar_month\tlunar_day\tday_number\tfast\t" +
+        (rec ? "recitation\t" : "") + "moon\tevent\n";
       var body = shown.map(function (d) {
-        return [d.date, d.weekday, d.monthCn, d.dayCn, d.dayNum,
-                d.fast ? "yes" : "", d.moon, d.event].join("\t");
+        var row = [d.date, d.weekday, d.monthCn, d.dayCn, d.dayNum,
+                   d.fast ? "yes" : ""];
+        if (rec) row.push(d.recite ? "yes" : "");
+        return row.concat([d.moon, d.event]).join("\t");
       }).join("\n");
       var text = head + body;
       var done = function () {
@@ -544,26 +699,55 @@ footer .han{font-family:var(--han)}
       } else { fallback(); }
     });
 
-  /* clicking a disc moves the day panel ------------------------------ */
-  document.getElementById("band-discs").addEventListener("click",
-    function (e) {
-      var b = e.target.closest(".disc");
-      if (b) drawBand(+b.dataset.i);
-    });
-
   /* views ------------------------------------------------------------ */
+  var VIEWS = ["today", "record", "settings"];
   function show(which) {
-    var isToday = which === "today";
-    document.getElementById("view-today").classList.toggle("hidden", !isToday);
-    document.getElementById("view-record").classList.toggle("hidden", isToday);
-    document.getElementById("nav-today").setAttribute("aria-current",
-      isToday ? "page" : "false");
-    document.getElementById("nav-record").setAttribute("aria-current",
-      isToday ? "false" : "page");
+    VIEWS.forEach(function (v) {
+      document.getElementById("view-" + v).classList.toggle("hidden",
+        v !== which);
+      document.getElementById("nav-" + v).setAttribute("aria-current",
+        v === which ? "page" : "false");
+    });
     window.scrollTo(0, 0);
   }
-  document.getElementById("nav-today").onclick = function () { show("today"); };
-  document.getElementById("nav-record").onclick = function () { show("record"); };
+  VIEWS.forEach(function (v) {
+    document.getElementById("nav-" + v).onclick = function () { show(v); };
+  });
+
+  /* settings --------------------------------------------------------- */
+  var reciteBox = document.getElementById("opt-recite");
+  function applySettings() {
+    document.body.classList.toggle("no-recite", !settings.recite);
+    if (!settings.recite && filter === "recite") {
+      filter = "fast";
+      Array.prototype.forEach.call(
+        document.querySelectorAll(".chip[data-filter]"), function (b) {
+          b.setAttribute("aria-pressed",
+            b.dataset.filter === "fast" ? "true" : "false");
+        });
+    }
+    reciteBox.checked = settings.recite;
+    document.getElementById("opt-recite-state").textContent =
+      settings.recite
+        ? "On. The 15th and the last day of each lunar month carry the flag."
+        : "Off. Fast days and moons are still shown.";
+    renderMarks();
+    drawBand();
+    renderCards();
+    renderUpcoming();
+    renderTable();
+  }
+  reciteBox.addEventListener("change", function () {
+    settings.recite = reciteBox.checked;
+    saveSettings();
+    applySettings();
+  });
+  document.getElementById("opt-reset").addEventListener("click", function () {
+    settings.recite = DEFAULTS.recite;
+    saveSettings();
+    applySettings();
+  });
+  applySettings();
 
   document.getElementById("foot-meta").textContent =
     DATA.meta.count + " days, " + shortDate(DATA.meta.first) + " to " +

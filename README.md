@@ -11,7 +11,7 @@ filesystem.
 
 | File | What it is |
 | --- | --- |
-| `index.html` | The whole app. Two views: **Today** and **The record**. |
+| `index.html` | The whole app. Three views: **Today**, **The record**, and **Settings** (the gear). |
 | `data.js` | The dataset as `window.DRBA_DATA`. Loaded by `index.html`; a plain script tag so it works over `file://`. |
 | `data.json` | The same records, indented, for anything that wants to read them programmatically. |
 | `data.csv` | The same records as CSV, UTF-8 **with BOM** so Excel on Windows keeps the diacritics. |
@@ -70,6 +70,19 @@ data came off the DRBA printed calendar or the HKO tables.
   rather than the astronomical instant. The moon discs in the Today view are
   drawn from the day number, so the 15th shows as very nearly rather than
   exactly full — that gap is the convention, not a bug.
+- **Precept Recitation** (布薩, bùsà): the 15th and the last day of each lunar
+  month, the two days the assembly gathers to recite the precepts. Both are
+  already fast days; the flag is an extra marking on top. The last day is
+  found by looking ahead to the next day-1 rather than from `monthLength`,
+  which is short for the truncated month at the end of the dataset. This is
+  derived in the browser, not stored in the dataset.
+
+## Settings
+
+The gear opens a Settings view. Precept Recitation flags can be switched off
+there; the choice is kept in `localStorage` under `bodhi.settings` and applies
+to every view. Nothing is sent anywhere, and storage failures (private mode,
+or a browser that blocks it over `file://`) fall back to the default silently.
 
 ## Sources
 
