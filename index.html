@@ -134,6 +134,10 @@ input:focus-visible,.chip:focus-visible{outline:2px solid var(--fast);
    are all but identical discs, and this separates them without another key:
    the disc under the halo is either wholly lit or wholly dark. */
 .disc.is-phase svg{filter:drop-shadow(0 0 2px var(--moonc))}
+/* On the dark ground a grey halo is lost against an already-bright full
+   moon, so there the halo becomes actual light spilling onto the ground. */
+:root[data-theme="dark"] .disc.is-phase svg{
+  filter:drop-shadow(0 0 3px #FFFDF6) drop-shadow(0 0 6px rgba(255,253,246,.5))}
 .disc .cap{height:.6rem;font-size:.55rem;line-height:.6rem;color:transparent}
 .disc .n{font-size:.62rem;color:var(--quiet);margin-top:.25rem;
   font-variant-numeric:tabular-nums}
@@ -196,6 +200,13 @@ h2{font-size:1rem;font-weight:600;letter-spacing:.02em;margin:2.25rem 0 .5rem}
   color:var(--moonc)}
 .tags li.recite{border-color:var(--recite-line);background:var(--recite-dim);
   color:var(--recite)}
+/* A week break: enough air and a rule to let the eye group the days into
+   working weeks. Spans the whole grid, so the next week starts a fresh row. */
+.weekbreak{grid-column:1/-1;display:flex;align-items:center;gap:.75rem;
+  margin:1.1rem 0 .1rem;font-size:.7rem;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--quiet)}
+.weekbreak::before,.weekbreak::after{content:"";flex:1;height:1px;
+  background:var(--line)}
 .card .events{list-style:none;margin:.65rem 0 0;padding:.55rem 0 0;
   width:100%;border-top:1px solid var(--hair)}
 .card .events li{font-size:.82rem;color:var(--ink-soft);margin-top:.3rem}
@@ -225,6 +236,9 @@ thead th{position:sticky;top:0;background:var(--paper);
 tbody tr.is-fast{background:var(--fast-wash)}
 td .aside{font-family:var(--sans);font-size:.8rem;color:var(--quiet);
   margin-left:.4rem}
+tbody tr.weekbreak-row td{padding:1.15rem .5rem .3rem;
+  border-bottom:1px solid var(--ink);font-size:.7rem;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--quiet)}
 tbody tr.is-moon{background:var(--moonc-dim)}
 tbody tr.is-fast.is-moon{background:var(--fast-moon)}
 td.han{font-family:var(--han);font-size:1.05rem}
@@ -306,7 +320,7 @@ body.no-recite .recite-only{display:none}
     </div>
     <nav>
       <button type="button" id="nav-today" aria-current="page">Today</button>
-      <button type="button" id="nav-record">The record</button>
+      <button type="button" id="nav-record">Upcoming</button>
       <button type="button" id="nav-settings" class="gear" title="Settings"
         aria-label="Settings"><span aria-hidden="true">&#9881;</span></button>
       <button type="button" id="theme-toggle" class="gear"></button>
@@ -405,6 +419,25 @@ body.no-recite .recite-only{display:none}
     </div>
 
     <div class="setting">
+      <h3>Week start</h3>
+      <p>Draws a break where each new week begins, on both Today and
+        Upcoming, so a run of fast days can be read against a working week.</p>
+      <div class="field">
+        <label for="opt-week">Weeks begin on</label>
+        <select id="opt-week">
+          <option value="0">Sunday</option>
+          <option value="1">Monday</option>
+          <option value="2">Tuesday</option>
+          <option value="3">Wednesday</option>
+          <option value="4">Thursday</option>
+          <option value="5">Friday</option>
+          <option value="6">Saturday</option>
+          <option value="none">None — no break</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="setting">
       <h3>Days on the Today view</h3>
       <p>How many day cards to show, counting today as the first.</p>
       <div class="field">
@@ -484,14 +517,16 @@ body.no-recite .recite-only{display:none}
   var FILTERS = ["all", "fast", "moon", "recite", "long", "event"];
   var THEMES = ["auto", "light", "dark"];
   var CARDS_MIN = 1, CARDS_MAX = 366;
+  var WEEK_STARTS = ["none", "0", "1", "2", "3", "4", "5", "6"];
   var DEFAULTS = { recite15: true, reciteOther: "last", filter: "fast",
-                   theme: "auto", cardCount: 7 };
+                   theme: "auto", cardCount: 7, weekStart: "0" };
   var settings = {
     recite15: DEFAULTS.recite15,
     reciteOther: DEFAULTS.reciteOther,
     filter: DEFAULTS.filter,
     theme: DEFAULTS.theme,
     cardCount: DEFAULTS.cardCount,
+    weekStart: DEFAULTS.weekStart,
     from: null
   };
   function clampCards(n) {
@@ -511,6 +546,8 @@ body.no-recite .recite-only{display:none}
       if (FILTERS.indexOf(saved.filter) > -1) settings.filter = saved.filter;
       if (THEMES.indexOf(saved.theme) > -1) settings.theme = saved.theme;
       settings.cardCount = clampCards(saved.cardCount);
+      if (WEEK_STARTS.indexOf(saved.weekStart) > -1)
+        settings.weekStart = saved.weekStart;
       if (typeof saved.from === "string" && index[saved.from] !== undefined)
         settings.from = saved.from;
     } catch (err) { /* private mode, or file:// with storage blocked */ }
@@ -552,6 +589,20 @@ body.no-recite .recite-only{display:none}
   setInterval(function () {
     if (settings.theme === "auto") applyTheme();
   }, 60000);
+
+  /* The date a day's week began, as an ISO string, or null when weeks are
+     off. Rows are grouped by it, so a break also appears between two filtered
+     rows that sit weeks apart. */
+  function weekOf(dateStr) {
+    if (settings.weekStart === "none") return null;
+    var d = parse(dateStr);
+    d.setDate(d.getDate() - (d.getDay() - +settings.weekStart + 7) % 7);
+    return iso(d);
+  }
+  function weekLabel(weekIso) {
+    var d = parse(weekIso);
+    return "week of " + d.getDate() + " " + MONTHS[d.getMonth()].slice(0, 3);
+  }
 
   function reciteOn() {
     return settings.recite15 || settings.reciteOther !== "none";
@@ -697,8 +748,14 @@ body.no-recite .recite-only{display:none}
       days.length - cursor);
     document.getElementById("cards-heading").textContent =
       shownDays === 1 ? "Today" : "The next " + shownDays + " days";
+    var prevWeek = null;
     for (var s = cursor; s < cursor + settings.cardCount &&
          s < days.length; s++) {
+      var week = weekOf(days[s].date);
+      if (week && prevWeek && week !== prevWeek)
+        html += '<div class="weekbreak"><span>' + weekLabel(week) +
+          "</span></div>";
+      prevWeek = week;
       var d = days[s], n = s - cursor;
       var rel = outOfRange ? WEEK[parse(d.date).getDay()]
         : n === 0 ? "Today"
@@ -795,8 +852,14 @@ body.no-recite .recite-only{display:none}
       ", from " + shortDate(from) + " to " +
       shortDate(days[days.length - 1].date) + ".";
     document.getElementById("table-caption").textContent = cap;
+    var prevWeek = null;
     var rows = shown.slice(0, 500).map(function (d) {
-      return "<tr class=" + '"' + (d.fast ? "is-fast " : "") +
+      var week = weekOf(d.date), lead = "";
+      if (week && prevWeek && week !== prevWeek)
+        lead = '<tr class="weekbreak-row"><td colspan="6">' +
+          weekLabel(week) + "</td></tr>";
+      prevWeek = week;
+      return lead + "<tr class=" + '"' + (d.fast ? "is-fast " : "") +
         (d.moon ? "is-moon" : "") + '">' +
         '<td class="num">' + shortDate(d.date) + " <span style=color:var(--quiet)>" +
         d.weekday + "</span></td>" +
@@ -894,6 +957,7 @@ body.no-recite .recite-only{display:none}
   var box15 = document.getElementById("opt-15");
   var otherSel = document.getElementById("opt-other");
   var cardsInput = document.getElementById("opt-cards");
+  var weekSel = document.getElementById("opt-week");
 
   function stateText() {
     var parts = [];
@@ -916,6 +980,7 @@ body.no-recite .recite-only{display:none}
     box15.checked = settings.recite15;
     otherSel.value = settings.reciteOther;
     cardsInput.value = settings.cardCount;
+    weekSel.value = settings.weekStart;
     document.getElementById("opt-state").textContent = stateText();
     var room = days.length - cursor;
     document.getElementById("opt-cards-state").textContent =
@@ -945,12 +1010,18 @@ body.no-recite .recite-only{display:none}
     saveSettings();
     applySettings();
   });
+  weekSel.addEventListener("change", function () {
+    settings.weekStart = weekSel.value;
+    saveSettings();
+    applySettings();
+  });
   document.getElementById("opt-reset").addEventListener("click", function () {
     settings.recite15 = DEFAULTS.recite15;
     settings.reciteOther = DEFAULTS.reciteOther;
     settings.filter = DEFAULTS.filter;
     settings.theme = DEFAULTS.theme;
     settings.cardCount = DEFAULTS.cardCount;
+    settings.weekStart = DEFAULTS.weekStart;
     settings.from = null;
     from = days[cursor].date;
     fromInput.value = from;

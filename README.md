@@ -11,7 +11,7 @@ filesystem.
 
 | File | What it is |
 | --- | --- |
-| `index.html` | The whole app. Three views: **Today**, **The record**, and **Settings** (the gear). |
+| `index.html` | The whole app. Three views: **Today**, **Upcoming**, and **Settings** (the gear). |
 | `data.js` | The dataset as `window.DRBA_DATA`. Loaded by `index.html`; a plain script tag so it works over `file://`. |
 | `data.json` | The same records, indented, for anything that wants to read them programmatically. |
 | `data.csv` | The same records as CSV, UTF-8 **with BOM** so Excel on Windows keeps the diacritics. |
@@ -92,7 +92,13 @@ fixed day 29 or 30 means shorter months simply have none.
 Settings also carries how many day cards the Today view shows, counting today
 as the first — seven by default, any whole number from 1 to 366.
 
-These settings, the theme, and the record's filter and start date are kept in
+The week start — any of the seven days, or none — draws a break where each new
+week begins, on both Today and Upcoming, so a run of fast days can be read
+against a working week. Rows are grouped by the week they fall in rather than
+by adjacency, so the break still lands correctly between two filtered rows
+that sit weeks apart.
+
+These settings, the theme, and Upcoming's filter and start date are kept in
 `localStorage` under `bodhi.settings`. Nothing is sent anywhere, and storage
 failures (private mode, or a browser that blocks it over `file://`) fall back
 to the defaults silently.
@@ -111,9 +117,11 @@ fast day is a cinnabar one, and a recitation landing on a fast day — the
 heaviest of the three — takes the cinnabar deeper still. Recitation days are
 marked in the moon band with a four-pointed pole star.
 
-The exact new and full moons carry a faint halo. The days either side of them
-are all but identical discs, and this tells them apart without another key:
-the disc under the halo is either wholly lit or wholly dark.
+The exact new and full moons carry a halo. The days either side of them are
+all but identical discs, and this tells them apart without another key: the
+disc under the halo is either wholly lit or wholly dark. On paper the halo is
+a soft grey; on the dark ground a grey halo is lost against an already-bright
+full moon, so there it becomes actual light spilling onto the ground.
 
 The icon beside the gear cycles three themes — auto, light, dark — and the
 choice is kept with the rest. Auto follows the **device clock**, not the
