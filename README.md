@@ -74,11 +74,11 @@ data came off the DRBA printed calendar or the HKO tables.
   today is easy to find; they carry nothing but the phase, the fast days, the
   recitation days and today.
 - **Precept Recitation** (布薩, bùsà): the days the assembly gathers to recite
-  the precepts. Two a month by default — the 15th, and the last day. Both are
-  already fast days, so the flag is an extra marking on top; reckoned by the
-  nearest weekend instead, it usually lands on a day that is not. Which days
-  count is a setting, not a fixed rule, so this is derived in the browser
-  rather than stored in the dataset. The last day is found by looking ahead to the next
+  the precepts. Two a month by default — lunar 1 and 15, the new moon and the
+  full. The 15th is already a fast day, so there the flag is an extra marking
+  on top; the 1st is not, nor is the nearest weekend, so those take the third
+  card colour. Which days count is a setting, not a fixed rule, so this is
+  derived in the browser rather than stored in the dataset. The last day is found by looking ahead to the next
   day-1 rather than from `monthLength`, which is short for the truncated month
   at the end of the dataset.
 
@@ -87,10 +87,10 @@ data came off the DRBA printed calendar or the HKO tables.
 The gear opens a Settings view, which decides which days carry the Precept
 Recitation flag. It is reckoned one of four ways:
 
-- **By lunar day** (the default), which then takes two more settings: the 15th
-  is a switch, and the second day is a choice of the last day of the lunar
-  month (the default), day 30, 29, 28, 1, or none. Turning both off drops the
-  flag. Choosing a fixed day 29 or 30 means shorter months simply have none.
+- **By lunar day** (the default), which then takes the two days themselves,
+  typed in: 1 and 15 by default, the new moon and the full. Any day from 1 to
+  30 will do; leaving a box blank gives a single recitation a month, and
+  leaving both blank drops the flag. Day 30 means a month of 29 days has none.
 - **Nearest Saturday** or **nearest Sunday to each moon**, for an assembly
   that gathers at weekends: the Saturday or Sunday closest to each new and
   full moon, never more than three days off. Over this dataset that lands on

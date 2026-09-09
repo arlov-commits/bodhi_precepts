@@ -317,9 +317,11 @@ nav button.gear{font-size:1.05rem;line-height:1;padding:.35rem .55rem}
 .field{display:flex;flex-wrap:wrap;align-items:center;gap:.6rem;
   margin-top:.9rem;font-size:.92rem}
 /* Settings that only apply under one choice, tucked under it. */
-.suboptions{margin-top:.5rem;padding:.1rem 0 .2rem .9rem;
+.suboptions{margin-top:.5rem;padding:.1rem 0 .3rem .9rem;
   border-left:2px solid var(--line)}
-.suboptions .switch{margin-top:.5rem}
+.suboptions .field{margin-top:.5rem}
+.suboptions .hint{font-size:.82rem;margin-top:.5rem}
+input[type=number].day{width:3.6rem;text-align:center}
 .setting .state{color:var(--quiet);font-size:.85rem;letter-spacing:.04em;
   border-left:2px solid var(--fast);padding-left:.6rem;margin-top:.9rem}
 
@@ -434,9 +436,10 @@ body.no-recite .recite-only{display:none}
       <h3>Precept Recitation days</h3>
       <p>Which days carry the Precept Recitation flag
         (<span class="han">布薩</span>, bùsà), in every view — the days the
-        assembly gathers to recite the precepts. Traditionally two a month, at
-        the full moon and at the month's end; where the assembly gathers at
-        weekends instead, the nearest Saturday or Sunday to each moon.</p>
+        assembly gathers to recite the precepts. Two a month, at the new moon
+        and the full — lunar 1 and 15 — or on whichever days your assembly
+        keeps; where it gathers at weekends instead, the nearest Saturday or
+        Sunday to each moon.</p>
 
       <div class="field">
         <label for="opt-mode">Reckon them</label>
@@ -449,23 +452,16 @@ body.no-recite .recite-only{display:none}
       </div>
 
       <div class="suboptions" id="lunar-opts">
-        <label class="switch">
-          <input type="checkbox" id="opt-15">
-          <span class="track" aria-hidden="true"></span>
-          <span>The 15th of the lunar month</span>
-        </label>
-
         <div class="field">
-          <label for="opt-other">The second recitation day</label>
-          <select id="opt-other">
-            <option value="last">Last day of the lunar month</option>
-            <option value="30">Day 30</option>
-            <option value="29">Day 29</option>
-            <option value="28">Day 28</option>
-            <option value="1">Day 1</option>
-            <option value="none">None</option>
-          </select>
+          <label for="opt-day-a">Recite on day</label>
+          <input type="number" class="day" id="opt-day-a" min="1" max="30"
+            step="1">
+          <label for="opt-day-b">and on day</label>
+          <input type="number" class="day" id="opt-day-b" min="1" max="30"
+            step="1">
         </div>
+        <p class="hint">Leave either blank for a single day a month. A month
+          of 29 days has no day 30.</p>
       </div>
 
       <p class="state" id="opt-state"></p>
@@ -566,25 +562,32 @@ body.no-recite .recite-only{display:none}
 
   /* settings ---------------------------------------------------------- */
   var SETTINGS_KEY = "bodhi.settings";
-  var OTHER_DAYS = ["last", "30", "29", "28", "1", "none"];
   var FILTERS = ["all", "fast", "moon", "recite", "long", "event"];
   var THEMES = ["auto", "light", "dark"];
   var CARDS_MIN = 1, CARDS_MAX = 366;
   var WEEK_STARTS = ["none", "0", "1", "2", "3", "4", "5", "6"];
   var RECITE_MODES = ["lunar", "sat", "sun", "none"];
-  var DEFAULTS = { reciteMode: "lunar", recite15: true, reciteOther: "last",
+  var DEFAULTS = { reciteMode: "lunar", reciteDayA: 1, reciteDayB: 15,
                    filter: "fast", theme: "auto", cardCount: 7,
                    weekStart: "0" };
   var settings = {
     reciteMode: DEFAULTS.reciteMode,
-    recite15: DEFAULTS.recite15,
-    reciteOther: DEFAULTS.reciteOther,
+    reciteDayA: DEFAULTS.reciteDayA,
+    reciteDayB: DEFAULTS.reciteDayB,
     filter: DEFAULTS.filter,
     theme: DEFAULTS.theme,
     cardCount: DEFAULTS.cardCount,
     weekStart: DEFAULTS.weekStart,
     from: null
   };
+  /* A lunar day, or null for a blank box — one recitation a month. */
+  function clampDay(v) {
+    if (v === null || v === undefined) return null;
+    if (typeof v === "string" && !v.trim()) return null;
+    var n = Math.round(Number(v));
+    if (!isFinite(n)) return null;
+    return Math.min(30, Math.max(1, n));
+  }
   function clampCards(n) {
     if (typeof n === "string" && !n.trim()) return DEFAULTS.cardCount;
     n = Math.round(Number(n));
@@ -598,9 +601,10 @@ body.no-recite .recite-only{display:none}
       var saved = JSON.parse(raw);
       if (RECITE_MODES.indexOf(saved.reciteMode) > -1)
         settings.reciteMode = saved.reciteMode;
-      if (typeof saved.recite15 === "boolean") settings.recite15 = saved.recite15;
-      if (OTHER_DAYS.indexOf(saved.reciteOther) > -1)
-        settings.reciteOther = saved.reciteOther;
+      if (saved.hasOwnProperty("reciteDayA"))
+        settings.reciteDayA = clampDay(saved.reciteDayA);
+      if (saved.hasOwnProperty("reciteDayB"))
+        settings.reciteDayB = clampDay(saved.reciteDayB);
       if (FILTERS.indexOf(saved.filter) > -1) settings.filter = saved.filter;
       if (THEMES.indexOf(saved.theme) > -1) settings.theme = saved.theme;
       settings.cardCount = clampCards(saved.cardCount);
@@ -679,16 +683,14 @@ body.no-recite .recite-only{display:none}
   function reciteOn() {
     if (settings.reciteMode === "none") return false;
     if (settings.reciteMode !== "lunar") return true;
-    return settings.recite15 || settings.reciteOther !== "none";
+    return settings.reciteDayA !== null || settings.reciteDayB !== null;
   }
   function reciting(d) {
     var near = nearMoon[settings.reciteMode];
     if (near) return !!near[d.date];
     if (settings.reciteMode === "none") return false;
-    if (settings.recite15 && d.dayNum === 15) return true;
-    if (settings.reciteOther === "none") return false;
-    if (settings.reciteOther === "last") return d.lastOfMonth;
-    return d.dayNum === +settings.reciteOther;
+    return d.dayNum === settings.reciteDayA ||
+           d.dayNum === settings.reciteDayB;
   }
   /* what a recitation day is keyed to, for the upcoming list */
   function reciteNote(d) {
@@ -1075,8 +1077,8 @@ body.no-recite .recite-only{display:none}
   /* settings --------------------------------------------------------- */
   var modeSel = document.getElementById("opt-mode");
   var lunarOpts = document.getElementById("lunar-opts");
-  var box15 = document.getElementById("opt-15");
-  var otherSel = document.getElementById("opt-other");
+  var dayA = document.getElementById("opt-day-a");
+  var dayB = document.getElementById("opt-day-b");
   var cardsInput = document.getElementById("opt-cards");
   var weekSel = document.getElementById("opt-week");
 
@@ -1087,17 +1089,13 @@ body.no-recite .recite-only{display:none}
       return "Flagged: the " +
         (settings.reciteMode === "sat" ? "Saturday" : "Sunday") +
         " nearest each new and full moon, so never more than three days off.";
-    var parts = [];
-    if (settings.recite15) parts.push("the 15th");
-    if (settings.reciteOther === "last") parts.push("the last day");
-    else if (settings.reciteOther !== "none")
-      parts.push("day " + settings.reciteOther);
-    if (!parts.length) return "Nothing is flagged as Precept Recitation.";
-    return "Flagged: " + parts.join(" and ") + " of each lunar month." +
-      (settings.reciteOther !== "none" && settings.reciteOther !== "last" &&
-       +settings.reciteOther > 28
-        ? " A shorter month has no day " + settings.reciteOther + "."
-        : "");
+    var days2 = [settings.reciteDayA, settings.reciteDayB]
+      .filter(function (n) { return n !== null; });
+    if (!days2.length) return "Nothing is flagged as Precept Recitation.";
+    var short = days2.filter(function (n) { return n === 30; });
+    return "Flagged: day " + days2.join(" and day ") +
+      " of each lunar month." +
+      (short.length ? " A month of 29 days has no day 30." : "");
   }
 
   function applySettings() {
@@ -1106,8 +1104,8 @@ body.no-recite .recite-only{display:none}
     if (!on && settings.filter === "recite") settings.filter = "fast";
     modeSel.value = settings.reciteMode;
     lunarOpts.classList.toggle("hidden", settings.reciteMode !== "lunar");
-    box15.checked = settings.recite15;
-    otherSel.value = settings.reciteOther;
+    dayA.value = settings.reciteDayA === null ? "" : settings.reciteDayA;
+    dayB.value = settings.reciteDayB === null ? "" : settings.reciteDayB;
     cardsInput.value = settings.cardCount;
     weekSel.value = settings.weekStart;
     document.getElementById("opt-state").textContent = stateText();
@@ -1129,15 +1127,12 @@ body.no-recite .recite-only{display:none}
     saveSettings();
     applySettings();
   });
-  box15.addEventListener("change", function () {
-    settings.recite15 = box15.checked;
-    saveSettings();
-    applySettings();
-  });
-  otherSel.addEventListener("change", function () {
-    settings.reciteOther = otherSel.value;
-    saveSettings();
-    applySettings();
+  [[dayA, "reciteDayA"], [dayB, "reciteDayB"]].forEach(function (pair) {
+    pair[0].addEventListener("change", function () {
+      settings[pair[1]] = clampDay(pair[0].value);
+      saveSettings();
+      applySettings();
+    });
   });
   cardsInput.addEventListener("change", function () {
     settings.cardCount = clampCards(cardsInput.value);
@@ -1151,8 +1146,8 @@ body.no-recite .recite-only{display:none}
   });
   document.getElementById("opt-reset").addEventListener("click", function () {
     settings.reciteMode = DEFAULTS.reciteMode;
-    settings.recite15 = DEFAULTS.recite15;
-    settings.reciteOther = DEFAULTS.reciteOther;
+    settings.reciteDayA = DEFAULTS.reciteDayA;
+    settings.reciteDayB = DEFAULTS.reciteDayB;
     settings.filter = DEFAULTS.filter;
     settings.theme = DEFAULTS.theme;
     settings.cardCount = DEFAULTS.cardCount;
