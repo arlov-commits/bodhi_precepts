@@ -155,13 +155,16 @@ input:focus-visible,.chip:focus-visible{outline:2px solid var(--fast);
 .disc svg{display:block;margin:0 auto;width:100%;max-width:1.45rem;height:auto}
 .moon .rim{fill:var(--moon-dark);stroke:var(--moon-edge)}
 .moon .lit{fill:var(--moon-lit)}
-/* The exact new and full moons carry a faint halo. Days either side of them
-   are all but identical discs, and this separates them without another key:
-   the disc under the halo is either wholly lit or wholly dark. */
-.is-phase > svg{filter:drop-shadow(0 0 2px var(--moonc))}
+/* The exact new and full moons carry a faint halo, but only in the band,
+   where they sit in a run of all but identical discs and need telling apart:
+   the disc under the halo is either wholly lit or wholly dark. Everywhere
+   else the disc stands alone among the four shapes the calendar draws — new,
+   full and the two quarters — and is named in the cards besides, so it needs
+   no such mark. */
+.disc.is-phase > svg{filter:drop-shadow(0 0 2px var(--moonc))}
 /* On the dark ground a grey halo is lost against an already-bright full
    moon, so there the halo becomes actual light spilling onto the ground. */
-:root[data-theme="dark"] .is-phase > svg{
+:root[data-theme="dark"] .disc.is-phase > svg{
   filter:drop-shadow(0 0 3px #FFFDF6) drop-shadow(0 0 6px rgba(255,253,246,.5))}
 .disc .cap{height:.6rem;font-size:.55rem;line-height:.6rem;color:transparent}
 .disc .n{font-size:.62rem;color:var(--quiet);margin-top:.25rem;
@@ -394,6 +397,28 @@ body.no-recite .recite-only{display:none}
   td.wd{font-size:.78rem}
 }
 </style>
+<script>
+/* Settle the theme before anything paints, so an installed copy does not open
+   on a flash of the wrong ground and the browser's own chrome is right from
+   the first frame — the manifest carries no theme_color, deliberately, since
+   a static one cannot follow a theme that changes.
+
+   This sits after the stylesheet so the tokens are readable, and it knowingly
+   repeats what resolvedTheme() does further down; the two must agree. */
+(function () {
+  try {
+    var saved = JSON.parse(localStorage.getItem("bodhi.settings") || "{}");
+    var hour = new Date().getHours();
+    var theme = saved.theme === "light" || saved.theme === "dark" ? saved.theme
+      : hour >= 6 && hour < 18 ? "light" : "dark";
+    var root = document.documentElement;
+    root.setAttribute("data-theme", theme);
+    var meta = document.querySelector('meta[name="theme-color"]');
+    var paper = getComputedStyle(root).getPropertyValue("--paper").trim();
+    if (meta && paper) meta.setAttribute("content", paper);
+  } catch (err) { /* no storage: the light ground in the CSS stands */ }
+})();
+</script>
 </head>
 <body>
 <div class="wrap">

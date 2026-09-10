@@ -58,7 +58,12 @@ looking right.
   and which theme `auto` resolves to are both rechecked on a timer, because
   the page gets left open across midnight.
 - **Colours come from the tokens**, not from a second copy. The browser
-  `theme-color` reads `--paper` back off the root for this reason.
+  `theme-color` reads `--paper` back off the root for this reason, and the
+  pre-paint shim in the head sits after the stylesheet so it can do the same.
+- **Never put `theme_color` in the manifest.** It governs an installed app's
+  status bar, is static, and so cannot follow a clock-driven theme — it once
+  left a dark app sitting under a light strip. Leaving it out hands the job to
+  the meta tag, which does follow.
 - **The service worker must not exist over `file://`.** Registration is
   guarded on the protocol, and the install panel falls back to telling the
   reader where their browser hides the command.
