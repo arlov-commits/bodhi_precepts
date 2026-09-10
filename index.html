@@ -163,9 +163,14 @@ input:focus-visible,.chip:focus-visible{outline:2px solid var(--fast);
    no such mark. */
 .disc.is-phase > svg{filter:drop-shadow(0 0 2px var(--moonc))}
 /* On the dark ground a grey halo is lost against an already-bright full
-   moon, so there the halo becomes actual light spilling onto the ground. */
+   moon, so there the halo becomes actual light spilling onto the ground —
+   but only just enough of it. Held any lower than this and the full moon,
+   which is a bright disc among near-identical bright discs, stops being
+   picked out at a glance; the new moon, dark on dark, would read at half
+   again less. */
 :root[data-theme="dark"] .disc.is-phase > svg{
-  filter:drop-shadow(0 0 3px #FFFDF6) drop-shadow(0 0 6px rgba(255,253,246,.5))}
+  filter:drop-shadow(0 0 2px rgba(255,253,246,.55))
+         drop-shadow(0 0 4px rgba(255,253,246,.22))}
 .disc .cap{height:.6rem;font-size:.55rem;line-height:.6rem;color:transparent}
 .disc .n{font-size:.62rem;color:var(--quiet);margin-top:.25rem;
   font-variant-numeric:tabular-nums}

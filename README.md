@@ -251,7 +251,10 @@ The exact new and full moons carry a halo, **but only in the band**, where
 they sit in a run of all but identical discs and need telling apart: the disc
 under the halo is either wholly lit or wholly dark. On paper that halo is a
 soft grey; on the dark ground a grey halo is lost against an already-bright
-full moon, so there it becomes actual light spilling onto the ground.
+full moon, so there it becomes actual light spilling onto the ground — kept
+to the least that still works. The full moon is the case that sets the floor:
+a bright disc among near-identical bright discs, it stops being picked out
+before the new moon does, which has the dark ground to sit against.
 Everywhere else — the day cards, Upcoming's lists, its table — a disc stands
 alone among the four shapes the calendar draws, and is named beside it on a
 card, so it needs no such mark and goes without one.
