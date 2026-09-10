@@ -267,18 +267,19 @@ On a phone the browser's own chrome — the address bar, or the status bar in a
 standalone window — is tinted to the paper the page is on, and follows the
 theme as it changes. It is set from the `--paper` token itself rather than
 from a second copy of the colour, so the chrome cannot drift from the page.
-That holds in a browser tab. An **installed** app on Android is a different
-matter: its system bars are painted from the manifest, which is static and
-read at install time, and no amount of updating the meta tag moves them. So
-the manifest's `theme_color` and `background_color` are both the evening ink,
-`#242A2F` — the same value as the dark theme's `--paper`, and the two must be
-kept in step by hand, since JSON cannot read a CSS token. A dark strip above
-the light ground reads as a title bar; a light strip above the dark ground,
-which is what the light value gave, does not.
+An **installed** app on Android is harder. Only the status bar is the app's to
+colour at all — the navigation bar at the foot of the screen follows the
+phone's own system theme and is not ours — and a `theme_color` in the manifest
+would fix that status bar to one value for good, matching one theme and
+clashing with the other. So the manifest deliberately carries none, leaving
+the meta tag to govern, and a small script in the head settles the theme and
+that meta **before the body exists**, which is the only point early enough for
+the colour to be picked up.
 
-A small script in the head settles the theme, and the meta, before the body
-exists, so a copy on either platform never opens on a flash of the wrong
-ground.
+`background_color`, which paints the splash, stays the light paper. That it
+differs from the dark ground is useful: if a dark-themed app ever shows a
+light status bar, the colour itself says the meta was ignored and one of the
+manifest's values won.
 
 On an iPhone the standalone status bar is fixed light
 (`apple-mobile-web-app-status-bar-style: default`); following the theme there
