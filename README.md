@@ -43,8 +43,12 @@ no store, no download.
 
 Once installed it opens in its own window, without the browser around it, and
 works with no connection at all: `sw.js` keeps the page, the dataset and the
-icons on the device. Each of those is refreshed in the background as it is
-served, so a new version lands at the next launch with nothing to clear.
+icons on the device. The page itself is fetched fresh whenever there is a
+network, so a new version is there the moment it is published rather than one
+launch late, and the fetch races a 2.5-second timer so a slow connection
+cannot hang the launch — the copy on the device wins if the network is not
+back in time. Everything else is served from that copy and refreshed behind
+it.
 
 Opening `index.html` straight off the filesystem still works and always will.
 There is simply no service worker there, and none is wanted — the page is
@@ -263,14 +267,20 @@ On a phone the browser's own chrome — the address bar, or the status bar in a
 standalone window — is tinted to the paper the page is on, and follows the
 theme as it changes. It is set from the `--paper` token itself rather than
 from a second copy of the colour, so the chrome cannot drift from the page.
-The manifest deliberately carries **no** `theme_color`: a static one there
-governs an installed app's status bar and cannot follow a theme that changes,
-which left a dark app under a light strip. With the field absent the meta tag
-governs instead. A small script in the head settles the theme, and that meta,
-before the body exists, so an installed copy never opens on a flash of the
-wrong ground.
+That holds in a browser tab. An **installed** app on Android is a different
+matter: its system bars are painted from the manifest, which is static and
+read at install time, and no amount of updating the meta tag moves them. So
+the manifest's `theme_color` and `background_color` are both the evening ink,
+`#242A2F` — the same value as the dark theme's `--paper`, and the two must be
+kept in step by hand, since JSON cannot read a CSS token. A dark strip above
+the light ground reads as a title bar; a light strip above the dark ground,
+which is what the light value gave, does not.
 
-On an iPhone the standalone status bar is still fixed light
+A small script in the head settles the theme, and the meta, before the body
+exists, so a copy on either platform never opens on a flash of the wrong
+ground.
+
+On an iPhone the standalone status bar is fixed light
 (`apple-mobile-web-app-status-bar-style: default`); following the theme there
 needs `black-translucent` with `viewport-fit=cover` and safe-area padding, and
 is not done yet.

@@ -60,10 +60,13 @@ looking right.
 - **Colours come from the tokens**, not from a second copy. The browser
   `theme-color` reads `--paper` back off the root for this reason, and the
   pre-paint shim in the head sits after the stylesheet so it can do the same.
-- **Never put `theme_color` in the manifest.** It governs an installed app's
-  status bar, is static, and so cannot follow a clock-driven theme — it once
-  left a dark app sitting under a light strip. Leaving it out hands the job to
-  the meta tag, which does follow.
+- **An installed Android app ignores the meta `theme-color`.** Its system bars
+  come from the manifest, which is read at install time and cannot be
+  theme-aware. `theme_color` and `background_color` are therefore pinned to
+  `#242A2F`, the dark theme's `--paper`; **change that token and you must
+  change the manifest by hand**, since JSON cannot read CSS. A test asserts
+  the two still match — keep it. Leaving the field out does not help: the
+  fallback is light, which was the original complaint.
 - **The service worker must not exist over `file://`.** Registration is
   guarded on the protocol, and the install panel falls back to telling the
   reader where their browser hides the command.
