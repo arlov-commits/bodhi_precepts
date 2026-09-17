@@ -3,7 +3,8 @@
 A small web view of the six fast days (六齋日, liù zhāi rì), the three long
 fasting months (三長齋月, sān cháng zhāi yuè), the new and full moons, and the
 days the assembly gathers to recite the precepts (布薩, bùsà), built from the
-DRBA calendar spreadsheet.
+DRBA calendar spreadsheet — and, beside the calendar, an index of what
+actually triggers an offense under the Brahma Net precepts (梵網經).
 
 Open `index.html`. No build step, no dependencies, works straight off the
 filesystem — and, served over the web, installs as an app on a phone or a
@@ -13,19 +14,22 @@ desktop.
 
 | File | What it is |
 | --- | --- |
-| `index.html` | The whole app. Three views: **Today**, **Upcoming**, and **Settings** (the gear). |
+| `index.html` | The whole app. Four views: **Today**, **Upcoming**, **Settings** and **Precepts**. |
 | `manifest.webmanifest` | Makes it installable: the name, the icons, the standalone display. |
 | `sw.js` | The service worker. Keeps a copy of the app so an installed one opens offline. |
 | `icon.svg` | The icon: a cinnabar seal carrying a crescent and the pole star. The source the rest are cut from. |
 | `icon-32.png`, `apple-touch-icon.png`, `icon-192.png`, `icon-512.png`, `icon-maskable-512.png` | Rasterised from `icon.svg` — for browsers that will not take an SVG, for an iOS home screen, and for an Android launcher that crops to its own shape. |
-| `data.js` | The dataset as `window.DRBA_DATA`. Loaded by `index.html`; a plain script tag so it works over `file://`. |
+| `data.js` | The calendar dataset as `window.DRBA_DATA`. Loaded by `index.html`; a plain script tag so it works over `file://`. |
+| `precepts.js` | The Brahma Net dataset as `window.BRAHMA_DATA` — the offense clauses, the Upasaka precepts and the legend the Precepts view reads. Loaded the same way. |
 | `data.json` | The same records, indented, for anything that wants to read them programmatically. |
 | `data.csv` | The same records as CSV, UTF-8 **with BOM** so Excel on Windows keeps the diacritics. |
 | `build_data.py` | Regenerates all three from `DRBA_Calendar.xlsx`. |
 | `DRBA_Calendar.xlsx` | The source workbook. Still the place to change rules or extend dates. |
 
-The three data files are **generated**. Change the workbook or the script and
-re-run it; never edit them by hand.
+`data.js`, `data.json` and `data.csv` are **generated**. Change the workbook or
+the script and re-run it; never edit them by hand. `precepts.js` is not
+generated here — it came off the CBETA P5 XML of T24n1484 with the editorial
+work the Precepts view's own Methodology note describes.
 
 ## Installing it
 
@@ -138,9 +142,65 @@ rule counts, are found by looking ahead to the next day 1 rather than from
 there is no next day 1 to look ahead to — the last few weeks of the data — a
 rule counted from the end simply does not fire, rather than firing on a guess.
 
+## Getting around
+
+Four views, and one set of tabs drawn twice. On a phone they are a bar across
+the foot of the screen; from 820px up the same cells stand on end as a rail
+down the left, with the active one marked by a leading rule rather than a
+filled cell — a cell a quarter of the screen tall, filled, reads as a slab
+rather than a selection. Both navs are always in the markup and the media
+query alone decides which one shows, so turning a tablet on its side costs
+nothing: no resize listener, nothing to redraw. A fifth tab would be one row
+in `TABS` and no layout change in either nav.
+
+The bar is **in ordinary flow** at the foot of a column exactly one viewport
+tall, not `position:fixed`. A fixed bar is placed against the layout
+viewport, which on Android Chrome keeps the taller URL-bar-hidden height; the
+bar then hangs below the glass with its labels cut off, and no amount of
+measuring from script corrects it, because the compositor moves fixed
+elements itself during a fling. A bar in flow at the end of a `100dvh` column
+cannot be anywhere but on screen. The cost, taken knowingly: the browser's
+URL bar no longer auto-hides while scrolling, because the document itself no
+longer scrolls. An installed copy has no URL bar to hide, and that is the
+case this is for.
+
+The consequence is that `#scroll`, not the document, is the thing that
+scrolls. Anything reading or setting `window.scrollY` goes through
+`scroller()` instead.
+
+## Precepts
+
+The fourth tab, under the 戒 glyph: what actually triggers an offense in the
+ten major and forty-eight minor precepts of the Brahma Net Sutra, with the
+Upasaka precepts on a second tab beside them. Clauses can be sorted by
+precept, by canonical order or by how intrusive they are, filtered by band
+and by a dozen facets, searched, and hidden one by one — each view keeping
+its own hidden set. Its own corner of storage, `bodhi.precepts`, and its own
+Reset inside the filter sheet.
+
+It arrived as a separate page and is re-skinned onto this app's tokens
+rather than keeping its own, so it follows light and dark with everything
+else; its four webfonts are gone, which is what lets the app keep working
+offline and over `file://`. Its band and remark colours are the `--t1`…`--t5`
+and `--bn-*` tokens at the top of the stylesheet, stated once per theme.
+
+Two things about it are worth knowing before editing it:
+
+- **Its CSS is scoped to `#view-precepts`, and the seven class names this
+  page already spends elsewhere are prefixed `p-`** — `.p-card`, `.p-tags`,
+  `.p-lit` and so on. `.card` above all: unprefixed, the day cards on Today
+  would take the offense cards' rules and vice versa.
+- **Its script is its own IIFE and every listener is bound to the view
+  element, never to the document.** Its delegated `.card` handler on the
+  document would otherwise open and close the day cards on Today along with
+  its own.
+
+Nothing in it is drawn until the tab is first opened: the dataset is the
+largest thing the app carries and this is not the view it opens on.
+
 ## Settings
 
-The gear opens a Settings view. Its panels run in the order they are most
+Settings is the third tab. Its panels run in the order they are most
 often touched, the rarest last — **Week start**, **Days on the Today view**,
 **Fast days**, **Precept Recitation days**, **Leap months**, **Install**, and
 then **Where this is kept**. The two panels that say which days carry a mark
@@ -219,7 +279,9 @@ box. The dataset's one leap month, the leap 5th of 2028, is 29 days.
 **Install** — the button, or the instructions for the browser in front of you.
 See *Installing it* above.
 
-**Where this is kept** — and a button to put everything back.
+**Where this is kept** — and a button to put everything back. It puts back
+the settings on this page; the Precepts view keeps its own, with its own
+Reset inside its filter sheet.
 
 ### What a reader who has set nothing gets
 
@@ -338,7 +400,7 @@ On an iPhone the standalone status bar is fixed light
 needs `black-translucent` with `viewport-fit=cover` and safe-area padding, and
 is not done yet.
 
-The icon beside the gear cycles three themes — auto, light, dark — and the
+The icon in the masthead cycles three themes — auto, light, dark — and the
 choice is kept with the rest. Auto follows the **device clock**, not the
 system setting: light from 6am to 6pm, dark outside it, rechecked while the
 page is left open.
@@ -377,6 +439,10 @@ disc.
 - The six-day list: 佛說四天王經, Taisho T15n0590.
 - The `verification` sheet in the workbook records what has been checked
   against a source, what was decided by hand, and what is still open.
+- The Brahma Net precepts: the CBETA P5 XML of 梵網經, Taisho T24n1484, in
+  Bhikshu Dharmamitra's Kalavinka translation and his emended Chinese. The
+  clause splits, the gates, the practical readings and the ranking are
+  editorial; the Precepts view's own Methodology note says which is which.
 
 ## Coverage
 

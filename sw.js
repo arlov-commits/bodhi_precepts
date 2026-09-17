@@ -3,11 +3,12 @@
    copy of all of them and serves from it. Bump CACHE only to force every
    client to throw its copy away; ordinary edits do not need it, because each
    response is refreshed in the background as it is served. */
-var CACHE = "bodhi-v3";
+var CACHE = "bodhi-v4";
 var SHELL = [
   "./",
   "index.html",
   "data.js",
+  "precepts.js",
   "manifest.webmanifest",
   "icon.svg",
   "icon-32.png",

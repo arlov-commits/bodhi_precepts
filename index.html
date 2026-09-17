@@ -61,6 +61,30 @@
           repeating-linear-gradient(-45deg,var(--netline) 0 1px,transparent 1px 9px);
   --sans:"Optima","Avenir Next","Gill Sans MT","Gill Sans","Trebuchet MS",sans-serif;
   --han:"Songti SC","STSong","Noto Serif CJK SC","Noto Serif SC","SimSun",serif;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+  /* The Precepts view sorts its clauses into five bands and marks four kinds
+     of remark, so it needs a wider set than the two inks the calendar keeps
+     to. They are pitched to sit beside the cinnabar rather than compete with
+     it: the first band IS the cinnabar, and the rest are muted earths. All of
+     it is restated below for the dark ground. --bn-on is whatever reads on a
+     solid accent, which flips with the theme - the accents are dark on paper
+     and light on ink, so the text on them goes the other way. */
+  --t1:#96231D; --t2:#8A5A1E; --t3:#35617A; --t4:#5B4E73; --t5:#446C49;
+  --bn-on:#FBFAF6;
+  --bn-green:#3B6340;  --bn-green-wash:#E8EEE8;
+  --bn-blue:#2F5468;   --bn-blue-wash:#EAF1F5;   --bn-blue-line:#9FB6C4;
+  --bn-amber:#835619;  --bn-amber-wash:#F7EEDF;  --bn-amber-line:#D2AB78;
+  --bn-violet:#544670; --bn-violet-wash:#ECE8F1; --bn-violet-line:#C7BDD8;
+  --bn-off:#8C857A;    --bn-off-line:#C9C0B4;
+  --bn-uniq-wash:#FAF0ED; --bn-count-wash:#EFE8DA;
+  /* Faint washes for the insets. On paper these are the ink laid on thin; on
+     the dark ground the ink is the light one, so they invert rather than
+     going darker still. --bn-on-ink-soft is the quiet tone for text sitting
+     on a filled ink chip, which is the paper both ways round. */
+  --bn-ink-wash:rgba(28,26,22,.035);   --bn-ink-wash-2:rgba(28,26,22,.055);
+  --bn-fast-wash:rgba(150,35,29,.05);  --bn-fast-wash-2:rgba(150,35,29,.13);
+  --bn-blue-tint:rgba(53,97,122,.06);  --bn-green-tint:rgba(68,108,73,.06);
+  --bn-on-ink-soft:rgba(246,243,236,.62);
 }
 /* Evening ink: diluted 墨 is never black but a blue-grey, so the dark ground
    is slate rather than soot, the strokes are warm paper, and the cinnabar
@@ -96,14 +120,50 @@
   --leap:#DE9184;
   --leap-dim:#3A302E;
   --netline:rgba(233,231,222,.067);
+  /* The same set, lifted off the slate. Every accent is now the light half of
+     its pair, so text sitting on one goes dark instead. */
+  --t1:#DE9184; --t2:#CFA267; --t3:#7FAFC9; --t4:#A99AC4; --t5:#8BB791;
+  --bn-on:#242A2F;
+  --bn-green:#8BB791;  --bn-green-wash:#2E3A31;
+  --bn-blue:#9FC4DA;   --bn-blue-wash:#2A363E;   --bn-blue-line:#4E6E82;
+  --bn-amber:#CFA267;  --bn-amber-wash:#38322A;  --bn-amber-line:#8A6B3C;
+  --bn-violet:#B5A8CE; --bn-violet-wash:#332F3C; --bn-violet-line:#5C5273;
+  --bn-off:#7C8385;    --bn-off-line:#4E565C;
+  --bn-uniq-wash:#362E2C; --bn-count-wash:#333A40;
+  --bn-ink-wash:rgba(233,231,222,.045); --bn-ink-wash-2:rgba(233,231,222,.075);
+  --bn-fast-wash:rgba(222,145,132,.07); --bn-fast-wash-2:rgba(222,145,132,.17);
+  --bn-blue-tint:rgba(127,175,201,.08); --bn-green-tint:rgba(139,183,145,.08);
+  --bn-on-ink-soft:rgba(36,42,47,.68);
 }
 *{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%}
+/* The ground is set on the root as well as the body: Chrome on Android tints
+   the system navigation bar at the foot of the screen from the root, and a
+   body-only background leaves a mismatched strip under the tab bar. */
+html{-webkit-text-size-adjust:100%;background:var(--paper)}
 .han{font-family:var(--han)}
 body{
   margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
   font-size:16px;line-height:1.5;
+  /* `clip`, not `hidden`: it does not make the body a scroll container, so
+     the sticky and in-flow chrome below keeps working. A long unbroken
+     string would otherwise widen the page and slide the layout under the
+     bar sideways. */
+  overflow-x:clip;
 }
+
+/* ------------------------------------------------------------- shell */
+/* One viewport tall, and the only thing that scrolls is .scroll. `dvh`
+   tracks the visible viewport as the browser's chrome slides; the `vh` line
+   before it is the fallback for anything without dvh. */
+.shell{height:100vh;height:100dvh;display:flex;flex-direction:column;
+  overflow:hidden}
+/* min-height:0 is load-bearing: without it this flex child refuses to shrink
+   below its content and the whole column overflows, pushing the bar off the
+   bottom of the screen - which looks exactly like the bug the shell exists
+   to avoid. */
+.frame{flex:1 1 auto;min-height:0;display:flex;position:relative}
+.scroll{flex:1 1 auto;min-width:0;overflow-y:auto;overflow-x:clip;
+  overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch}
 .wrap{max-width:56rem;margin:0 auto;padding:1.5rem 1.25rem 4rem}
 
 /* ---------------------------------------------------------- masthead */
@@ -349,6 +409,452 @@ td .rec{color:var(--recite);font-weight:600}
 .downloads-note code{background:var(--raised);border:1px solid var(--hair);
   padding:.05rem .3rem;font-size:.9em}
 
+/* --------------------------------------------------------------- navs */
+/* One set of tabs drawn twice: a bar across the foot on a phone, the same
+   cells stood on end as a rail on a wide screen. Both are always in the DOM
+   and the media query alone decides which shows, so turning a tablet on its
+   side costs nothing - no resize listener, nothing to redraw.
+
+   The icons are monochrome SVG masks tinted with background-color, so one
+   rule recolours them for idle, hover, active and either theme. The fourth
+   tab is a glyph instead, 戒, the same character the view's own seal
+   carries; it takes its colour from the text, which is the same trick by a
+   different route. */
+:root{
+  --nv-today:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='4.2'/%3E%3Cpath d='M12 2.4v2.6M12 19v2.6M2.4 12h2.6M19 12h2.6M5.2 5.2l1.9 1.9M16.9 16.9l1.9 1.9M18.8 5.2l-1.9 1.9M7.1 16.9l-1.9 1.9'/%3E%3C/svg%3E");
+  --nv-record:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3.2' y='5' width='17.6' height='15.8' rx='2'/%3E%3Cpath d='M3.2 9.6h17.6M8.2 2.9v3.9M15.8 2.9v3.9'/%3E%3Cpath d='M7.4 13.2h2.2M14.4 13.2h2.2M7.4 17h2.2M14.4 17h2.2'/%3E%3C/svg%3E");
+  --nv-settings:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3Cpath d='M19.1 14.6a1.6 1.6 0 0 0 .32 1.77l.06.06a1.9 1.9 0 1 1-2.7 2.7l-.06-.06a1.6 1.6 0 0 0-1.77-.32 1.6 1.6 0 0 0-.97 1.46v.17a1.9 1.9 0 1 1-3.8 0v-.09a1.6 1.6 0 0 0-1.05-1.46 1.6 1.6 0 0 0-1.77.32l-.06.06a1.9 1.9 0 1 1-2.7-2.7l.06-.06a1.6 1.6 0 0 0 .32-1.77 1.6 1.6 0 0 0-1.46-.97h-.17a1.9 1.9 0 1 1 0-3.8h.09a1.6 1.6 0 0 0 1.46-1.05 1.6 1.6 0 0 0-.32-1.77l-.06-.06a1.9 1.9 0 1 1 2.7-2.7l.06.06a1.6 1.6 0 0 0 1.77.32h.08a1.6 1.6 0 0 0 .97-1.46v-.17a1.9 1.9 0 1 1 3.8 0v.09a1.6 1.6 0 0 0 .97 1.46 1.6 1.6 0 0 0 1.77-.32l.06-.06a1.9 1.9 0 1 1 2.7 2.7l-.06.06a1.6 1.6 0 0 0-.32 1.77v.08a1.6 1.6 0 0 0 1.46.97h.17a1.9 1.9 0 1 1 0 3.8h-.09a1.6 1.6 0 0 0-1.46.97z'/%3E%3C/svg%3E");
+}
+.nav-icon{display:inline-block;width:22px;height:22px;flex-shrink:0;
+  background-color:var(--quiet);
+  -webkit-mask:var(--icon) center/contain no-repeat;
+  mask:var(--icon) center/contain no-repeat}
+.nav-glyph{display:inline-flex;align-items:center;justify-content:center;
+  width:22px;height:22px;flex-shrink:0;font-family:var(--han);
+  font-size:20px;line-height:1;color:var(--quiet)}
+.bn-item .nav-icon,.bn-item .nav-glyph{width:24px;height:24px}
+.bn-item .nav-glyph{font-size:21px}
+.nav-item .nav-icon,.nav-item .nav-glyph{width:26px;height:26px}
+.nav-item .nav-glyph{font-size:23px}
+.nav-item:hover .nav-icon,.nav-item.active .nav-icon,
+.bn-item.active .nav-icon{background-color:var(--ink)}
+.nav-item:hover .nav-glyph,.nav-item.active .nav-glyph,
+.bn-item.active .nav-glyph{color:var(--fast)}
+
+.sidenav{display:none;flex:0 0 13rem;background:var(--panel);
+  border-right:1px solid var(--line);flex-direction:column;
+  padding:.9rem .6rem;gap:.35rem;overflow-y:auto}
+.sidenav-title{font-family:var(--han);font-size:1.15rem;letter-spacing:.12em;
+  color:var(--fast);padding:.3rem .5rem .7rem;flex:0 0 auto}
+/* The cell divides the rail's height; the FACE is what gets marked. Filling a
+   cell a quarter of the screen tall with the active ground reads as a slab,
+   so the ground sits on the icon-and-label group and the cell keeps only the
+   leading rule - the bar's active rule, turned a quarter circle. The border
+   is reserved as transparent on every item, never added on selection, or the
+   button would jump by its own width when picked. */
+.nav-item{flex:1 1 0;min-height:4rem;display:flex;align-items:center;
+  justify-content:center;width:100%;background:none;
+  border:0;border-left:3px solid transparent;color:var(--quiet);
+  font:inherit;font-size:.92rem;font-weight:600;padding:.4rem;cursor:pointer}
+.nav-face{display:flex;flex-direction:column;align-items:center;gap:.5rem;
+  padding:.85rem 1.25rem}
+.nav-item:hover{color:var(--ink)}
+.nav-item:hover .nav-face{background:var(--raised)}
+.nav-item.active{color:var(--ink);border-left-color:var(--fast)}
+.nav-item.active .nav-face{background:var(--raised);
+  box-shadow:inset 0 0 0 1px var(--hair)}
+
+.bottomnav{flex:0 0 auto;display:flex;background:var(--panel);
+  border-top:1px solid var(--line);
+  padding-bottom:env(safe-area-inset-bottom,0)}
+.bn-item{flex:1;display:flex;align-items:center;justify-content:center;
+  background:none;border:0;border-top:2px solid transparent;
+  color:var(--quiet);font:inherit;font-size:.7rem;font-weight:600;
+  letter-spacing:.02em;padding:.5rem .15rem .45rem;cursor:pointer}
+.bn-item .nav-face{gap:.2rem;padding:0}
+.bn-item.active{color:var(--ink);border-top-color:var(--fast)}
+.nav-item:focus-visible,.bn-item:focus-visible{outline:2px solid var(--fast);
+  outline-offset:-2px}
+
+@media (min-width:820px){
+  .sidenav{display:flex}
+  .bottomnav{display:none}
+  /* The bar is gone here, so this is trailing room at the end of a long
+     page rather than clearance under anything. */
+  .wrap{padding-bottom:5rem}
+}
+
+/* ========================================================== precepts */
+/* The Brahma Net view, re-skinned onto this page's tokens and scoped to its
+   own element. The scope is not tidiness: it arrived using .p-card, .p-tags,
+   .body, .note and h1-h3, all of which this page already spends elsewhere.
+   Its five band colours and four remark colours are the --t* and --bn-*
+   tokens at the top of the file, so the whole view restates itself for the
+   dark ground without a rule in here changing. */
+#view-precepts{--gut:1.25rem}
+
+/* ---------- masthead ---------- */
+#view-precepts header.mast{padding:1.75rem 0 2rem; border-bottom:1px solid var(--line)}
+#view-precepts .seal{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:52px; height:52px; background:var(--fast); color:var(--bn-on);
+  font-family:var(--han); font-size:25px; line-height:1;
+  border-radius:3px; margin-bottom:20px;
+  animation:bn-seal .7s cubic-bezier(.2,.9,.3,1) both;
+}
+@keyframes bn-seal{from{opacity:0;transform:scale(.82) rotate(-5deg)}to{opacity:1;transform:none}}
+#view-precepts h1{
+  font-family:var(--sans); font-weight:300; font-size:clamp(34px,5vw,54px);
+  line-height:1.04; letter-spacing:-.022em; margin:0 0 6px;
+}
+#view-precepts h1 em{font-style:italic; color:var(--fast)}
+#view-precepts .sub{
+  font-family:var(--mono); font-size:11px; letter-spacing:.12em;
+  text-transform:uppercase; color:var(--quiet); margin:0 0 20px; line-height:1.75;
+}
+#view-precepts .lede{max-width:63ch; color:var(--ink-soft); font-size:16px; margin:0 0 26px}
+#view-precepts .lede strong{font-weight:600; color:var(--ink)}
+#view-precepts .stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(112px,1fr)); gap:1px; background:var(--hair); border:1px solid var(--hair); border-radius:3px; overflow:hidden}
+#view-precepts .stat{padding:11px 13px; background:var(--panel)}
+#view-precepts .stat b{display:block; font-family:var(--sans); font-size:25px; font-weight:500; line-height:1}
+#view-precepts .stat span{font-family:var(--mono); font-size:9.5px; letter-spacing:.11em; text-transform:uppercase; color:var(--quiet)}
+
+
+/* ---------- accordions ---------- */
+#view-precepts .acc{margin-top:18px; border:1px solid var(--line); border-radius:4px; background:var(--panel)}
+#view-precepts .acc + .acc{margin-top:8px}
+#view-precepts .acc summary{
+  cursor:pointer; list-style:none; padding:10px 14px;
+  font-family:var(--mono); font-size:10px; letter-spacing:.13em;
+  text-transform:uppercase; color:var(--quiet); display:flex; align-items:center; gap:8px;
+}
+#view-precepts .acc summary::-webkit-details-marker{display:none}
+#view-precepts .acc summary::before{content:'+'; font-size:13px; line-height:1; color:var(--fast)}
+#view-precepts .acc[open] summary::before{content:'\2013'}
+#view-precepts .acc[open] summary{border-bottom:1px solid var(--hair); color:var(--ink-soft)}
+#view-precepts .accbody{padding:13px 16px 15px}
+#view-precepts .accbody p{margin:0 0 9px; font-size:14.5px; line-height:1.55; color:var(--ink-soft); max-width:70ch}
+#view-precepts .accbody p:last-child{margin-bottom:0}
+
+
+/* ---------- tabs ---------- */
+#view-precepts .tabs{display:flex; gap:7px; margin-top:20px}
+#view-precepts .tab{flex:1 1 0; min-width:0; cursor:pointer; text-align:left; padding:9px 13px;
+  border:1px solid var(--line); border-radius:5px; background:var(--panel);
+  font-family:var(--sans); font-size:14.5px; font-weight:500; color:var(--ink-soft);
+  display:flex; flex-direction:column; gap:2px; transition:all .16s ease}
+#view-precepts .tab span{font-family:var(--mono); font-size:8.5px; letter-spacing:.09em;
+  text-transform:uppercase; color:var(--quiet); font-weight:400}
+#view-precepts .tab.on{background:var(--ink); border-color:var(--ink); color:var(--paper)}
+#view-precepts .tab.on span{color:var(--bn-on-ink-soft)}
+#view-precepts #bn-uplist[hidden]{display:none}
+#view-precepts .upcard{background:var(--panel); border:1px solid var(--hair); border-left:3px solid var(--t3);
+  border-radius:3px; padding:14px 18px; margin-bottom:10px}
+#view-precepts .upcard.uniq{border-left-color:var(--fast); background:var(--bn-uniq-wash)}
+#view-precepts .uphd{display:flex; flex-wrap:wrap; align-items:baseline; gap:9px}
+#view-precepts .upid{font-family:var(--mono); font-size:10.5px; font-weight:500;
+  padding:2px 7px; border-radius:2px; background:var(--t3); color:var(--bn-on); white-space:nowrap}
+#view-precepts .upcard.uniq .upid{background:var(--fast)}
+#view-precepts .upname{font-family:var(--sans); font-weight:500; font-size:16.5px}
+#view-precepts .upzh{font-family:var(--han); font-size:14px; color:var(--quiet)}
+#view-precepts .upmap{margin-left:auto; display:flex; gap:5px; flex-wrap:wrap}
+#view-precepts .upnote{margin:9px 0 0; font-size:14.5px; line-height:1.55; color:var(--ink-soft)}
+#view-precepts .st{font-family:var(--mono); font-size:8.5px; letter-spacing:.07em;
+  text-transform:uppercase; padding:2px 7px; border-radius:2px; white-space:nowrap}
+#view-precepts .st.Same{background:var(--bn-green-wash); color:var(--bn-green)}
+#view-precepts .st.Stricter{background:var(--bn-fast-wash-2); color:var(--fast)}
+#view-precepts .st.Laxer{background:var(--bn-blue-wash); color:var(--bn-blue)}
+#view-precepts .st.Unique{background:var(--fast); color:var(--bn-on)}
+#view-precepts .st.map{background:var(--hair); color:var(--ink-soft)}
+#view-precepts .upintro{margin:20px 0 16px; font-size:14.5px; line-height:1.6; color:var(--ink-soft); max-width:70ch}
+#view-precepts .upbar{display:flex; gap:7px; margin-bottom:16px; flex-wrap:wrap}
+#view-precepts .upbtn{cursor:pointer; font-family:var(--mono); font-size:10.5px;
+  padding:5px 12px; border:1px solid var(--line); border-radius:100px;
+  background:var(--panel); color:var(--ink-soft)}
+#view-precepts .upbtn.on{background:var(--fast); border-color:var(--fast); color:var(--bn-on)}
+
+
+/* ---------- sticky bar: one line at rest, everything else on demand ---------- */
+#view-precepts .bar[hidden], #view-precepts #bn-list[hidden]{display:none}
+#view-precepts .bar{
+  position:sticky; top:0; z-index:30; margin:26px calc(var(--gut) * -1) 22px; padding:8px var(--gut);
+  background-color:var(--paper);
+  border-top:1px solid var(--line); border-bottom:1px solid var(--line);
+}
+#view-precepts .barrow{display:flex; align-items:center; gap:7px; min-width:0}
+#view-precepts .iconbtn.push{margin-left:auto}
+#view-precepts .metarow{display:flex; align-items:center; gap:8px; margin-top:6px; min-width:0;
+  overflow-x:auto; scrollbar-width:none}
+#view-precepts .metarow::-webkit-scrollbar{display:none}
+#view-precepts .barrow .count{margin-left:8px; flex:0 0 auto}
+#view-precepts .badge[hidden]{display:none}
+#view-precepts .fbtn{
+  display:inline-flex; align-items:center; gap:5px; cursor:pointer; flex:0 0 auto;
+  font-family:var(--mono); font-size:10.5px; letter-spacing:.04em;
+  height:26px; padding:0 11px; box-sizing:border-box;
+  border:1px solid var(--line); border-radius:100px;
+  background:var(--panel); color:var(--ink-soft); transition:all .16s ease;
+}
+#view-precepts .fbtn:hover{border-color:var(--quiet)}
+#view-precepts .fbtn[aria-expanded="true"]{background:var(--ink); color:var(--paper); border-color:var(--ink)}
+#view-precepts .badge{
+  display:inline-flex; align-items:center; justify-content:center; min-width:14px; height:14px;
+  padding:0 4px; border-radius:100px; background:var(--fast); color:var(--bn-on);
+  font-size:9px; line-height:1;
+}
+#view-precepts .seg{display:inline-flex; border:1px solid var(--line); border-radius:100px;
+  background:var(--panel); padding:2px; flex:0 0 auto}
+#view-precepts .segbtn{font-family:var(--mono); font-size:10.5px; padding:4px 13px; border:0;
+  border-radius:100px; background:transparent; color:var(--quiet); cursor:pointer;
+  transition:background .18s ease,color .18s ease; white-space:nowrap}
+#view-precepts .segbtn.on{background:var(--ink); color:var(--paper)}
+#view-precepts .count{font-family:var(--mono); font-size:10px; color:var(--quiet); white-space:nowrap}
+#view-precepts .iconbtn{flex:0 0 auto; cursor:pointer; border:0; background:transparent; color:var(--quiet);
+  padding:4px 5px; display:inline-flex; align-items:center; border-radius:4px;
+  transition:color .16s ease, background .16s ease, transform .2s ease}
+#view-precepts .iconbtn:hover{color:var(--ink); background:var(--bn-ink-wash-2)}
+#view-precepts .bar.expanded #bn-toggleall{transform:rotate(180deg); color:var(--fast)}
+
+
+/* active filters: visible AND removable without opening anything */
+#view-precepts .activerow{display:flex; align-items:center; gap:6px; margin-top:6px; min-height:19px;
+  overflow-x:auto; scrollbar-width:none; min-width:0}
+#view-precepts .activerow:empty::before{content:''; display:block; height:19px}
+#view-precepts .activerow::-webkit-scrollbar{display:none}
+#view-precepts .apill{
+  display:inline-flex; align-items:center; gap:6px; flex:0 0 auto; cursor:pointer;
+  font-family:var(--mono); font-size:9.5px; line-height:1;
+  height:19px; padding:0 9px; box-sizing:border-box;
+  border-radius:100px; border:0; background:var(--fast); color:var(--bn-on);
+}
+#view-precepts .apill em{font-style:normal; opacity:.65; font-size:11px; line-height:1}
+#view-precepts .apill:hover em{opacity:1}
+#view-precepts .apill.tierpill{background:var(--ink); color:var(--paper)}
+#view-precepts .apill.hidpill{background:var(--quiet); color:var(--panel)}
+
+
+/* the sheet drops in place — no scrolling back up */
+#view-precepts .sheet{
+  margin:9px calc(var(--gut) * -1) -9px; padding:11px var(--gut) 11px;
+  background:var(--panel); border-top:1px solid var(--hair); overflow:visible;
+  animation:bn-drop .2s cubic-bezier(.2,.9,.3,1) both;
+}
+#view-precepts .sheet[hidden]{display:none}
+@keyframes bn-drop{from{opacity:0; transform:translateY(-7px)}to{opacity:1; transform:none}}
+#view-precepts .plabel{font-family:var(--mono); font-size:8.5px; letter-spacing:.12em;
+  text-transform:uppercase; color:var(--ink-soft); margin:0 0 5px; display:flex;
+  flex-wrap:wrap; align-items:baseline; gap:4px 9px}
+#view-precepts .plabel em{font-style:normal; text-transform:none; letter-spacing:.02em; font-size:9.5px;
+  color:var(--quiet)}
+#view-precepts .sheet .fgrid{margin-bottom:15px}
+#view-precepts .numnote{font-family:var(--mono); font-size:8.5px; letter-spacing:.05em;
+  text-transform:uppercase; color:var(--quiet); margin:-5px 0 9px}
+#view-precepts .fgrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(112px,1fr)); gap:6px; margin-bottom:11px}
+#view-precepts .fcard{text-align:left; cursor:pointer; padding:7px 10px 6px; border-radius:4px;
+  border:1px solid var(--line); background:var(--paper); transition:all .16s ease;
+  display:flex; flex-direction:column; gap:1px; min-width:0}
+#view-precepts .fcard b{font-family:var(--sans); font-weight:500; font-size:17px; line-height:1.1; color:var(--ink)}
+#view-precepts .fcard span{font-family:var(--mono); font-size:8.5px; letter-spacing:.03em;
+  text-transform:uppercase; color:var(--quiet); line-height:1.3; white-space:normal;
+  overflow-wrap:anywhere}
+#view-precepts .fcard:hover{border-color:var(--quiet)}
+#view-precepts .tog{border-left:3px solid var(--line)}
+#view-precepts .tog[data-tier="1"]{border-left-color:var(--t1)}
+#view-precepts .tog[data-tier="2"]{border-left-color:var(--t2)}
+#view-precepts .tog[data-tier="3"]{border-left-color:var(--t3)}
+#view-precepts .tog[data-tier="4"]{border-left-color:var(--t4)}
+#view-precepts .tog[data-tier="5"]{border-left-color:var(--t5)}
+#view-precepts .tog:not(.on){border-style:dashed; background:transparent}
+#view-precepts .tog:not(.on) b, #view-precepts .tog:not(.on) span{color:var(--bn-off)}
+#view-precepts .tog:not(.on) b{text-decoration:line-through; text-decoration-color:var(--bn-off-line)}
+#view-precepts .ref.on{background:var(--fast); border-color:var(--fast)}
+#view-precepts .ref.on b{color:var(--bn-on)}
+#view-precepts .ref.on span{color:var(--bn-on-ink-soft)}
+#view-precepts .ref.hid{border-style:dotted; border-color:var(--quiet); background:var(--bn-ink-wash)}
+#view-precepts .ref.hid b{color:var(--quiet)}
+#view-precepts .ref.hid.on{background:var(--quiet); border-color:var(--quiet); border-style:solid}
+#view-precepts .ref.hid.on b{color:var(--panel)}
+#view-precepts .fcard.zero{opacity:.3; cursor:not-allowed}
+#view-precepts .sheetfoot{display:flex; align-items:center; gap:9px; padding-top:1px}
+#view-precepts .clear{cursor:pointer; border:1px solid var(--fast); background:transparent; color:var(--fast);
+  font-family:var(--mono); font-size:10.5px; border-radius:100px;
+  height:24px; padding:0 13px; box-sizing:border-box; display:inline-flex; align-items:center}
+#view-precepts .clear[hidden]{display:inline-flex; visibility:hidden}
+#view-precepts .clear:hover{background:var(--fast); color:var(--panel)}
+#view-precepts .done{margin-left:auto; cursor:pointer; border:0; background:var(--ink); color:var(--paper);
+  font-family:var(--mono); font-size:10px; border-radius:100px;
+  height:24px; padding:0 16px; box-sizing:border-box; display:inline-flex; align-items:center}
+@media (max-width:420px){
+#view-precepts .fgrid{grid-template-columns:repeat(2,1fr)}
+}
+
+
+/* search replaces the bar row entirely while open */
+#view-precepts .searchrow{display:flex; align-items:center; gap:8px; margin-top:7px;
+  border-top:1px solid var(--hair); padding-top:7px}
+#view-precepts .searchrow[hidden]{display:none}
+#view-precepts .searchrow .sicon{flex:0 0 auto; color:var(--quiet)}
+#view-precepts input[type=search]{flex:1 1 auto; min-width:0; padding:4px 2px; font-family:var(--sans);
+  font-size:15px; border:0; background:transparent; color:var(--ink)}
+#view-precepts input[type=search]:focus{outline:none}
+
+
+/* ---------- group headings ---------- */
+#view-precepts .grp{display:flex; align-items:baseline; gap:12px; margin:38px 0 14px; padding-bottom:8px; border-bottom:1px solid var(--line)}
+/* The count is the loudest thing in the heading, so it is set light - but
+   --fast-line is a hairline colour and at this size it fell under 3:1 on
+   both grounds. The cinnabar itself carries at weight 300. */
+#view-precepts .grp .p-n{font-family:var(--sans); font-size:34px; font-weight:300; line-height:.8;
+  color:var(--fast); flex:0 0 auto}
+#view-precepts .grp h2{font-family:var(--sans); font-weight:500; font-size:19px; margin:0; letter-spacing:-.01em}
+#view-precepts .grp .note{font-family:var(--mono); font-size:9.5px; letter-spacing:.06em;
+  text-transform:uppercase; color:var(--quiet); margin-left:auto; text-align:right}
+
+
+/* ---------- cards ---------- */
+#view-precepts .p-card.anim{animation:bn-rise .42s cubic-bezier(.2,.9,.3,1) both}
+#view-precepts .p-card{
+  scroll-margin-top:96px; position:relative; background:var(--panel); border:1px solid var(--hair);
+  border-left:3px solid var(--tc,var(--line)); border-radius:3px;
+  padding:16px 20px 16px 22px; margin-bottom:11px;
+  transition:border-color .18s ease, background-color .18s ease;
+}
+@keyframes bn-rise{from{opacity:0; transform:translateY(9px)}to{opacity:1; transform:none}}
+#view-precepts .p-card:hover{border-color:var(--line)}
+#view-precepts .p-card[data-tier="1"]{--tc:var(--t1)}
+#view-precepts .p-card[data-tier="2"]{--tc:var(--t2)}
+#view-precepts .p-card[data-tier="3"]{--tc:var(--t3)}
+#view-precepts .p-card[data-tier="4"]{--tc:var(--t4)}
+#view-precepts .p-card[data-tier="5"]{--tc:var(--t5)}
+#view-precepts .hd{display:flex; flex-wrap:nowrap; align-items:baseline; gap:9px; cursor:pointer; padding-right:58px}
+#view-precepts .hd .pname{overflow-wrap:anywhere}
+#view-precepts .rank{font-family:var(--mono); font-size:10px; color:var(--quiet); min-width:22px}
+#view-precepts .pnum{
+  font-family:var(--mono); font-size:10.5px; font-weight:500; letter-spacing:.04em;
+  padding:2px 7px; border-radius:2px; background:var(--tc); color:var(--bn-on); white-space:nowrap;
+}
+#view-precepts .pname{font-family:var(--sans); font-weight:500; font-size:17px; letter-spacing:-.008em}
+#view-precepts .p-tags{display:flex; gap:5px; flex-wrap:wrap; align-items:center; margin-top:8px}
+#view-precepts .tag{
+  font-family:var(--mono); font-size:9.5px; letter-spacing:.06em; text-transform:uppercase;
+  padding:2px 7px; border:1px solid var(--line); border-radius:2px; color:var(--quiet); white-space:nowrap;
+}
+#view-precepts .tag.orient{border-color:var(--fast-line); color:var(--fast)}
+#view-precepts .tag.gated{background:var(--bn-violet-wash); border-color:var(--bn-violet-line); color:var(--bn-violet)}
+#view-precepts .caret{font-family:var(--mono); font-size:13px; color:var(--quiet);
+  transition:transform .2s ease; display:inline-block}
+#view-precepts .p-card.open .caret{transform:rotate(90deg)}
+#view-precepts .trigl{font-family:var(--mono); font-size:8.5px; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--quiet); margin:12px 0 5px}
+#view-precepts .clauses{margin:0; padding-left:20px; font-size:15px; line-height:1.5; color:var(--ink)}
+#view-precepts .clauses li{margin:5px 0; padding-left:2px}
+#view-precepts .clauses li::marker{color:var(--fast); font-family:var(--mono); font-size:11px}
+#view-precepts .clauses .cg{font-family:var(--mono); font-size:8.5px; letter-spacing:.05em;
+  text-transform:uppercase; font-style:normal; color:var(--bn-violet); background:var(--bn-violet-wash);
+  padding:1px 5px; border-radius:2px; margin-right:5px; white-space:nowrap}
+#view-precepts .p-card.precept .p-lit{margin-top:0}
+#view-precepts .multi{margin:0; padding-left:17px}
+#view-precepts .multi li{margin:3px 0; font-size:14.5px; line-height:1.55; color:var(--ink-soft)}
+#view-precepts .p-f.daily .multi li{color:var(--ink)}
+#view-precepts .tag.cnt{border-color:var(--line); color:var(--ink-soft); background:var(--bn-count-wash)}
+#view-precepts .p-lit{margin:11px 0 0; font-size:16px; line-height:1.55; color:var(--ink)}
+#view-precepts .p-lit::before{content:'\201C'; color:var(--fast); font-family:var(--sans); font-size:22px; line-height:0; vertical-align:-2px; margin-right:2px}
+#view-precepts .body{display:none; margin-top:14px; padding-top:13px; border-top:1px solid var(--hair)}
+#view-precepts .p-card.open .body{display:block; animation:bn-fade .28s ease both}
+@keyframes bn-fade{from{opacity:0}to{opacity:1}}
+#view-precepts .fields{display:grid; grid-template-columns:repeat(auto-fit,minmax(238px,1fr)); gap:15px 26px}
+#view-precepts .p-f h3{
+  font-family:var(--mono); font-size:9.5px; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--quiet); margin:0 0 4px; font-weight:500;
+}
+#view-precepts .p-f p{margin:0; font-size:14.5px; line-height:1.55; color:var(--ink-soft)}
+#view-precepts .p-f.daily{grid-column:1/-1}
+#view-precepts .p-f.daily p{color:var(--ink)}
+#view-precepts .p-f.daily h3{color:var(--fast)}
+#view-precepts .emend, #view-precepts .cnote{margin-top:12px; padding:9px 13px; border-radius:0 2px 2px 0; font-size:14px; line-height:1.52}
+#view-precepts .emend h3, #view-precepts .cnote h3{font-family:var(--mono); font-size:9px; letter-spacing:.12em;
+  text-transform:uppercase; margin:0 0 3px; font-weight:500}
+#view-precepts .emend p, #view-precepts .cnote p{margin:0}
+#view-precepts .emend{background:var(--bn-amber-wash); border-left:2px solid var(--bn-amber-line)}
+#view-precepts .emend h3{color:var(--bn-amber)}
+#view-precepts .emend p{color:var(--ink-soft)}
+#view-precepts .cnote{background:var(--bn-blue-tint); border-left:2px solid var(--t3)}
+#view-precepts .cnote h3{color:var(--bn-blue)}
+#view-precepts .cnote p{color:var(--ink-soft)}
+#view-precepts .tag.emendt{border-color:var(--bn-amber-line); background:var(--bn-amber-wash); color:var(--bn-amber)}
+#view-precepts .tag.scopet{border-color:var(--bn-blue-line); background:var(--bn-blue-wash); color:var(--bn-blue)}
+#view-precepts .ctl{position:absolute; top:13px; right:15px; display:inline-flex; align-items:center;
+  gap:6px; white-space:nowrap; z-index:2}
+#view-precepts .hidebtn{border:1px solid var(--line); background:var(--panel); color:var(--quiet);
+  font-family:var(--mono); font-size:11px; line-height:1; cursor:pointer;
+  border-radius:2px; padding:3px 6px; transition:all .15s ease}
+#view-precepts .hidebtn:hover{border-color:var(--fast); color:var(--fast)}
+#view-precepts .p-card.hiddencard{opacity:.42}
+#view-precepts .p-card.hiddencard:hover{opacity:.8}
+#view-precepts .cond{margin-top:12px; padding:10px 13px; background:var(--bn-fast-wash);
+  border-left:2px solid var(--fast); border-radius:0 2px 2px 0}
+#view-precepts .cond h3{font-family:var(--mono); font-size:9px; letter-spacing:.12em;
+  text-transform:uppercase; color:var(--fast); margin:0 0 6px; font-weight:500}
+#view-precepts .cond ol{margin:0; padding-left:19px; font-size:14px; line-height:1.5; color:var(--ink)}
+#view-precepts .cond li{margin:2px 0}
+#view-precepts .cond li::marker{color:var(--fast); font-family:var(--mono); font-size:11px}
+#view-precepts .four{margin-top:12px; padding:10px 13px; background:var(--bn-ink-wash);
+  border-left:2px solid var(--line); border-radius:0 2px 2px 0}
+#view-precepts .four h3{font-family:var(--mono); font-size:9px; letter-spacing:.12em;
+  text-transform:uppercase; color:var(--quiet); margin:0 0 6px; font-weight:500}
+#view-precepts .four dl{margin:0; display:grid; grid-template-columns:auto 1fr; gap:3px 12px; font-size:14px}
+#view-precepts .four dt{font-family:var(--mono); font-size:10px; text-transform:uppercase;
+  letter-spacing:.06em; color:var(--quiet); padding-top:3px}
+#view-precepts .four dd{margin:0; color:var(--ink-soft); line-height:1.5}
+#view-precepts .voices{margin-top:12px; display:flex; flex-direction:column; gap:8px}
+#view-precepts .voice{padding:9px 13px; border-radius:0 2px 2px 0; border-left:2px solid var(--line);
+  background:var(--bn-ink-wash)}
+#view-precepts .voice .vhead{display:flex; align-items:baseline; gap:8px; margin-bottom:3px}
+#view-precepts .voice .vhead b{font-family:var(--sans); font-weight:500; font-size:13.5px; color:var(--ink)}
+#view-precepts .voice .vhead em{font-family:var(--mono); font-size:8.5px; letter-spacing:.11em;
+  text-transform:uppercase; font-style:normal; padding:1px 6px; border-radius:2px}
+#view-precepts .voice .vhead i{font-style:normal}
+#view-precepts .voice p{margin:0; font-size:14px; line-height:1.53; color:var(--ink-soft)}
+#view-precepts .vbul{margin:2px 0 0; padding-left:16px; font-size:14px; line-height:1.53; color:var(--ink-soft)}
+#view-precepts .vbul li{margin:6px 0}
+#view-precepts .vbul li::marker{color:var(--fast-line)}
+#view-precepts .vsub{margin:4px 0 0; padding-left:15px}
+#view-precepts .vsub li{margin:3px 0}
+#view-precepts .vsub li::marker{color:var(--line); content:'\2013  '}
+#view-precepts .vbul b{display:block; font-family:var(--mono); font-size:9px; letter-spacing:.09em;
+  text-transform:uppercase; color:var(--quiet); font-weight:500; margin-bottom:2px}
+#view-precepts .voice.accords{border-left-color:var(--t5); background:var(--bn-green-tint)}
+#view-precepts .voice.accords .vhead em{background:var(--bn-green-wash); color:var(--bn-green)}
+#view-precepts .voice.adds{border-left-color:var(--t3); background:var(--bn-blue-tint)}
+#view-precepts .voice.adds .vhead em{background:var(--bn-blue-wash); color:var(--bn-blue)}
+#view-precepts .voice.diverges{border-left-color:var(--fast); background:var(--bn-fast-wash)}
+#view-precepts .voice.diverges .vhead em{background:var(--bn-fast-wash-2); color:var(--fast)}
+#view-precepts .tag.condt{border-color:var(--fast-line); color:var(--fast)}
+#view-precepts .tag.divt{background:var(--fast); border-color:var(--fast); color:var(--bn-on)}
+#view-precepts .term{
+  margin-top:13px; padding:9px 12px; background:var(--bn-fast-wash);
+  border-left:2px solid var(--fast-line); border-radius:0 2px 2px 0;
+  font-family:'Noto Serif SC',var(--sans); font-size:14px; color:var(--ink-soft);
+}
+#view-precepts .p-empty{text-align:center; padding:64px 20px; color:var(--quiet); font-style:italic}
+
+
+/* ---------- legend ---------- */
+#view-precepts .p-legend{margin-top:56px; padding-top:28px; border-top:1px solid var(--line)}
+#view-precepts .p-legend h2{font-family:var(--sans); font-weight:500; font-size:20px; margin:0 0 16px}
+#view-precepts .p-legend dl{margin:0; display:grid; grid-template-columns:minmax(130px,190px) 1fr; gap:9px 22px}
+#view-precepts .p-legend dt{font-family:var(--mono); font-size:10.5px; letter-spacing:.05em;
+           text-transform:uppercase; color:var(--quiet); padding-top:3px}
+#view-precepts .p-legend dd{margin:0; font-size:14.5px; color:var(--ink-soft)}
+#view-precepts footer{margin-top:34px; font-size:13px; color:var(--quiet); font-style:italic}
+@media (max-width:720px){
+#view-precepts .bar{margin:20px calc(var(--gut) * -1) 18px}
+#view-precepts .fgrid{grid-template-columns:repeat(auto-fit,minmax(104px,1fr))}
+#view-precepts .p-legend dl{grid-template-columns:1fr; gap:2px 0}
+#view-precepts .p-legend dd{margin-bottom:11px}
+#view-precepts .p-tags{margin-left:0; width:100%}
+}
+
 /* ---------------------------------------------------------- settings */
 nav button.gear{font-size:1.05rem;line-height:1;padding:.35rem .55rem}
 .setting{background:var(--panel);border:1px solid var(--line);
@@ -474,18 +980,28 @@ body.no-fast .fast-only{display:none}
 </script>
 </head>
 <body>
-<div class="wrap">
+<!-- The shell is exactly one viewport tall and never itself scrolls; #scroll
+     is what moves. The tab bar is the last child of that column, in ordinary
+     flow, so it cannot be anywhere but on screen. A position:fixed bar is
+     placed against the layout viewport instead, which on Android Chrome keeps
+     the taller URL-bar-hidden height, and hangs the bar below the glass with
+     its labels sheared off - a fault no amount of measuring from script can
+     correct, because the compositor moves fixed elements itself during a
+     fling. The cost, knowingly taken: the URL bar no longer auto-hides while
+     scrolling, since the document no longer scrolls. In an installed copy,
+     which is the point of the thing, there is no URL bar to hide. -->
+<div class="shell">
+  <div class="frame">
+    <nav class="sidenav" id="side-nav" aria-label="Views"></nav>
+    <div class="scroll" id="scroll">
+      <div class="wrap">
 
   <header class="masthead">
     <div class="brand">
       <span class="han" aria-hidden="true">六齋日</span>
       <h1>Days of Abstinence</h1>
     </div>
-    <nav>
-      <button type="button" id="nav-today" aria-current="page">Today</button>
-      <button type="button" id="nav-record">Upcoming</button>
-      <button type="button" id="nav-settings" class="gear" title="Settings"
-        aria-label="Settings"><span aria-hidden="true">&#9881;</span></button>
+    <nav aria-label="Theme">
       <button type="button" id="theme-toggle" class="gear"></button>
     </nav>
   </header>
@@ -699,6 +1215,111 @@ body.no-fast .fast-only{display:none}
     </div>
   </main>
 
+  <!-- ==================================================== precepts -->
+  <!-- What triggers an offense under the Brahma Net precepts. Its own
+       document, with its own filters, search and hidden sets, kept in
+       `bodhi.precepts`; the dataset is precepts.js. Everything inside is
+       scoped to #view-precepts in the stylesheet and to the element in the
+       script, because it arrived carrying class names this page already
+       uses - .card above all, which would otherwise open and close the day
+       cards on Today along with its own. -->
+  <main id="view-precepts" class="hidden">
+
+  <header class="mast">
+    <div class="seal">戒</div>
+    <h1>What actually <em>triggers</em> an offense</h1>
+    <p class="sub">Brahmā's Net Sūtra · 梵網經<br>ten major and forty-eight minor<br>Kalavinka translation</p>
+    <details class="acc" id="bn-methodology">
+      <summary>Methodology</summary>
+      <div class="accbody">
+        <p>Every clause below sits inside an offense clause. Aspirational and exhortative material that carries no penalty has been removed &mdash; no burning of fingers, no selling of children, no three taels of gold. Completing conditions are folded into the clause they complete.</p>
+        <p>Two orders are available: <strong>canonical</strong> (Major 1&ndash;10, then Minor 1&ndash;48) and <strong>by intrusiveness</strong>, which ranks gain- and malice-gated clauses low. Cards can be hidden per view, and each view keeps its own hidden set.</p>
+        <p>Wording follows Bhikshu Dharmamitra's Kalavinka translation and his emended Chinese. Every commentarial statement names its source.</p>
+      </div>
+    </details>
+
+    <details class="acc" id="bn-glance">
+      <summary>At a glance</summary>
+      <div class="accbody"><div class="stats" id="bn-stats"></div></div>
+    </details>
+  </header>
+
+  <div class="tabs" id="bn-tabs">
+    <button class="tab on" data-tab="bn">Brahmā&rsquo;s Net<span>10 major &middot; 48 minor</span></button>
+    <button class="tab" data-tab="up">Upāsaka precepts<span>6 major &middot; 28 minor</span></button>
+  </div>
+
+  <div class="bar" id="bn-bar">
+    <div class="barrow">
+      <button class="fbtn" id="bn-filterbtn" aria-expanded="false">
+        <svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
+          <path d="M2 4h12M4.5 8h7M7 12h2"/></svg>
+        Filters<span class="badge" id="bn-fbadge" hidden></span>
+      </button>
+      <span class="count" id="bn-count"></span>
+      <button class="iconbtn push" id="bn-searchbtn" title="Search" aria-label="Search">
+        <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6">
+          <circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14" stroke-linecap="round"/></svg>
+      </button>
+      <button class="iconbtn" id="bn-toggleall" title="Expand all" aria-label="Expand all">
+        <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+          <path d="M3 6l5 4 5-4"/></svg>
+      </button>
+    </div>
+
+    <div class="metarow">
+      <div class="seg" role="group" aria-label="View">
+        <button class="segbtn on" data-s="precept">Precepts</button>
+        <button class="segbtn" data-s="canon">Clauses</button>
+        <button class="segbtn" data-s="rank">Ranked</button>
+      </div>
+    </div>
+    <div class="activerow" id="bn-activerow"></div>
+
+    <div class="searchrow" id="bn-searchrow" hidden>
+      <svg class="sicon" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6">
+        <circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14" stroke-linecap="round"/></svg>
+      <input type="search" id="bn-q" placeholder="Search clauses, principles, commentary, Chinese…">
+      <button class="iconbtn" id="bn-searchclose" aria-label="Close search">&times;</button>
+    </div>
+
+    <div class="sheet" id="bn-sheet" hidden>
+      <p class="plabel">Frequency band<em>tap to hide a band</em></p>
+      <div class="fgrid">
+        <button class="fcard tog on" data-f="tier" data-v="1" data-tier="1"><b id="bn-n-t1"></b><span>Continuous</span></button>
+        <button class="fcard tog on" data-f="tier" data-v="2" data-tier="2"><b id="bn-n-t2"></b><span>Daily practical</span></button>
+        <button class="fcard tog on" data-f="tier" data-v="3" data-tier="3"><b id="bn-n-t3"></b><span>Situational</span></button>
+        <button class="fcard tog on" data-f="tier" data-v="4" data-tier="4"><b id="bn-n-t4"></b><span>Gated by ill intent</span></button>
+        <button class="fcard tog on" data-f="tier" data-v="5" data-tier="5"><b id="bn-n-t5"></b><span>Dormant / one-off</span></button>
+        <button class="fcard ref hid" data-f="hiddenonly"><b id="bn-n-hiddenonly"></b><span>Hidden only</span></button>
+      </div>
+      <p class="plabel">Then require<em>these stack</em></p>
+      <div class="fgrid">
+        <button class="fcard ref" data-f="ungated"><b id="bn-n-ungated"></b><span>No intent needed</span></button>
+        <button class="fcard ref" data-f="omission"><b id="bn-n-omission"></b><span>Failure to act</span></button>
+        <button class="fcard ref" data-f="orient"><b id="bn-n-orient"></b><span>Whole-attitude</span></button>
+        <button class="fcard ref" data-f="emend"><b id="bn-n-emend"></b><span>Text restored</span></button>
+        <button class="fcard ref" data-f="commentary"><b id="bn-n-commentary"></b><span>Has commentary</span></button>
+        <button class="fcard ref" data-f="restricted"><b id="bn-n-restricted"></b><span>Monastics / rulers only</span></button>
+      </div>
+      <p class="numnote">Numbers show what would remain if you tapped that card.</p>
+      <div class="sheetfoot">
+        <button class="clear" id="bn-clear" hidden>Reset</button>
+        <button class="done" id="bn-done">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="bn-list"></div>
+  <section id="bn-uplist" hidden></section>
+
+  <section class="p-legend">
+    <h2>How to read this</h2>
+    <dl id="bn-legend"></dl>
+  </section>
+  <p class="bn-foot" id="bn-foot"></p>
+  </main>
+
   <footer>
     <p id="foot-meta"></p>
     <p>Lunar dates come from the Hong Kong Observatory conversion tables.
@@ -713,9 +1334,17 @@ body.no-fast .fast-only{display:none}
       follow the calendar convention, day 1 and day 15, not the astronomical
       instant.</p>
   </footer>
+      </div>
+    </div>
+  </div>
+  <!-- In flow at the foot of the shell, so there is no viewport for it to be
+       stranded outside of. The safe-area inset is padding rather than margin,
+       so the bar's own ground still paints into it under a home indicator. -->
+  <nav class="bottomnav" id="bottom-nav" aria-label="Views"></nav>
 </div>
 
 <script src="data.js"></script>
+<script src="precepts.js"></script>
 <script>
 (function () {
   "use strict";
@@ -1051,6 +1680,11 @@ body.no-fast .fast-only{display:none}
   function esc(s) {
     return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;")
       .replace(/>/g, "&gt;");
+  }
+  /* The one scroll container. The document does not scroll under the shell,
+     so anything that used to read or set window.scrollY comes here instead. */
+  function scroller() {
+    return document.getElementById("scroll");
   }
 
   var MONTHS = ["January","February","March","April","May","June","July",
@@ -1471,20 +2105,60 @@ body.no-fast .fast-only{display:none}
     });
 
   /* views ------------------------------------------------------------ */
-  var VIEWS = ["today", "record", "settings"];
+  /* One row per tab, drawn into both navs. A fifth would be this one line
+     and nothing else: the cells divide whatever axis they are on. */
+  var TABS = [
+    { id: "today", label: "Today" },
+    { id: "record", label: "Upcoming" },
+    { id: "settings", label: "Settings" },
+    { id: "precepts", label: "Precepts", glyph: "戒" }
+  ];
+  var VIEWS = TABS.map(function (t) { return t.id; });
+  var sideNav = document.getElementById("side-nav");
+  var bottomNav = document.getElementById("bottom-nav");
+  var active = "today";
+
+  function tabFace(t) {
+    return t.glyph
+      ? '<span class="nav-glyph" aria-hidden="true">' + t.glyph + "</span>"
+      : '<span class="nav-icon" aria-hidden="true" ' +
+        'style="--icon:var(--nv-' + t.id + ')"></span>';
+  }
+  function tabBtn(cls, t) {
+    return '<button type="button" class="' + cls +
+      (active === t.id ? " active" : "") + '" data-tab="' + t.id +
+      '" aria-current="' + (active === t.id ? "page" : "false") + '">' +
+      '<span class="nav-face">' + tabFace(t) + t.label + "</span></button>";
+  }
+  function drawNavs() {
+    sideNav.innerHTML = '<div class="sidenav-title" aria-hidden="true">' +
+      "六齋日</div>" +
+      TABS.map(function (t) { return tabBtn("nav-item", t); }).join("");
+    bottomNav.innerHTML =
+      TABS.map(function (t) { return tabBtn("bn-item", t); }).join("");
+  }
   function show(which) {
+    active = which;
     VIEWS.forEach(function (v) {
       document.getElementById("view-" + v).classList.toggle("hidden",
         v !== which);
-      document.getElementById("nav-" + v).setAttribute("aria-current",
-        v === which ? "page" : "false");
     });
-    window.scrollTo(0, 0);
+    drawNavs();
+    /* The document itself no longer scrolls; #scroll is what moves. */
+    scroller().scrollTop = 0;
     if (which === "record") alignHatch();
+    /* The precepts dataset is large and is not what the app opens on, so
+       nothing there is drawn until it is first looked at. */
+    if (which === "precepts" && window.BODHI_PRECEPTS)
+      window.BODHI_PRECEPTS.open();
   }
-  VIEWS.forEach(function (v) {
-    document.getElementById("nav-" + v).onclick = function () { show(v); };
+  [sideNav, bottomNav].forEach(function (nav) {
+    nav.addEventListener("click", function (e) {
+      var btn = e.target.closest ? e.target.closest("[data-tab]") : null;
+      if (btn) show(btn.getAttribute("data-tab"));
+    });
   });
+  drawNavs();
 
   /* settings --------------------------------------------------------- */
   var modeSel = document.getElementById("opt-mode");
@@ -1923,6 +2597,444 @@ body.no-fast .fast-only{display:none}
     shortDate(DATA.meta.last) + ". Built from DRBA_Calendar.xlsx on " +
     shortDate(DATA.meta.generated) + ".";
 })();
+</script>
+
+<script>
+/* The Precepts view: what triggers an offense under the Brahma Net precepts,
+   with the Upasaka set beside it. Its own IIFE, so the names it brought with
+   it - render, save, state, card, esc, match - stay clear of the calendar's,
+   which are the same words for different things.
+
+   Every query and every delegated listener is bound to the view element
+   rather than to the document. Left on the document its .card handler would
+   open and close the day cards on Today, which wear the same class. */
+(function () {
+  "use strict";
+  var root = document.getElementById("view-precepts");
+  if (!root) return;
+  function scroller() { return document.getElementById("scroll"); }
+
+  var DATA = window.BRAHMA_DATA || {rows: [], upasaka: [], legend: []};
+    var ROWS = DATA.rows, UPASAKA = DATA.upasaka, LEGEND = DATA.legend;
+
+    const TIERNOTE = {
+   1:"governs ordinary hours", 2:"meals, possessions, posture, routine",
+   3:"triggered by events", 4:"gate already closed by disposition",
+   5:"needs an office, or is said once"
+  };
+  const DEFAULTS = ()=>({tiers:[1,2,3,4,5], ungated:false, orient:false, omission:false,
+    emend:false, commentary:false, restricted:false, hiddenonly:false, q:"", sort:"precept",
+    tab:"bn", upUnique:false,
+    hidden:{rank:[], canon:[], precept:[]}});
+  const KEY = "bodhi.precepts";
+  let state = DEFAULTS();
+  function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
+  function load(){
+    try{ const raw = localStorage.getItem(KEY); if(!raw) return;
+         const d = DEFAULTS(), p = JSON.parse(raw);
+         state = Object.assign(d, p);
+         state.hidden = Object.assign({rank:[],canon:[],precept:[]}, p.hidden||{});
+    }catch(e){ state = DEFAULTS(); }
+  }
+  load();
+  const tierSet = ()=>new Set(state.tiers);
+  const isPV = ()=> state.sort === "precept";
+  const hkey = r => isPV() ? r.precept : r.key;
+  const isHidden = r => (state.hidden[state.sort]||[]).includes(hkey(r));
+
+  const esc = s => String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+
+  const LBL={ungated:"No intent needed",omission:"Failure to act",orient:"Whole-attitude",
+    emend:"Text restored",commentary:"Has commentary",restricted:"Kings, officials, monastics",
+    hiddenonly:"Hidden only"};
+  const TIERSHORT={1:"Continuous",2:"Daily practical",3:"Situational",4:"Ill intent",5:"Dormant"};
+  const FACET={
+    ungated:r=>r.gate==="Ungated", omission:r=>r.trigger==="Omission",
+    orient:r=>r.form==="General orientation", emend:r=>!!r.emend,
+    commentary:r=>r.voices.length>0, restricted:r=>r.scope!=="Anyone holding the precepts",
+    hiddenonly:r=>isHidden(r)
+  };
+  function countRows(over){
+    const t = over.tiers ? new Set(over.tiers) : tierSet();
+    return ROWS.filter(r=>{
+      if(!t.has(r.tier)) return false;
+      const ho = "hiddenonly" in over ? over.hiddenonly : state.hiddenonly;
+      if(ho){ if(!isHidden(r)) return false; } else if(isHidden(r)) return false;
+      for(const k in FACET){
+        if(k==="hiddenonly") continue;
+        const on = k in over ? over[k] : state[k];
+        if(on && !FACET[k](r)) return false;
+      }
+      if(state.q){
+        const hay=[r.precept,r.name,r.literal,r.principle,r.practical,r.daily,r.term,r.gate,r.scope,
+          r.note,r.emend,(r.conditions?r.conditions[0]+" "+r.conditions[1].join(" "):""),
+          (r.fourfold?Object.values(r.fourfold).join(" "):""),
+          r.voices.map(v=>v.src+" "+(v.text||(v.bullets||[]).map(x=>x.label+" "+(x.text||(x.items||[]).join(" "))).join(" "))).join(" ")].join(" ").toLowerCase();
+        if(!hay.includes(state.q)) return false;
+      }
+      return true;
+    });
+  }
+  function countWith(over){ const r = countRows(over); return isPV() ? new Set(r.map(x=>x.precept)).size : r.length; }
+  function facetCounts(){
+    const ts = tierSet();
+    for(let t=1;t<=5;t++){
+      const el=document.getElementById("bn-n-t"+t); if(!el) continue;
+      const next = ts.has(t) ? [...ts].filter(x=>x!==t) : [...ts, t];
+      el.textContent = countWith({tiers: next.length?next:[t]});
+      const card = el.closest('.fcard'); if(card) card.classList.toggle('zero', ts.size===1 && ts.has(t));
+    }
+    for(const k in FACET){
+      const el=document.getElementById("bn-n-"+k); if(!el) continue;
+      const n = countWith({[k]: !state[k]});
+      el.textContent = n;
+      const card = el.closest('.fcard');
+      if(card) card.classList.toggle('zero', n===0 && !state[k]);
+    }
+  }
+  function summary(nVisible, pv){
+    const pills=[], ts=tierSet();
+    [1,2,3,4,5].forEach(t=>{ if(!ts.has(t))
+      pills.push(`<button class="apill tierpill" data-restore="tier" data-v="${t}"><em>&times;</em>${TIERSHORT[t]}</button>`); });
+    for(const k in LBL) if(state[k])
+      pills.push(`<button class="apill${k==="hiddenonly"?" hidpill":""}" data-restore="${k}">${LBL[k]}<em>&times;</em></button>`);
+    if(state.q) pills.push(`<button class="apill" data-restore="q">&ldquo;${esc(state.q)}&rdquo;<em>&times;</em></button>`);
+    document.getElementById('bn-activerow').innerHTML = pills.join('');
+    const badge=document.getElementById('bn-fbadge');
+    badge.textContent = pills.length; badge.hidden = !pills.length;
+    const tot = pv ? 58 : ROWS.length, unit = pv ? " precepts" : " clauses";
+    document.getElementById('bn-count').textContent =
+      nVisible===tot ? tot+unit : nVisible+" of "+tot+unit;
+  }
+  function stats(){
+    const t = n => ROWS.filter(r=>r.tier===n).length;
+    const box = [
+      ["58","precepts"], [String(ROWS.length),"trigger clauses"],
+      [String(t(1)+t(2)),"daily or continuous"],
+      [String(ROWS.filter(r=>r.gate==="Ungated").length),"ungated"],
+      [String(ROWS.filter(r=>r.emend).length),"emended text"],
+      [String(ROWS.reduce((n,r)=>n+r.voices.length,0)),"commentary notes"]
+    ];
+    document.getElementById('bn-stats').innerHTML =
+      box.map(([b,s])=>`<div class="stat"><b>${b}</b><span>${s}</span></div>`).join('');
+  }
+
+  function match(r){
+    if(!tierSet().has(r.tier)) return false;
+    if(state.hiddenonly){ if(!isHidden(r)) return false; }
+    else if(isHidden(r)) return false;
+    if(state.restricted && r.scope === "Anyone holding the precepts") return false;
+    if(state.ungated && r.gate!=="Ungated") return false;
+    if(state.orient && r.form!=="General orientation") return false;
+    if(state.omission && r.trigger!=="Omission") return false;
+    if(state.emend && !r.emend) return false;
+    if(state.commentary && !r.voices.length) return false;
+    if(state.q){
+      const hay = [r.precept,r.name,r.literal,r.principle,r.practical,r.daily,r.term,r.gate,r.scope,r.note,r.emend,
+                  (r.conditions?r.conditions[0]+" "+r.conditions[1].join(" "):""),
+                  (r.fourfold?Object.values(r.fourfold).join(" "):""),
+                  r.voices.map(v=>v.src+" "+(v.text||(v.bullets||[]).map(x=>x.label+" "+(x.text||(x.items||[]).join(" "))).join(" "))).join(" ")].join(" ").toLowerCase();
+      if(!hay.includes(state.q)) return false;
+    }
+    return true;
+  }
+
+  let animate = true;   // only the first paint animates; re-filters must not move
+  const uniq = a => a.filter((x,i)=>x && a.indexOf(x)===i);
+  function groupByPrecept(rows){
+    const m = new Map();
+    for(const r of rows){
+      if(!m.has(r.precept)) m.set(r.precept, {
+        precept:r.precept, name:r.name, tier:r.tier, tier_label:r.tier_label,
+        canon:r.canon, rank:r.rank, scope:r.scope, form:r.form, key:r.precept,
+        clauses:[], practicals:[], dailies:[], principles:[], gates:[],
+        emends:[], notes:[], terms:[], voices:[], conditions:null, fourfold:null,
+        tiers:new Set()
+      });
+      const g = m.get(r.precept);
+      g.clauses.push({literal:r.literal, gate:r.gate, trigger:r.trigger});
+      g.practicals.push(r.practical); g.dailies.push(r.daily);
+      g.principles.push(r.principle); g.gates.push(r.gate);
+      g.emends.push(r.emend); g.notes.push(r.note); g.terms.push(r.term);
+      g.voices = g.voices.concat(r.voices);
+      if(r.conditions && !g.conditions) g.conditions = r.conditions;
+      if(r.fourfold && !g.fourfold) g.fourfold = r.fourfold;
+      g.tiers.add(r.tier);
+      // the card sits in its most intrusive band and carries its earliest positions
+      if(r.tier < g.tier){ g.tier = r.tier; g.tier_label = r.tier_label; }
+      if(r.canon < g.canon) g.canon = r.canon;
+      if(r.rank < g.rank) g.rank = r.rank;
+    }
+    for(const g of m.values()){
+      g.practicals = uniq(g.practicals); g.dailies = uniq(g.dailies);
+      g.principles = uniq(g.principles); g.emends = uniq(g.emends);
+      g.notes = uniq(g.notes); g.terms = uniq(g.terms);
+      g.gateset = uniq(g.gates);
+    }
+    return [...m.values()];
+  }
+
+  function pcard(g,i){
+    const tags = [];
+    if(g.form==="General orientation") tags.push('<span class="tag orient">Orientation</span>');
+    if(g.clauses.length>1) tags.push('<span class="tag cnt">'+g.clauses.length+' clauses</span>');
+    if(g.gateset.length===1 && g.gateset[0]!=="Ungated")
+      tags.push('<span class="tag gated">'+esc(g.gateset[0])+'</span>');
+    else if(g.gateset.length>1) tags.push('<span class="tag gated">mixed gates</span>');
+    if(g.emends.length) tags.push('<span class="tag emendt">Emended</span>');
+    if(g.scope!=="Anyone holding the precepts") tags.push('<span class="tag scopet">'+esc(g.scope)+'</span>');
+    if(g.conditions) tags.push('<span class="tag condt">'+g.conditions[1].length+' conditions</span>');
+    if(g.voices.some(v=>v.stance==="diverges")) tags.push('<span class="tag divt">Sources diverge</span>');
+    if(g.tiers.size>1) tags.push('<span class="tag">spans '+g.tiers.size+' bands</span>');
+
+    const multi = g.clauses.length>1;
+    const clauseBlock = multi
+      ? '<ol class="clauses">'+g.clauses.map(c=>
+          '<li>'+(g.gateset.length>1&&c.gate!=="Ungated"?'<em class="cg">'+esc(c.gate)+'</em> ':'')+esc(c.literal)+'</li>').join('')+'</ol>'
+      : '<p class="p-lit">'+esc(g.clauses[0].literal)+'</p>';
+
+    const many = (label, arr, cls) => !arr.length ? '' :
+      '<div class="p-f '+(cls||'')+'"><h3>'+label+'</h3>'+
+      (arr.length===1 ? '<p>'+esc(arr[0])+'</p>'
+                      : '<ul class="multi">'+arr.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>')+'</div>';
+
+    return `<article class="p-card precept${animate?" anim":""}${isHidden(g)?" hiddencard":""}" data-key="${esc(g.precept)}" data-tier="${g.tier}"${animate?` style="animation-delay:${Math.min(i*11,420)}ms"`:''}>
+      <div class="hd">
+        <span class="rank">${i+1}</span>
+        <span class="pnum">${esc(g.precept)}</span>
+        <span class="pname">${esc(g.name)}</span>
+      </div>
+      ${tags.length?`<div class="p-tags">${tags.join('')}</div>`:''}
+      <span class="ctl"><button class="hidebtn" title="${isHidden(g)?'Unhide':'Hide from this view'}">${isHidden(g)?'\u21ba':'\u00d7'}</button><span class="caret">&rsaquo;</span></span>
+      <p class="trigl">What triggers an offense</p>
+      ${clauseBlock}
+      <div class="body">
+        <div class="fields">
+          ${many('Principle', g.principles)}
+          ${many('Practical reading', g.practicals)}
+          ${many('Daily implication', g.dailies, 'daily')}
+        </div>
+        ${g.emends.length?`<div class="emend"><h3>Emended by Dharmamitra</h3>${g.emends.length===1?'<p>'+esc(g.emends[0])+'</p>':'<ul class="multi">'+g.emends.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>'}</div>`:''}
+        ${g.notes.length?g.notes.map(n=>`<div class="cnote"><h3>Commentary &mdash; ${esc(n.split(":")[0])}</h3><p>${esc(n.split(":").slice(1).join(":").trim())}</p></div>`).join(''):''}
+        ${g.conditions?`<div class="cond"><h3>All must be met &mdash; ${esc(g.conditions[0])}</h3><ol>${g.conditions[1].map(c=>`<li>${esc(c)}</li>`).join('')}</ol></div>`:''}
+        ${g.fourfold?`<div class="four"><h3>Causes &middot; conditions &middot; methods &middot; karma</h3><dl>${Object.entries(g.fourfold).map(([k,v])=>`<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('')}</dl></div>`:''}
+        ${g.voices.length?`<div class="voices">${g.voices.map(v=>`<div class="voice ${esc(v.stance)}"><span class="vhead"><b>${esc(v.src)}</b><em>${esc(v.stance)}</em>${v.strictness?`<i class="st ${esc(v.strictness)}">${esc(v.strictness)}</i>`:''}</span>${v.bullets?`<ul class="vbul">${v.bullets.map(x=>`<li><b>${esc(x.label)}</b>${x.items?`<ul class="vsub">${x.items.map(y=>`<li>${esc(y)}</li>`).join('')}</ul>`:esc(x.text)}</li>`).join('')}</ul>`:`<p>${esc(v.text)}</p>`}</div>`).join('')}</div>`:''}
+        ${g.terms.length?g.terms.map(t=>`<div class="term">${esc(t)}</div>`).join(''):''}
+      </div>
+    </article>`;
+  }
+
+  function card(r,i){
+    const tags = [];
+    if(r.form==="General orientation") tags.push('<span class="tag orient">Orientation</span>');
+    if(r.gate!=="Ungated") tags.push(`<span class="tag gated">${esc(r.gate)}</span>`);
+    tags.push(`<span class="tag">${esc(r.trigger)}</span>`);
+    if(r.emend) tags.push('<span class="tag emendt">Emended</span>');
+    if(r.scope !== "Anyone holding the precepts") tags.push('<span class="tag scopet">'+esc(r.scope)+'</span>');
+    if(r.conditions) tags.push('<span class="tag condt">'+r.conditions[1].length+' conditions</span>');
+    if(r.voices.some(v=>v.stance==="diverges")) tags.push('<span class="tag divt">Sources diverge</span>');
+    return `<article class="p-card${animate?" anim":""}${isHidden(r)?" hiddencard":""}" data-key="${esc(r.key)}" data-tier="${r.tier}"${animate?` style="animation-delay:${Math.min(i*11,420)}ms"`:''}>
+      <div class="hd">
+        <span class="rank">${state.sort==="canon"?"":r.rank}</span>
+        <span class="pnum">${esc(r.precept)}</span>
+        <span class="pname">${esc(r.name)}</span>
+      </div>
+      ${tags.length?`<div class="p-tags">${tags.join('')}</div>`:''}
+      <span class="ctl"><button class="hidebtn" title="${isHidden(r)?'Unhide':'Hide from this view'}">${isHidden(r)?'\u21ba':'\u00d7'}</button><span class="caret">&rsaquo;</span></span>
+      <p class="p-lit">${esc(r.literal)}</p>
+      <div class="body">
+        <div class="fields">
+          <div class="p-f"><h3>Principle</h3><p>${esc(r.principle)}</p></div>
+          <div class="p-f"><h3>Practical reading</h3><p>${esc(r.practical)}</p></div>
+          <div class="p-f daily"><h3>Daily implication</h3><p>${esc(r.daily)}</p></div>
+        </div>
+        ${r.emend?`<div class="emend"><h3>Emended by Dharmamitra</h3><p>${esc(r.emend)}</p></div>`:''}
+        ${r.note?`<div class="cnote"><h3>Commentary &mdash; ${esc(r.note.split(":")[0])}</h3><p>${esc(r.note.split(":").slice(1).join(":").trim())}</p></div>`:''}
+        ${r.conditions?`<div class="cond"><h3>All must be met — ${esc(r.conditions[0])}</h3><ol>${r.conditions[1].map(c=>`<li>${esc(c)}</li>`).join('')}</ol></div>`:''}
+        ${r.fourfold?`<div class="four"><h3>Causes · conditions · methods · karma</h3><dl>${Object.entries(r.fourfold).map(([k,v])=>`<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('')}</dl></div>`:''}
+        ${r.voices.length?`<div class="voices">${r.voices.map(v=>`<div class="voice ${esc(v.stance)}"><span class="vhead"><b>${esc(v.src)}</b><em>${esc(v.stance)}</em>${v.strictness?`<i class="st ${esc(v.strictness)}">${esc(v.strictness)}</i>`:''}</span>${v.bullets?`<ul class="vbul">${v.bullets.map(x=>`<li><b>${esc(x.label)}</b>${x.items?`<ul class="vsub">${x.items.map(y=>`<li>${esc(y)}</li>`).join('')}</ul>`:esc(x.text)}</li>`).join('')}</ul>`:`<p>${esc(v.text)}</p>`}</div>`).join('')}</div>`:''}
+        ${r.term?`<div class="term">${esc(r.term)}</div>`:''}
+      </div>
+    </article>`;
+  }
+
+  function render(){
+    const pv = isPV();
+    let vis = ROWS.filter(match);
+    if(pv){
+      vis = groupByPrecept(vis).filter(g=>!(isHidden(g)&&!state.hiddenonly) && !(state.hiddenonly&&!isHidden(g)));
+      vis.sort((a,b)=>a.canon-b.canon);
+    } else {
+      vis.sort((a,b)=> state.sort==="canon" ? a.canon-b.canon : a.rank-b.rank);
+    }
+    const list = document.getElementById('bn-list');
+    if(!vis.length){
+      list.innerHTML = '<p class="p-empty">'+(state.hiddenonly?'Nothing hidden in this view yet.':'Nothing matches those filters.')+'</p>';
+      summary(0, pv); facetCounts(); return; }
+    const gkey = r => (state.sort==="canon"||pv) ? (r.canon<10000?"major":"minor") : r.tier;
+    const tally = {};
+    for(const r of vis) tally[gkey(r)] = (tally[gkey(r)]||0) + 1;
+    const unit = pv ? "precept" : "clause";
+    let html='', last=null, i=0;
+    for(const r of vis){
+      const g = gkey(r);
+      if(g!==last){
+        const n = tally[g], label = n + " " + unit + (n===1?"":"s");
+        html += (state.sort==="canon"||pv)
+          ? `<div class="grp"><span class="p-n">${n}</span><h2>${g==="major"?"Major precepts":"Minor precepts"}</h2><span class="note">${g==="major"?"pārājika &middot; "+label:"light defiling &middot; "+label}</span></div>`
+          : `<div class="grp"><span class="p-n">${n}</span><h2>${esc(r.tier_label)}</h2><span class="note">${TIERNOTE[r.tier]} &middot; ${label}</span></div>`;
+        last = g; i = 0;
+      }
+      html += pv ? pcard(r,i++) : card(r,i++);
+    }
+    list.innerHTML = html;
+    summary(vis.length, pv); facetCounts();
+  }
+
+  // the bar keeps a constant height, so a re-filter cannot move the list
+  function steady(fn){ const sc = scroller(), y = sc.scrollTop; fn(); sc.scrollTop = y; }
+  function syncClear(){
+    const nh = (state.hidden.rank.length + state.hidden.canon.length);
+    const active = state.ungated||state.orient||state.omission||state.emend||state.commentary||
+                   state.restricted||state.hiddenonly||state.q||state.sort!=="precept"||tierSet().size<5||nh>0;
+    const btn = document.getElementById('bn-clear');
+    btn.textContent = nh ? `Reset (${nh} hidden)` : "Reset";
+    btn.hidden = !active;
+  }
+  root.addEventListener('click', e=>{
+    const ap = e.target.closest('.apill');
+    if(ap){
+      const k = ap.dataset.restore;
+      if(k === "tier") state.tiers.push(+ap.dataset.v);
+      else if(k === "q"){ state.q = ""; qin.value = ""; srow.hidden = true; }
+      else state[k] = false;
+      save(); syncControls(); render(); return;
+    }
+    const hb = e.target.closest('.hidebtn');
+    if(hb){
+      const card = hb.closest('.p-card'), k = card.dataset.key, list = state.hidden[state.sort];
+      const i = list.indexOf(k);
+      i >= 0 ? list.splice(i,1) : list.push(k);
+      save(); render(); return;
+    }
+    const card = e.target.closest('.p-card');
+    if(card){
+      const inHead = e.target.closest('.hd') || e.target.closest('.p-lit');
+      if(card.classList.contains('open')){ if(inHead) card.classList.remove('open'); }
+      else { card.classList.add('open'); }
+      return;
+    }
+    const seg = e.target.closest('.segbtn');
+    if(seg){
+      state.sort = seg.dataset.s; save();
+      root.querySelectorAll('.segbtn').forEach(c=>c.classList.toggle('on', c.dataset.s===state.sort));
+      render(); return;
+    }
+    const tog = e.target.closest('.tog');
+    if(tog){
+      const v = +tog.dataset.v, i = state.tiers.indexOf(v);
+      i >= 0 ? state.tiers.splice(i,1) : state.tiers.push(v);
+      tog.classList.toggle('on'); save(); syncClear(); steady(render); return;
+    }
+    const ref = e.target.closest('.ref');
+    if(ref){
+      state[ref.dataset.f] = !state[ref.dataset.f];
+      ref.classList.toggle('on'); save(); syncClear(); steady(render); return;
+    }
+  });
+  document.getElementById('bn-q').addEventListener('input', e=>{ state.q = e.target.value.trim().toLowerCase(); render(); });
+  const srow = document.getElementById('bn-searchrow'), qin = document.getElementById('bn-q');
+  document.getElementById('bn-searchbtn').onclick = ()=>{
+    srow.hidden=false; qin.focus();
+  };
+  document.getElementById('bn-searchclose').onclick = ()=>{
+    srow.hidden=true; qin.value=""; state.q=""; save(); render();
+  };
+  const ctl = document.getElementById('bn-bar');
+  const sheet = document.getElementById('bn-sheet'), fbtn = document.getElementById('bn-filterbtn');
+  function setSheet(open){ sheet.hidden = !open; fbtn.setAttribute('aria-expanded', open?'true':'false'); }
+  fbtn.onclick = ()=> setSheet(sheet.hidden);
+  document.getElementById('bn-done').onclick = ()=> setSheet(false);
+  // the sheet is an accordion inside the bar: it offsets the list rather than covering it
+
+  document.getElementById('bn-toggleall').onclick = ()=>{
+    const opening = !ctl.classList.contains('expanded');
+    ctl.classList.toggle('expanded', opening);
+    document.getElementById('bn-toggleall').title = opening ? 'Collapse all' : 'Expand all';
+    root.querySelectorAll('.p-card').forEach(c=>c.classList.toggle('open', opening));
+  };
+  function syncControls(){
+    const ts = tierSet();
+    root.querySelectorAll('.tog').forEach(c=>c.classList.toggle('on', ts.has(+c.dataset.v)));
+    root.querySelectorAll('.ref').forEach(c=>c.classList.toggle('on', !!state[c.dataset.f]));
+    root.querySelectorAll('.segbtn').forEach(c=>c.classList.toggle('on', c.dataset.s===state.sort));
+    qin.value = state.q || "";
+    syncClear();
+  }
+  document.getElementById('bn-clear').onclick = ()=>{
+    const open = !sheet.hidden;
+    state = DEFAULTS(); save(); syncControls();
+    srow.hidden = true; setSheet(open); render();
+  };
+
+  document.getElementById('bn-legend').innerHTML =
+    LEGEND.map(([k,v])=>`<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('');
+  document.getElementById('bn-foot').textContent =
+    "Generated from the CBETA P5 XML of T24n1484. Clause splits, gates, practical readings and ranking are editorial; no commentary was consulted.";
+  function renderUp(){
+    const only = state.upUnique;
+    const rows = UPASAKA.filter(r=>!only || r.unique);
+    const n = rows.length, u = UPASAKA.filter(r=>r.unique).length;
+    document.getElementById('bn-uplist').innerHTML =
+      `<p class="upintro">A different precept set, transmitted to lay people at CTTB since 1995 — six major and twenty-eight minor. Where it holds a precept in common with the Brahmā's Net it appears on that card as commentary, marked <i class="st Laxer">Laxer</i> <i class="st Same">Same</i> or <i class="st Stricter">Stricter</i>. ${u} have no Brahmā's Net counterpart at all.</p>
+       <div class="upbar">
+         <button class="upbtn${only?'':' on'}" data-up="all">All ${UPASAKA.length}</button>
+         <button class="upbtn${only?' on':''}" data-up="uniq">Unique to this set &middot; ${u}</button>
+       </div>` +
+      rows.map(r=>`<article class="upcard${r.unique?' uniq':''}">
+        <div class="uphd">
+          <span class="upid">${esc(r.id)}</span>
+          <span class="upname">${esc(r.en)}</span>
+          <span class="upzh">${esc(r.zh)}</span>
+          <span class="upmap">${r.unique
+            ? '<span class="st Unique">No Brahmā&rsquo;s Net counterpart</span>'
+            : `<span class="st map">${esc(r.maps)}</span><span class="st ${esc(r.stance)}">${esc(r.stance)}</span>`}</span>
+        </div>
+        <p class="upnote">${esc(r.note)}</p>
+      </article>`).join('');
+  }
+  function setTab(t){
+    state.tab = t; save();
+    root.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on', b.dataset.tab===t));
+    const bn = t==='bn';
+    document.getElementById('bn-bar').hidden = !bn;
+    document.getElementById('bn-list').hidden = !bn;
+    document.getElementById('bn-uplist').hidden = bn;
+    if(bn) render(); else renderUp();
+  }
+  root.addEventListener('click', e=>{
+    const tb = e.target.closest('.tab');
+    if(tb){ setTab(tb.dataset.tab); return; }
+    const ub = e.target.closest('.upbtn');
+    if(ub){ state.upUnique = ub.dataset.up==='uniq'; save(); renderUp(); return; }
+  });
+
+
+  /* Drawn when the view is first opened rather than at load: the dataset is
+     the largest thing the page carries and this is not the view it opens on.
+     Only the first call does the work; the rest are free. */
+  var started = false;
+  window.BODHI_PRECEPTS = {
+    open: function () {
+      if (started) return;
+      started = true;
+      stats();
+      syncControls();
+      setTab(state.tab || "bn");
+      animate = false;
+    }
+  };
+}());
 </script>
 </body>
 </html>
