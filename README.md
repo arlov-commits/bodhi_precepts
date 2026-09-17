@@ -90,6 +90,11 @@ One object per day:
 data came off the DRBA printed calendar or the HKO tables. Same-day events are
 packed into `event` separated by pipes.
 
+`monthLength` is `null` for the lunar month the dataset is cut off in, whose
+end is past the last row and so cannot be measured. The page never counts on
+it: the last day of a month, and the distance back from it, are found by
+looking ahead to the next day 1.
+
 What is stored is what is fixed. Anything that is a reading rather than a rule
 — which days carry the recitation, whether a leap month carries the long fast
 — is derived in the browser from a setting, so changing your mind costs
@@ -101,7 +106,9 @@ nothing and rebuilds nothing.
   A 29-day month therefore uses 28 and 29. The day list is the one given in
   佛說四天王經 (Fo shuo si tianwang jing, Taisho T15n0590), where envoys
   descend on the 8th and 23rd, princes on the 14th and 29th, and the kings
-  themselves on the 15th and 30th.
+  themselves on the 15th and 30th. Which days actually carry the fast is a
+  setting — that list is where it starts, not where it is fixed. See *Fast
+  days* below.
 - **Three long fasting months**: the 1st, 5th and 9th lunar months.
 - **Leap months** are flagged as leap wherever they appear. Whether the
   repeat also carries the long fast is a reading rather than a rule, so it is
@@ -125,17 +132,20 @@ nothing and rebuilds nothing.
   top; where it does not — most of a fortnightly weekend, and lunar 1 under
   the other reckoning — the card takes a colour of its own.
 
-The last day of a lunar month is found by looking ahead to the next day 1
-rather than from `monthLength`, which is short for the truncated month at the
-end of the dataset.
+The last day of a lunar month, and the distance back from it that a fast-day
+rule counts, are found by looking ahead to the next day 1 rather than from
+`monthLength`, which is null for the month the dataset is cut off in. Where
+there is no next day 1 to look ahead to — the last few weeks of the data — a
+rule counted from the end simply does not fire, rather than firing on a guess.
 
 ## Settings
 
 The gear opens a Settings view. Its panels run in the order they are most
 often touched, the rarest last — **Week start**, **Days on the Today view**,
-**Precept Recitation days**, **Leap months**, **Install**, and then **Where
-this is kept**. A new panel goes second from the bottom, above *Where this is
-kept*, which stays the tail of the page.
+**Fast days**, **Precept Recitation days**, **Leap months**, **Install**, and
+then **Where this is kept**. The two panels that say which days carry a mark
+sit together in the middle. A new panel goes second from the bottom, above
+*Where this is kept*, which stays the tail of the page.
 
 **Week start** — any of the seven days, or none; Saturday out of the box. It
 draws a break where each new week begins, on both Today and Upcoming, so a run
@@ -145,6 +155,40 @@ between two filtered rows that sit weeks apart.
 
 **Days on the Today view** — how many day cards to show, counting today as the
 first. Eight out of the box, any whole number from 1 to 366.
+
+**Fast days** — which days carry the fast, in every view. Each day is a rule
+of two parts: which end of the lunar month it counts from, and how far along.
+Counting from the start, 8 is the 8th. Counting from the end, 1 is the last
+day of the month — the 30th of a long month, the 29th of a short one — so it
+resolves by itself rather than by special-casing 29 and 30, and can never land
+on a day the month does not have. The default six are 8, 14, 15, 23, and the
+last two days.
+
+Three presets:
+
+- **The default six** — 8, 14, 15, 23, and the last two days of the month.
+- **Six, aligned to the moon** — 1, 8, 14, 15, 23, and the last day of the
+  month: the last day of one month and the 1st of the next, in place of the
+  last two days. It follows the shape underneath the list — the two half
+  moons, the full moon and the new, and the day before each. The full moon is
+  paired with the day before it, 14 and 15; this pairs the new moon the same
+  way, the month's last day with the 1st, which is where the Chinese calendar
+  puts the conjunction. Still six days a month.
+- **The ten fast days** — 1, 8, 14, 15, 18, 23, 24, 28, and the last two days,
+  as listed in the Earth Store Sutra, Taisho T13n0412.
+
+Days are added and removed freely, up to thirty — a lunar month has no more
+than that, so a longer set could only repeat itself. Naming the same day twice
+folds the two rows into one. Rows stay in the order they were built, so
+nothing moves under a reader mid-edit, and a preset is still recognised
+whatever order its days were arrived at.
+
+The preview under the rows says what the set gives in the month in front of
+you, in a 30-day month and in a 29-day month, with each month's last day
+marked — that being where counting from one end and from the other part
+company. Clearing every day drops the fast entirely: no mark on any view, and
+the filter and the band's legend entry go with it. The table's Fast column
+stays, because it also carries the long fasting months.
 
 **Precept Recitation days** — which days carry the flag, reckoned one of four
 ways:
@@ -179,9 +223,9 @@ See *Installing it* above.
 
 ### What a reader who has set nothing gets
 
-Weeks beginning on Saturday, eight day cards, Precept Recitation on every
-other Saturday, leap months carrying no long fast, and Upcoming showing every
-day in the dataset with the dharma events hidden.
+Weeks beginning on Saturday, eight day cards, the default six fast days,
+Precept Recitation on every other Saturday, leap months carrying no long fast,
+and Upcoming showing every day in the dataset with the dharma events hidden.
 
 ### Upcoming's own controls
 
@@ -197,10 +241,15 @@ days are drawn; past that it says so and points at `data.csv`. **Copy what is
 shown** puts every matching day on the clipboard as TSV, not only the drawn
 500.
 
+The `fast` column in `data.csv` and `data.json` is the **default** six, fixed
+when they were generated; the page reads whichever days are set under the
+gear, and the copy button follows the page rather than the files. A note under
+the download links says so.
+
 ### Where it is kept
 
-These settings, the theme, and Upcoming's filters and start date are kept in
-`localStorage` under `bodhi.settings`. Nothing is sent anywhere, and storage
+These settings — the fast-day rules among them — the theme, and Upcoming's
+filters and start date are kept in `localStorage` under `bodhi.settings`. Nothing is sent anywhere, and storage
 failures — private mode, or a browser that blocks it over `file://` — fall
 back to the defaults silently. Settings saved by an older version are read
 where they still make sense and ignored where they do not.

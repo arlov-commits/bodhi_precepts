@@ -257,6 +257,7 @@ h2{font-size:1rem;font-weight:600;letter-spacing:.02em;margin:2.25rem 0 .5rem}
   cursor:pointer}
 .chip[aria-pressed="true"]{border-color:var(--fast);color:var(--fast);
   background:var(--raised)}
+.chip:disabled{opacity:.45;cursor:default}
 .filter-sep{width:1px;align-self:stretch;background:var(--line);
   margin:0 .15rem}
 label.jump{font-size:.85rem;color:var(--quiet);margin-left:auto}
@@ -343,6 +344,10 @@ td .rec{color:var(--recite);font-weight:600}
   margin:1rem 0 1.5rem;font-size:.9rem}
 .downloads a{color:var(--fast);text-decoration:underline;
   text-underline-offset:2px}
+.downloads-note{font-size:.82rem;color:var(--quiet);max-width:62ch;
+  margin:-.75rem 0 1.5rem}
+.downloads-note code{background:var(--raised);border:1px solid var(--hair);
+  padding:.05rem .3rem;font-size:.9em}
 
 /* ---------------------------------------------------------- settings */
 nav button.gear{font-size:1.05rem;line-height:1;padding:.35rem .55rem}
@@ -375,6 +380,38 @@ nav button.gear{font-size:1.05rem;line-height:1;padding:.35rem .55rem}
 .suboptions .field{margin-top:.5rem}
 .suboptions .hint{font-size:.82rem;margin-top:.5rem}
 input[type=number].day{width:3.6rem;text-align:center}
+
+/* The fast-day rules: a row per day, each a pair of controls and a reading
+   of what that pair means, with the presets as chips above them. */
+.presets{display:flex;flex-wrap:wrap;gap:.5rem;margin:.9rem 0 .2rem}
+.rules{margin-top:.9rem;border-top:1px solid var(--line)}
+.rule{display:grid;grid-template-columns:auto 3.6rem 1fr auto;gap:.6rem;
+  align-items:center;padding:.45rem .1rem;border-bottom:1px solid var(--hair);
+  font-size:.9rem}
+.rule .gloss{color:var(--quiet);font-size:.85rem}
+.rule .gloss b{color:var(--ink);font-weight:600}
+.rule .drop{background:none;border:0;color:var(--quiet);cursor:pointer;
+  font-size:1.05rem;line-height:1;padding:.1rem .4rem}
+.rule .drop:hover{color:var(--fast)}
+.rule .drop:focus-visible{outline:2px solid var(--fast);outline-offset:1px}
+.rules .empty{padding:.55rem .1rem;color:var(--quiet);font-size:.85rem;
+  border-bottom:1px solid var(--hair)}
+.rule-actions{gap:.5rem}
+/* Recessed rather than raised: the page's own ground inside the panel, which
+   on the dark theme is also the darker of the two, so the quiet tone the
+   rest of Settings uses still carries against it. */
+.preview{background-color:var(--paper);border:1px solid var(--hair);
+  padding:.7rem .85rem;margin-top:1rem;font-size:.85rem}
+.preview h4{margin:0 0 .45rem;font-size:.72rem;font-weight:600;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--quiet)}
+.preview .row{display:flex;flex-wrap:wrap;gap:.5rem;align-items:baseline;
+  padding:.18rem 0;font-variant-numeric:tabular-nums}
+.preview .row .label{flex:0 0 11rem;color:var(--quiet)}
+.preview .row .days{color:var(--ink-soft)}
+.preview .row .days b{color:var(--fast);font-weight:600}
+.preview .row .days em{font-style:normal;color:var(--quiet)}
+.preview .warn{margin:.5rem 0 0;color:var(--ink-soft);
+  border-left:2px solid var(--leap);padding-left:.55rem}
 .setting .state{color:var(--quiet);font-size:.85rem;letter-spacing:.04em;
   border-left:2px solid var(--fast);padding-left:.6rem;margin-top:.9rem}
 
@@ -384,6 +421,10 @@ footer p{margin:.4rem 0}
 footer .han{font-family:var(--han);color:var(--fast)}
 .hidden{display:none}
 body.no-recite .recite-only{display:none}
+/* With no days set, nothing can be a fast day, so what names them goes -
+   except the table's Fast column, which also carries the long fasting
+   months and is not the rule set's to take away. */
+body.no-fast .fast-only{display:none}
 .notice{background:var(--leap-dim);border-left:3px solid var(--leap);
   padding:.7rem .9rem;font-size:.9rem;margin:1rem 0;color:var(--ink)}
 @media (max-width:640px){
@@ -393,6 +434,13 @@ body.no-recite .recite-only{display:none}
   .disc{flex:0 0 1.55rem}
   .disc svg{max-width:1.55rem}
   label.jump{margin-left:0}
+  /* Too narrow for the reading to sit beside the controls, so it drops to a
+     line of its own underneath them - with the × kept up on the controls'
+     row, where it still reads as belonging to that day. */
+  .rule{grid-template-columns:1fr auto auto;gap:.3rem .45rem}
+  .rule .gloss{grid-column:1/-1;grid-row:2}
+  .rule .drop{grid-column:3;grid-row:1}
+  .preview .row .label{flex:1 0 100%}
   /* Narrow enough that the longest heading and the Long Fast label were
      setting the column widths on their own; shrink them so the shares hold. */
   th,td{padding:.42rem .2rem}
@@ -467,7 +515,7 @@ body.no-recite .recite-only{display:none}
 
     <div class="filters">
       <button class="chip" type="button" data-filter="all" aria-pressed="true">All days</button>
-      <button class="chip" type="button" data-filter="fast" aria-pressed="false">Fast days</button>
+      <button class="chip fast-only" type="button" data-filter="fast" aria-pressed="false">Fast days</button>
       <button class="chip" type="button" data-filter="moon" aria-pressed="false">New and full moons</button>
       <button class="chip recite-only" type="button" data-filter="recite" aria-pressed="false">Precept Recitation</button>
       <button class="chip" type="button" data-filter="long" aria-pressed="false">Long fasting months</button>
@@ -499,6 +547,10 @@ body.no-recite .recite-only{display:none}
       <a href="data.json" download>data.json</a>
       <button class="chip" type="button" id="copy-visible">Copy what is shown</button>
     </div>
+    <p class="downloads-note">The <code>fast</code> column in those two files
+      is the default six, fixed when they were generated. This page reads
+      whichever days are set under the gear, and the copy button follows the
+      page rather than the files.</p>
   </main>
 
   <!-- ==================================================== settings -->
@@ -535,6 +587,30 @@ body.no-recite .recite-only{display:none}
         <input type="number" id="opt-cards" min="1" max="366" step="1">
       </div>
       <p class="state" id="opt-cards-state"></p>
+    </div>
+
+    <div class="setting">
+      <h3>Fast days</h3>
+      <p>Which days carry the fast, in every view. Six by default — the 8th,
+        14th, 15th, 23rd and the last two days of the lunar month. Underneath
+        that list is a shape: the two half moons, the full moon and the new,
+        and the day before each.</p>
+      <p>Each day is counted from one end of the lunar month or the other.
+        From the start, 8 is the 8th. From the end, 1 is the last day — the
+        30th of a long month, the 29th of a short one — so it never lands on
+        a day the month does not have.</p>
+
+      <div class="presets" id="fast-presets"></div>
+
+      <div class="rules" id="fast-rules"></div>
+      <div class="field rule-actions">
+        <button class="chip" type="button" id="fast-add">Add a day</button>
+        <button class="chip" type="button" id="fast-clear">Clear them
+          all</button>
+      </div>
+
+      <div class="preview" id="fast-preview"></div>
+      <p class="state" id="opt-fast-state"></p>
     </div>
 
     <div class="setting">
@@ -632,11 +708,10 @@ body.no-recite .recite-only{display:none}
       other Saturday. Which days carry it — two lunar days a month, a
       fortnight of Saturdays or of Sundays, or none at all — is a setting,
       under the gear.</p>
-    <p>The six fast days are the 8th, 14th, 15th, 23rd and the last two days
-      of each lunar month, following <span class="han">佛說四天王經</span>
-      (Fo shuo si tianwang jing, Taisho T15n0590). The long fasting months
-      are the 1st, 5th and 9th. New and full moon follow the calendar
-      convention, day 1 and day 15, not the astronomical instant.</p>
+    <p id="foot-fast"></p>
+    <p>The long fasting months are the 1st, 5th and 9th. New and full moon
+      follow the calendar convention, day 1 and day 15, not the astronomical
+      instant.</p>
   </footer>
 </div>
 
@@ -655,18 +730,25 @@ body.no-recite .recite-only{display:none}
   var index = {};
   days.forEach(function (d, i) { index[d.date] = i; });
 
-  /* The last day of a lunar month is found by lookahead to the next day 1,
-     rather than from monthLength, which is short for the truncated month at
-     the end of the dataset. */
-  days.forEach(function (d, i) {
-    var next = days[i + 1];
-    d.lastOfMonth = next ? next.dayNum === 1 : false;
-  });
+  /* How far each day stands from the end of its lunar month, counted by
+     lookahead to the next day 1 rather than from monthLength: the last day
+     is 1, the day before it 2. Lookahead because monthLength is null for the
+     partial month the dataset opens on, and the month it is cut off in has
+     no end to measure to at all - those days are left null, and a rule that
+     counts from the end simply does not fire there. */
+  (function () {
+    var nextStart = null;
+    for (var i = days.length - 1; i >= 0; i--) {
+      days[i].fromEnd = nextStart === null ? null : nextStart - i;
+      days[i].lastOfMonth = days[i].fromEnd === 1;
+      if (days[i].dayNum === 1) nextStart = i;
+    }
+  })();
 
   /* Days in each day's own lunar month, for drawing the moon. The stored
-     monthLength is null for the partial month the dataset opens on and short
-     for the one it is cut off in, so measure between day 1s and assume 30
-     for the partial months at either end. */
+     monthLength is null for the month the dataset is cut off in, whose end is
+     past the last row, so measure between day 1s and assume 30 for the
+     partial month at either end. */
   (function () {
     var starts = [];
     days.forEach(function (d, i) { if (d.dayNum === 1) starts.push(i); });
@@ -685,10 +767,70 @@ body.no-recite .recite-only{display:none}
   var CARDS_MIN = 1, CARDS_MAX = 366;
   var WEEK_STARTS = ["none", "0", "1", "2", "3", "4", "5", "6"];
   var RECITE_MODES = ["lunar", "sat", "sun", "none"];
+  var RULES_MAX = 30;
+
+  /* Which days carry the fast is a reading rather than a rule, so it is a
+     setting like the others. A day is a rule of two parts: which end of the
+     lunar month it counts from, and how far along. Counting from the start,
+     8 is the 8th; counting from the end, 1 is the last day of the month -
+     the 30th of a long month, the 29th of a short one, with no special case
+     for either. */
+  var FAST_PRESETS = [
+    { key: "six",
+      name: "The default six",
+      note: "8, 14, 15, 23 and the last two days of the month",
+      rules: [{f: "start", n: 8}, {f: "start", n: 14}, {f: "start", n: 15},
+              {f: "start", n: 23}, {f: "end", n: 2}, {f: "end", n: 1}] },
+    { key: "moon",
+      name: "Six, aligned to the moon",
+      note: "the last day of the month and the 1st of the next, in place of "
+            + "the last two days",
+      rules: [{f: "start", n: 1}, {f: "start", n: 8}, {f: "start", n: 14},
+              {f: "start", n: 15}, {f: "start", n: 23}, {f: "end", n: 1}] },
+    { key: "ten",
+      name: "The ten fast days",
+      note: "as listed in the Earth Store Sutra, Taisho T13n0412",
+      rules: [{f: "start", n: 1}, {f: "start", n: 8}, {f: "start", n: 14},
+              {f: "start", n: 15}, {f: "start", n: 18}, {f: "start", n: 23},
+              {f: "start", n: 24}, {f: "start", n: 28}, {f: "end", n: 2},
+              {f: "end", n: 1}] }
+  ];
+  function presetByKey(key) {
+    for (var i = 0; i < FAST_PRESETS.length; i++)
+      if (FAST_PRESETS[i].key === key) return FAST_PRESETS[i];
+    return null;
+  }
+  function cloneRules(rs) {
+    return rs.map(function (r) { return {f: r.f, n: r.n}; });
+  }
+  /* Rules are kept in the order the rows are in, so nothing moves under a
+     reader in the middle of setting one. Only the duplicates are dropped:
+     the same day named twice is one day. */
+  function cleanRules(rs) {
+    var out = [], seen = {};
+    rs.forEach(function (r) {
+      if (!validRule(r)) return;
+      var key = r.f + r.n;
+      if (!seen[key]) { seen[key] = true; out.push({f: r.f, n: r.n}); }
+    });
+    return out;
+  }
+  /* Two rule sets are the same set when they name the same days, whatever
+     order the rows were built in, so a preset is still recognised after its
+     rows have been shuffled. Days counted from the start sort first. */
+  function rulesKey(rs) {
+    return cleanRules(rs).map(function (r) {
+      return (r.f === "start" ? "0" : "1") + (100 + r.n);
+    }).sort().join(" ");
+  }
+  function sameRules(a, b) {
+    return rulesKey(a) === rulesKey(b);
+  }
   var DEFAULTS = { reciteMode: "sat", reciteDayA: 1, reciteDayB: 15,
                    reciteAnchor: "2026-09-12", leapLongFast: false,
                    filters: [], showEvents: false, theme: "auto",
-                   cardCount: 8, weekStart: "6" };
+                   cardCount: 8, weekStart: "6",
+                   fastRules: FAST_PRESETS[0].rules };
   var settings = {
     reciteMode: DEFAULTS.reciteMode,
     reciteDayA: DEFAULTS.reciteDayA,
@@ -700,6 +842,7 @@ body.no-recite .recite-only{display:none}
     theme: DEFAULTS.theme,
     cardCount: DEFAULTS.cardCount,
     weekStart: DEFAULTS.weekStart,
+    fastRules: cloneRules(DEFAULTS.fastRules),
     from: null
   };
   /* A lunar day, or null for a blank box — one recitation a month. */
@@ -715,6 +858,20 @@ body.no-recite .recite-only{display:none}
   function isDate(v) {
     return typeof v === "string" && /^\d{4}-\d{2}-\d{2}$/.test(v) &&
       iso(parse(v)) === v;
+  }
+  /* A day counted from either end of a lunar month. 30 is the ceiling because
+     a lunar month never runs longer than that; a rule numbered past the
+     length of the month it falls in simply does not fire there, which is
+     what the preview under the rows is for. */
+  function validRule(r) {
+    return !!r && (r.f === "start" || r.f === "end") &&
+      typeof r.n === "number" && isFinite(r.n) &&
+      r.n === Math.round(r.n) && r.n >= 1 && r.n <= 30;
+  }
+  function clampRuleDay(v) {
+    var n = Math.round(Number(v));
+    if (!isFinite(n)) return null;
+    return Math.min(30, Math.max(1, n));
   }
   function clampCards(n) {
     if (typeof n === "string" && !n.trim()) return DEFAULTS.cardCount;
@@ -747,6 +904,13 @@ body.no-recite .recite-only{display:none}
       settings.cardCount = clampCards(saved.cardCount);
       if (WEEK_STARTS.indexOf(saved.weekStart) > -1)
         settings.weekStart = saved.weekStart;
+      if (Array.isArray(saved.fastRules)) {
+        var kept = cleanRules(saved.fastRules);
+        /* An empty set is a set with nothing in it, not a missing one, so it
+           is kept: a reader who wants no fast days at all gets none. */
+        if (kept.length || saved.fastRules.length === 0)
+          settings.fastRules = kept;
+      }
       if (typeof saved.from === "string" && index[saved.from] !== undefined)
         settings.from = saved.from;
     } catch (err) { /* private mode, or file:// with storage blocked */ }
@@ -813,6 +977,41 @@ body.no-recite .recite-only{display:none}
     var gap = (parse(d.date) - parse(settings.reciteAnchor)) / 86400000;
     return Math.round(gap) % 14 === 0;
   }
+  /* With no days set nothing can be a fast day, so the filter, the band's
+     legend entry and Upcoming's list of the next eight all go - the way the
+     recitation's own marks go when it is switched off. */
+  function fastOn() {
+    return settings.fastRules.length > 0;
+  }
+  /* Whether a day carries the fast, read off the rule set rather than the
+     `fast` column in the dataset, which is only the default six baked in at
+     generation time. A day counted from the end of the month resolves
+     against `fromEnd`, so the last day is the 29th or the 30th as the month
+     falls, and neither the truncated month at the end of the dataset nor a
+     rule numbered past the month's length can put the mark on a wrong day.
+
+     Pure, and called once per day per render rather than cached, because the
+     rule set can change under it at any moment from Settings. */
+  function fasting(d) {
+    var rs = settings.fastRules;
+    for (var i = 0; i < rs.length; i++) {
+      if (rs[i].f === "start" ? d.dayNum === rs[i].n
+                              : d.fromEnd === rs[i].n) return true;
+    }
+    return false;
+  }
+  /* Which days a rule set puts the fast on in a month of a given length,
+     for the preview. Ordered, and with the duplicates a month can create -
+     in a 29-day month the 29th is both "the 29th" and "the last day" -
+     folded into one. */
+  function fastDaysIn(len) {
+    var out = [];
+    settings.fastRules.forEach(function (r) {
+      var n = r.f === "start" ? r.n : len - r.n + 1;
+      if (n >= 1 && n <= len && out.indexOf(n) < 0) out.push(n);
+    });
+    return out.sort(function (a, b) { return a - b; });
+  }
   /* A leap month repeats a month of the year. Whether the repeat carries the
      long fast with it is a reading rather than a rule, so it is a setting. */
   function longFasting(d) {
@@ -856,6 +1055,11 @@ body.no-recite .recite-only{display:none}
 
   var MONTHS = ["January","February","March","April","May","June","July",
                 "August","September","October","November","December"];
+  function ordinal(n) {
+    var tens = n % 100;
+    if (tens >= 11 && tens <= 13) return n + "th";
+    return n + (["th", "st", "nd", "rd"][n % 10] || "th");
+  }
   var WEEK = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday",
               "Saturday"];
 
@@ -971,10 +1175,10 @@ body.no-recite .recite-only{display:none}
       var day = days[k], isToday = day.date === d.date;
       var label = shortDate(day.date) + " — lunar " + lunarDate(day) +
         (day.moon ? ", " + day.moon + " moon" : "") +
-        (day.fast ? ", fast day" : "") +
+        (fasting(day) ? ", fast day" : "") +
         (reciting(day) ? ", Precept Recitation" : "") +
         (isToday ? " (today)" : "");
-      html += '<div class="disc' + (day.fast ? " is-fast" : "") +
+      html += '<div class="disc' + (fasting(day) ? " is-fast" : "") +
         (reciting(day) ? " is-recite" : "") +
         (day.moon ? " is-phase" : "") +
         (isToday ? " is-today" : "") +
@@ -1001,7 +1205,7 @@ body.no-recite .recite-only{display:none}
     document.getElementById("band-legend").innerHTML =
       "<span>Gregorian dates</span>" +
       '<span><i class="t"></i>today</span>' +
-      '<span><i class="f"></i>fast day</span>' +
+      (fastOn() ? '<span><i class="f"></i>fast day</span>' : "") +
       (reciteOn() ? '<span><i class="r">' + STAR +
         "</i>precept recitation</span>" : "");
   }
@@ -1026,7 +1230,7 @@ body.no-recite .recite-only{display:none}
         : n === 1 ? "Tomorrow"
         : WEEK[parse(d.date).getDay()];
       var tags = "";
-      if (d.fast) tags +=
+      if (fasting(d)) tags +=
         '<li class="fast">Fast day <span class="han">齋</span></li>';
       if (reciting(d)) tags += '<li class="recite">Precept Recitation ' +
         '<span class="star-ic">' + STAR + "</span></li>";
@@ -1036,7 +1240,7 @@ body.no-recite .recite-only{display:none}
       var events = eventsOf(d).map(function (e) {
         return "<li>" + esc(e) + "</li>";
       }).join("");
-      html += '<article class="card' + (d.fast ? " is-fast" : "") +
+      html += '<article class="card' + (fasting(d) ? " is-fast" : "") +
         (reciting(d) ? " is-recite" : "") +
         (longFasting(d) ? " is-long" : "") +
         (!outOfRange && n === 0 ? " is-today" : "") + '"' +
@@ -1087,8 +1291,9 @@ body.no-recite .recite-only{display:none}
     var nextLong = firstWhere(longFasting);
     var here = days[cursor].date;
     document.getElementById("upcoming").innerHTML =
-      "<section><h3>Next eight fast days</h3>" +
-      ul(listOf(function (d) { return d.fast; }, 8)) + "</section>" +
+      (fastOn() ? "<section><h3>Next eight fast days</h3>" +
+        ul(listOf(function (d) { return fasting(d); }, 8)) + "</section>"
+        : "") +
       (reciteOn() ?
         "<section><h3>Next Precept Recitations</h3>" +
         ul(listOf(reciting, 6)) + "</section>" : "") +
@@ -1107,7 +1312,7 @@ body.no-recite .recite-only{display:none}
   fromInput.max = days[days.length - 1].date;
 
   var MATCH = {
-    fast: function (d) { return d.fast; },
+    fast: function (d) { return fasting(d); },
     moon: function (d) { return !!d.moon; },
     recite: reciting,
     long: longFasting
@@ -1144,7 +1349,7 @@ body.no-recite .recite-only{display:none}
          classes, so they take that day's colour and hatch and read as part
          of it rather than as a line of their own. */
       var evs = settings.showEvents ? eventsOf(d) : [];
-      var klass = (d.fast ? "is-fast " : "") +
+      var klass = (fasting(d) ? "is-fast " : "") +
         (longFasting(d) ? "is-long " : "") + (d.moon ? "is-moon" : "");
       var tail = evs.length ? '<tr class="event-row ' + klass + '">' +
         '<td colspan="6">' + evs.map(esc).join(" &nbsp;·&nbsp; ") +
@@ -1157,7 +1362,7 @@ body.no-recite .recite-only{display:none}
         '<td class="han">' + lunarCell(d) + "</td>" +
         "<td>" +
         (longFasting(d) ? '<span class="longfast">Long Fast</span>' : "") +
-        (d.fast ? '<span class="yes han">齋</span>' : "") + "</td>" +
+        (fasting(d) ? '<span class="yes han">齋</span>' : "") + "</td>" +
         '<td class="recite-only">' +
         (reciting(d) ? '<span class="star-ic" title="Precept Recitation">' +
           STAR + "</span>" : "") + "</td>" +
@@ -1238,7 +1443,7 @@ body.no-recite .recite-only{display:none}
         (rec ? "recitation\t" : "") + "moon\tevent\n";
       var body = shown.map(function (d) {
         var row = [d.date, d.weekday, d.monthCn, d.dayCn, d.dayNum,
-                   d.fast ? "yes" : ""];
+                   fasting(d) ? "yes" : ""];
         if (rec) row.push(reciting(d) ? "yes" : "");
         return row.concat([d.moon, d.event]).join("\t");
       }).join("\n");
@@ -1293,6 +1498,122 @@ body.no-recite .recite-only{display:none}
   var cardsInput = document.getElementById("opt-cards");
   var weekSel = document.getElementById("opt-week");
 
+  /* What a rule means in words, so a reader setting one by hand can see what
+     they have chosen without counting it out on the calendar. Only the days
+     the tradition's own shape names are glossed; anything else is left to
+     stand as the number it is. */
+  var RULE_MEANS = {
+    "start1": "the new moon",
+    "start8": "the waxing half moon",
+    "start14": "the day before the full moon",
+    "start15": "the full moon",
+    "start23": "the waning half moon",
+    "end1": "the day before the new moon",
+    "end2": "two days before the new moon"
+  };
+  function ruleGloss(r) {
+    var head = r.f === "start" ? "the " + ordinal(r.n)
+      : r.n === 1 ? "the last day of the month"
+      : r.n === 2 ? "the second to last day"
+      : "the " + ordinal(r.n) + " day from the end";
+    var means = RULE_MEANS[r.f + r.n];
+    return "<b>" + head + "</b>" + (means ? " — " + means : "");
+  }
+  function currentPreset() {
+    for (var i = 0; i < FAST_PRESETS.length; i++)
+      if (sameRules(settings.fastRules, FAST_PRESETS[i].rules))
+        return FAST_PRESETS[i];
+    return null;
+  }
+  function renderFastPresets() {
+    var here = currentPreset();
+    document.getElementById("fast-presets").innerHTML =
+      FAST_PRESETS.map(function (pre) {
+        return '<button class="chip" type="button" data-preset="' + pre.key +
+          '" aria-pressed="' + (here === pre) + '" title="' + esc(pre.note) +
+          '">' + esc(pre.name) + "</button>";
+      }).join("");
+  }
+  function renderFastRules() {
+    var rs = settings.fastRules;
+    document.getElementById("fast-rules").innerHTML = rs.length
+      ? rs.map(function (r, i) {
+          return '<div class="rule">' +
+            '<select class="r-from" data-i="' + i + '" ' +
+            'aria-label="Which end of the month day ' + (i + 1) +
+            ' counts from">' +
+            '<option value="start"' + (r.f === "start" ? " selected" : "") +
+            ">Counting from the start</option>" +
+            '<option value="end"' + (r.f === "end" ? " selected" : "") +
+            ">Counting from the end</option></select>" +
+            '<input type="number" class="day r-n" min="1" max="30" step="1" ' +
+            'value="' + r.n + '" data-i="' + i + '" ' +
+            'aria-label="How far along, for day ' + (i + 1) + '">' +
+            '<span class="gloss">' + ruleGloss(r) + "</span>" +
+            '<button type="button" class="drop" data-i="' + i +
+            '" aria-label="Remove ' + esc(stripTags(ruleGloss(r))) +
+            '">&times;</button></div>';
+        }).join("")
+      : '<p class="empty">No days set — nothing is marked as a fast day.</p>';
+  }
+  function stripTags(html) {
+    return html.replace(/<[^>]*>/g, "");
+  }
+  /* The preview answers the question the controls raise: a month is 29 days
+     or 30, and a rule counted from one end lands differently in each. The
+     month in front of the reader is shown first where its length is known,
+     then both lengths, so the difference is visible rather than inferred. */
+  function renderFastPreview() {
+    function row(label, len) {
+      var list = fastDaysIn(len);
+      return '<div class="row"><span class="label">' + label + "</span>" +
+        '<span class="days">' + (list.length
+          ? list.map(function (n) {
+              return n === len ? "<b>" + n + "</b>" : String(n);
+            }).join(", ") + " <em>(" + list.length +
+            (list.length === 1 ? " day)" : " days)") + "</em>"
+          : "<em>none</em>") + "</span></div>";
+    }
+    var here = days[cursor], mine = "";
+    if (here.fromEnd !== null)
+      mine = row("This lunar month, " + (here.dayNum + here.fromEnd - 1) +
+        " days", here.dayNum + here.fromEnd - 1);
+    var has30 = settings.fastRules.some(function (r) {
+      return r.f === "start" && r.n === 30;
+    });
+    document.getElementById("fast-preview").innerHTML =
+      "<h4>What that gives</h4>" + mine +
+      row("In a 30-day month", 30) + row("In a 29-day month", 29) +
+      (has30 ? '<p class="warn">A 29-day month has no 30th, so a day ' +
+        "counted from the start as 30 is simply skipped there. Counting it " +
+        "from the end lands on the last day instead, whichever it is.</p>"
+        : "");
+  }
+  function fastStateText() {
+    var here = currentPreset(), n = settings.fastRules.length;
+    if (!n) return "Nothing is marked as a fast day.";
+    var fromEnd = settings.fastRules.some(function (r) {
+      return r.f === "end";
+    });
+    return (here ? here.name + ": " + here.note
+                 : "A rule set of your own, " + n +
+                   (n === 1 ? " day a month" : " days a month")) + "." +
+      (fromEnd ? " The last day of the month is the 29th or the 30th as the "
+               + "month falls." : "");
+  }
+  function renderFootFast() {
+    var here = currentPreset();
+    document.getElementById("foot-fast").innerHTML =
+      "The six fast days begin here as the 8th, 14th, 15th, 23rd and the " +
+      "last two days of each lunar month, the list given in " +
+      '<span class="han">佛說四天王經</span> (Fo shuo si tianwang jing, ' +
+      "Taisho T15n0590). Which days carry the fast is a setting, under the " +
+      "gear." + (here && here.key === "six" ? "" :
+        " This page is set to " +
+        (here ? here.name.toLowerCase() + " — " + here.note
+              : "a rule set of your own") + ".");
+  }
+
   function stateText() {
     if (settings.reciteMode === "none")
       return "Nothing is flagged as Precept Recitation.";
@@ -1309,10 +1630,11 @@ body.no-recite .recite-only{display:none}
   }
 
   function applySettings() {
-    var on = reciteOn();
+    var on = reciteOn(), fastsOn = fastOn();
     document.body.classList.toggle("no-recite", !on);
-    if (!on) settings.filters = settings.filters.filter(function (f) {
-      return f !== "recite";
+    document.body.classList.toggle("no-fast", !fastsOn);
+    settings.filters = settings.filters.filter(function (f) {
+      return (on || f !== "recite") && (fastsOn || f !== "fast");
     });
     modeSel.value = settings.reciteMode;
     lunarOpts.classList.toggle("hidden", settings.reciteMode !== "lunar");
@@ -1333,6 +1655,13 @@ body.no-recite .recite-only{display:none}
     cardsInput.value = settings.cardCount;
     weekSel.value = settings.weekStart;
     document.getElementById("opt-state").textContent = stateText();
+    renderFastPresets();
+    /* A lunar month has 30 days at most, so a longer set can only repeat. */
+    document.getElementById("fast-add").disabled =
+      settings.fastRules.length >= RULES_MAX;
+    renderFastPreview();
+    renderFootFast();
+    document.getElementById("opt-fast-state").textContent = fastStateText();
     var room = days.length - cursor;
     document.getElementById("opt-cards-state").textContent =
       settings.cardCount > room
@@ -1396,6 +1725,97 @@ body.no-recite .recite-only{display:none}
     saveSettings();
     applySettings();
   });
+
+  /* Setting a rule set. The rows are listened to from the container they sit
+     in, because a row that gains or loses a day is redrawn.
+
+     `setRules` redraws them; `touchRules` deliberately does not. A number box
+     fires `change` on every click of its own spinner, and redrawing the rows
+     under that click would replace the box being clicked - so an edit inside
+     a row rewrites that row's reading in place and leaves the controls, the
+     focus and the caret exactly where the reader left them. Adding, removing
+     and the presets change which rows exist, so those redraw. */
+  var rulesBox = document.getElementById("fast-rules");
+  function touchRules(rs) {
+    settings.fastRules = cleanRules(rs);
+    saveSettings();
+    applySettings();
+  }
+  function setRules(rs) {
+    touchRules(rs);
+    renderFastRules();
+  }
+  document.getElementById("fast-presets").addEventListener("click",
+    function (e) {
+      var btn = e.target;
+      if (!btn.hasAttribute || !btn.hasAttribute("data-preset")) return;
+      var pre = presetByKey(btn.getAttribute("data-preset"));
+      if (pre) setRules(cloneRules(pre.rules));
+    });
+  rulesBox.addEventListener("change", function (e) {
+    var el = e.target;
+    if (!el.classList) return;
+    var row = el.parentNode, i = +el.getAttribute("data-i");
+    var rs = cloneRules(settings.fastRules);
+    if (!rs[i]) return;
+    if (el.classList.contains("r-from")) rs[i].f = el.value;
+    else if (el.classList.contains("r-n")) {
+      var n = clampRuleDay(el.value);
+      /* An emptied or nonsense box goes back to the day it held rather than
+         dropping it; the × beside it is how a day is removed. */
+      if (n === null) { el.value = rs[i].n; return; }
+      el.value = n;                    /* a number typed past either bound */
+      rs[i].n = n;
+    } else return;
+    var want = rs[i];
+    touchRules(rs);
+    /* Naming a day a second time folds the two rows into one, so the rows
+       have to be redrawn or the one that went would leave every row below it
+       pointing at the wrong rule. The caret follows the survivor, which is
+       the day the reader just typed. */
+    if (settings.fastRules.length !== rs.length) {
+      renderFastRules();
+      var kept = rulesBox.querySelectorAll(".rule");
+      for (var k = 0; k < settings.fastRules.length; k++) {
+        if (settings.fastRules[k].f === want.f &&
+            settings.fastRules[k].n === want.n) {
+          kept[k].querySelector(".r-n").focus();
+          break;
+        }
+      }
+      return;
+    }
+    /* Otherwise the reading beside the controls is the one thing in the row
+       that the edit changes, so it is the one thing rewritten - leaving the
+       controls, the focus and the caret where the reader left them. */
+    var gloss = row.querySelector(".gloss");
+    if (gloss) gloss.innerHTML = ruleGloss(want);
+    var drop = row.querySelector(".drop");
+    if (drop) drop.setAttribute("aria-label",
+      "Remove " + stripTags(ruleGloss(want)));
+  });
+  rulesBox.addEventListener("click", function (e) {
+    var btn = e.target;
+    if (!btn.classList || !btn.classList.contains("drop")) return;
+    var rs = cloneRules(settings.fastRules);
+    rs.splice(+btn.getAttribute("data-i"), 1);
+    setRules(rs);
+  });
+  document.getElementById("fast-add").addEventListener("click", function () {
+    /* the lowest day from the start that is not already set */
+    var taken = {}, n = 1;
+    settings.fastRules.forEach(function (r) {
+      if (r.f === "start") taken[r.n] = true;
+    });
+    while (taken[n] && n < 30) n++;
+    setRules(settings.fastRules.concat([{f: "start", n: n}]));
+    /* the new row is the one the reader is here to set, so hand it the caret */
+    var last = rulesBox.querySelector(".rule:last-child .r-n");
+    if (last) last.focus();
+  });
+  document.getElementById("fast-clear").addEventListener("click", function () {
+    setRules([]);
+  });
   document.getElementById("opt-reset").addEventListener("click", function () {
     settings.reciteMode = DEFAULTS.reciteMode;
     settings.reciteDayA = DEFAULTS.reciteDayA;
@@ -1407,7 +1827,9 @@ body.no-recite .recite-only{display:none}
     settings.theme = DEFAULTS.theme;
     settings.cardCount = DEFAULTS.cardCount;
     settings.weekStart = DEFAULTS.weekStart;
+    settings.fastRules = cloneRules(DEFAULTS.fastRules);
     settings.from = null;
+    renderFastRules();
     from = days[cursor].date;
     fromInput.value = from;
     saveSettings();
@@ -1478,6 +1900,7 @@ body.no-recite .recite-only{display:none}
     });
   }
 
+  renderFastRules();
   applySettings();
 
   /* One tick for both things the wall clock can change under a page that is

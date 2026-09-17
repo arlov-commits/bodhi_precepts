@@ -5,7 +5,7 @@
 #   data.csv   UTF-8 with BOM so Excel on Windows keeps the diacritics
 # Source of truth is the lunar_ref sheet (Hong Kong Observatory transcription)
 # plus the dharma events typed off the DRBA 2026 printed calendar.
-# Version 1.0
+# Version 1.1
 
 import csv
 import json
@@ -68,9 +68,17 @@ print("    %d dharma events, DRBA range ends %s" % (len(events), drba_last))
 starts = [i for i, (_, _, day) in enumerate(rows) if DAY_NUM[day] == 1]
 length_at = {}
 for k, i in enumerate(starts):
-    end = starts[k + 1] if k + 1 < len(starts) else len(rows)
+    if k + 1 >= len(starts):
+        break            # the range ends mid-month; that length is unknown
+    end = starts[k + 1]
     for j in range(i, end):
         length_at[j] = end - i
+# the range opens mid-month; that month's length is the day number of its
+# last day, which is the row just before the first day-1
+if starts and starts[0] > 0:
+    lead = DAY_NUM[rows[starts[0] - 1][2]]
+    for j in range(0, starts[0]):
+        length_at[j] = lead
 print("    %d lunar months spanned" % len(starts))
 
 print("[*] applying the rules")
