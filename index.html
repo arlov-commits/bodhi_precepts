@@ -81,10 +81,16 @@
      the dark ground the ink is the light one, so they invert rather than
      going darker still. --bn-on-ink-soft is the quiet tone for text sitting
      on a filled ink chip, which is the paper both ways round. */
+  /* A filled chip - the active sort, the open filter button, a tier pill.
+     On paper it is the ink itself with the paper written on it. On the dark
+     ground that inverts, and the ink token (#E6E4DB) is far too bright for a
+     slab this size: as a letterform it is right, as a filled area it glares.
+     So the dark half is a parchment rather than the ink read backwards. */
+  --bn-fill:#1C1A16; --bn-fill-ink:#F6F3EC;
   --bn-ink-wash:rgba(28,26,22,.035);   --bn-ink-wash-2:rgba(28,26,22,.055);
   --bn-fast-wash:rgba(150,35,29,.05);  --bn-fast-wash-2:rgba(150,35,29,.13);
   --bn-blue-tint:rgba(53,97,122,.06);  --bn-green-tint:rgba(68,108,73,.06);
-  --bn-on-ink-soft:rgba(246,243,236,.62);
+  --bn-on-ink-soft:rgba(246,243,236,.64);
 }
 /* Evening ink: diluted 墨 is never black but a blue-grey, so the dark ground
    is slate rather than soot, the strokes are warm paper, and the cinnabar
@@ -130,10 +136,11 @@
   --bn-violet:#B5A8CE; --bn-violet-wash:#332F3C; --bn-violet-line:#5C5273;
   --bn-off:#7C8385;    --bn-off-line:#4E565C;
   --bn-uniq-wash:#362E2C; --bn-count-wash:#333A40;
+  --bn-fill:#CFC7B6; --bn-fill-ink:#23272B;
   --bn-ink-wash:rgba(233,231,222,.045); --bn-ink-wash-2:rgba(233,231,222,.075);
   --bn-fast-wash:rgba(222,145,132,.07); --bn-fast-wash-2:rgba(222,145,132,.17);
   --bn-blue-tint:rgba(127,175,201,.08); --bn-green-tint:rgba(139,183,145,.08);
-  --bn-on-ink-soft:rgba(36,42,47,.68);
+  --bn-on-ink-soft:rgba(35,39,43,.66);
 }
 *{box-sizing:border-box}
 /* The ground is set on the root as well as the body: Chrome on Android tints
@@ -545,7 +552,7 @@ td .rec{color:var(--recite);font-weight:600}
   display:flex; flex-direction:column; gap:2px; transition:all .16s ease}
 #view-precepts .tab span{font-family:var(--mono); font-size:8.5px; letter-spacing:.09em;
   text-transform:uppercase; color:var(--quiet); font-weight:400}
-#view-precepts .tab.on{background:var(--ink); border-color:var(--ink); color:var(--paper)}
+#view-precepts .tab.on{background:var(--bn-fill); border-color:var(--bn-fill); color:var(--bn-fill-ink)}
 #view-precepts .tab.on span{color:var(--bn-on-ink-soft)}
 #view-precepts #bn-uplist[hidden]{display:none}
 #view-precepts .upcard{background:var(--panel); border:1px solid var(--hair); border-left:3px solid var(--t3);
@@ -596,7 +603,7 @@ td .rec{color:var(--recite);font-weight:600}
   background:var(--panel); color:var(--ink-soft); transition:all .16s ease;
 }
 #view-precepts .fbtn:hover{border-color:var(--quiet)}
-#view-precepts .fbtn[aria-expanded="true"]{background:var(--ink); color:var(--paper); border-color:var(--ink)}
+#view-precepts .fbtn[aria-expanded="true"]{background:var(--bn-fill); color:var(--bn-fill-ink); border-color:var(--bn-fill)}
 #view-precepts .badge{
   display:inline-flex; align-items:center; justify-content:center; min-width:14px; height:14px;
   padding:0 4px; border-radius:100px; background:var(--fast); color:var(--bn-on);
@@ -607,7 +614,7 @@ td .rec{color:var(--recite);font-weight:600}
 #view-precepts .segbtn{font-family:var(--mono); font-size:10.5px; padding:4px 13px; border:0;
   border-radius:100px; background:transparent; color:var(--quiet); cursor:pointer;
   transition:background .18s ease,color .18s ease; white-space:nowrap}
-#view-precepts .segbtn.on{background:var(--ink); color:var(--paper)}
+#view-precepts .segbtn.on{background:var(--bn-fill); color:var(--bn-fill-ink)}
 #view-precepts .count{font-family:var(--mono); font-size:10px; color:var(--quiet); white-space:nowrap}
 #view-precepts .iconbtn{flex:0 0 auto; cursor:pointer; border:0; background:transparent; color:var(--quiet);
   padding:4px 5px; display:inline-flex; align-items:center; border-radius:4px;
@@ -629,7 +636,7 @@ td .rec{color:var(--recite);font-weight:600}
 }
 #view-precepts .apill em{font-style:normal; opacity:.65; font-size:11px; line-height:1}
 #view-precepts .apill:hover em{opacity:1}
-#view-precepts .apill.tierpill{background:var(--ink); color:var(--paper)}
+#view-precepts .apill.tierpill{background:var(--bn-fill); color:var(--bn-fill-ink)}
 #view-precepts .apill.hidpill{background:var(--quiet); color:var(--panel)}
 
 
@@ -681,7 +688,7 @@ td .rec{color:var(--recite);font-weight:600}
   height:24px; padding:0 13px; box-sizing:border-box; display:inline-flex; align-items:center}
 #view-precepts .clear[hidden]{display:inline-flex; visibility:hidden}
 #view-precepts .clear:hover{background:var(--fast); color:var(--panel)}
-#view-precepts .done{margin-left:auto; cursor:pointer; border:0; background:var(--ink); color:var(--paper);
+#view-precepts .done{margin-left:auto; cursor:pointer; border:0; background:var(--bn-fill); color:var(--bn-fill-ink);
   font-family:var(--mono); font-size:10px; border-radius:100px;
   height:24px; padding:0 16px; box-sizing:border-box; display:inline-flex; align-items:center}
 @media (max-width:420px){
@@ -2110,8 +2117,8 @@ body.no-fast .fast-only{display:none}
   var TABS = [
     { id: "today", label: "Today" },
     { id: "record", label: "Upcoming" },
-    { id: "settings", label: "Settings" },
-    { id: "precepts", label: "Precepts", glyph: "戒" }
+    { id: "precepts", label: "Precepts", glyph: "戒" },
+    { id: "settings", label: "Settings" }
   ];
   var VIEWS = TABS.map(function (t) { return t.id; });
   var sideNav = document.getElementById("side-nav");

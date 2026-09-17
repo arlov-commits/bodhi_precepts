@@ -14,7 +14,7 @@ desktop.
 
 | File | What it is |
 | --- | --- |
-| `index.html` | The whole app. Four views: **Today**, **Upcoming**, **Settings** and **Precepts**. |
+| `index.html` | The whole app. Four views: **Today**, **Upcoming**, **Precepts** and **Settings**. |
 | `manifest.webmanifest` | Makes it installable: the name, the icons, the standalone display. |
 | `sw.js` | The service worker. Keeps a copy of the app so an installed one opens offline. |
 | `icon.svg` | The icon: a cinnabar seal carrying a crescent and the pole star. The source the rest are cut from. |
@@ -170,7 +170,7 @@ scrolls. Anything reading or setting `window.scrollY` goes through
 
 ## Precepts
 
-The fourth tab, under the 戒 glyph: what actually triggers an offense in the
+The third tab, under the 戒 glyph: what actually triggers an offense in the
 ten major and forty-eight minor precepts of the Brahma Net Sutra, with the
 Upasaka precepts on a second tab beside them. Clauses can be sorted by
 precept, by canonical order or by how intrusive they are, filtered by band
@@ -200,7 +200,7 @@ largest thing the app carries and this is not the view it opens on.
 
 ## Settings
 
-Settings is the third tab. Its panels run in the order they are most
+Settings is the last tab. Its panels run in the order they are most
 often touched, the rarest last — **Week start**, **Days on the Today view**,
 **Fast days**, **Precept Recitation days**, **Leap months**, **Install**, and
 then **Where this is kept**. The two panels that say which days carry a mark
@@ -399,6 +399,12 @@ On an iPhone the standalone status bar is fixed light
 (`apple-mobile-web-app-status-bar-style: default`); following the theme there
 needs `black-translucent` with `viewport-fit=cover` and safe-area padding, and
 is not done yet.
+
+A filled chip in the Precepts view — the active sort, the open filter button,
+a tier pill — is the ink itself with the paper written on it. On the dark
+ground that cannot simply invert: the ink token is a near-white, right as a
+letterform and glaring as a slab, so the dark half of the pair is a parchment
+instead. Both are `--bn-fill` and `--bn-fill-ink`.
 
 The icon in the masthead cycles three themes — auto, light, dark — and the
 choice is kept with the rest. Auto follows the **device clock**, not the
