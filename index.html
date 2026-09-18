@@ -59,6 +59,18 @@
   --netline:rgba(28,26,22,.067);
   --hatch:repeating-linear-gradient(45deg,var(--netline) 0 1px,transparent 1px 9px),
           repeating-linear-gradient(-45deg,var(--netline) 0 1px,transparent 1px 9px);
+  /* The dhūta period's honeycomb. It is a tiled SVG rather than gradients
+     because hexagons cannot be drawn by repeating-linear-gradient, and an SVG
+     in a background-image has no CSS context, so it cannot read --netline: the
+     colour is written into the tile and therefore restated for the dark ground
+     below. That is the one place in this file a colour is kept twice; the two
+     sit beside each other so they cannot drift apart unseen.
+
+     It is deliberately coarse — a 17×30 tile against the hatch's 9px pitch.
+     The two textures have to share a day wherever a dhūta period runs through
+     a long fasting month, and they stay separable by working at different
+     scales rather than by fighting for the same one. */
+  --comb:url(data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2717.32%27%20height%3D%2730.00%27%20viewBox%3D%270%200%2017.32%2030.00%27%3E%3Cpath%20d%3D%27M8.66%2010.00L-0.00%205.00L0.00%20-5.00L8.66%20-10.00L17.32%20-5.00L17.32%205.00Z%20M0.00%2025.00L-8.66%2020.00L-8.66%2010.00L-0.00%205.00L8.66%2010.00L8.66%2020.00Z%20M17.32%2025.00L8.66%2020.00L8.66%2010.00L17.32%205.00L25.98%2010.00L25.98%2020.00Z%20M8.66%2040.00L-0.00%2035.00L0.00%2025.00L8.66%2020.00L17.32%2025.00L17.32%2035.00Z%27%20fill%3D%27none%27%20stroke%3D%27rgba%2828%2C26%2C22%2C.11%29%27%20stroke-width%3D%271%27%2F%3E%3C%2Fsvg%3E);
   --sans:"Optima","Avenir Next","Gill Sans MT","Gill Sans","Trebuchet MS",sans-serif;
   --han:"Songti SC","STSong","Noto Serif CJK SC","Noto Serif SC","SimSun",serif;
   --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
@@ -126,6 +138,7 @@
   --leap:#DE9184;
   --leap-dim:#3A302E;
   --netline:rgba(233,231,222,.067);
+  --comb:url(data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2717.32%27%20height%3D%2730.00%27%20viewBox%3D%270%200%2017.32%2030.00%27%3E%3Cpath%20d%3D%27M8.66%2010.00L-0.00%205.00L0.00%20-5.00L8.66%20-10.00L17.32%20-5.00L17.32%205.00Z%20M0.00%2025.00L-8.66%2020.00L-8.66%2010.00L-0.00%205.00L8.66%2010.00L8.66%2020.00Z%20M17.32%2025.00L8.66%2020.00L8.66%2010.00L17.32%205.00L25.98%2010.00L25.98%2020.00Z%20M8.66%2040.00L-0.00%2035.00L0.00%2025.00L8.66%2020.00L17.32%2025.00L17.32%2035.00Z%27%20fill%3D%27none%27%20stroke%3D%27rgba%28233%2C231%2C222%2C.12%29%27%20stroke-width%3D%271%27%2F%3E%3C%2Fsvg%3E);
   /* The same set, lifted off the slate. Every accent is now the light half of
      its pair, so text sitting on one goes dark instead. */
   --t1:#DE9184; --t2:#CFA267; --t3:#7FAFC9; --t4:#A99AC4; --t5:#8BB791;
@@ -364,8 +377,14 @@ td .longfast{color:var(--ink-soft);font-size:.75rem;letter-spacing:.05em;
   text-transform:uppercase;white-space:nowrap}
 /* Indra's net: a hatch laid over whatever colour the row already carries,
    so a long fasting month reads as one stretch without displacing the marks
-   for the single days inside it. */
+   for the single days inside it. The dhūta period is a honeycomb laid the
+   same way, and the two overlap for weeks at a time — the 1st and 9th months
+   sit inside a dhūta period entire — so a day can carry both at once and the
+   combined rule stacks them rather than letting either win. */
 tbody tr.is-long,.card.is-long{background-image:var(--hatch)}
+tbody tr.is-dhuta,.card.is-dhuta{background-image:var(--comb)}
+tbody tr.is-long.is-dhuta,
+.card.is-long.is-dhuta{background-image:var(--comb),var(--hatch)}
 /* A day's events sit under it, sharing its colour, with the day's own rule
    held back so the two read as one block. */
 tbody tr.has-event td{border-bottom:0}
@@ -424,9 +443,9 @@ td .rec{color:var(--recite);font-weight:600}
 
    The icons are monochrome SVG masks tinted with background-color, so one
    rule recolours them for idle, hover, active and either theme. The fourth
-   tab is a glyph instead, 戒, the same character the view's own seal
-   carries; it takes its colour from the text, which is the same trick by a
-   different route. */
+   tab is a glyph instead, 戒 — the 戒 of 梵網戒, which the masthead spells out
+   when that view is open; it takes its colour from the text, which is the
+   same trick by a different route. */
 :root{
   --nv-today:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='4.2'/%3E%3Cpath d='M12 2.4v2.6M12 19v2.6M2.4 12h2.6M19 12h2.6M5.2 5.2l1.9 1.9M16.9 16.9l1.9 1.9M18.8 5.2l-1.9 1.9M7.1 16.9l-1.9 1.9'/%3E%3C/svg%3E");
   --nv-record:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3.2' y='5' width='17.6' height='15.8' rx='2'/%3E%3Cpath d='M3.2 9.6h17.6M8.2 2.9v3.9M15.8 2.9v3.9'/%3E%3Cpath d='M7.4 13.2h2.2M14.4 13.2h2.2M7.4 17h2.2M14.4 17h2.2'/%3E%3C/svg%3E");
@@ -501,24 +520,12 @@ td .rec{color:var(--recite);font-weight:600}
 #view-precepts{--gut:1.25rem}
 
 /* ---------- masthead ---------- */
-#view-precepts header.mast{padding:1.75rem 0 2rem; border-bottom:1px solid var(--line)}
-#view-precepts .seal{
-  display:inline-flex; align-items:center; justify-content:center;
-  width:52px; height:52px; background:var(--fast); color:var(--bn-on);
-  font-family:var(--han); font-size:25px; line-height:1;
-  border-radius:3px; margin-bottom:20px;
-  animation:bn-seal .7s cubic-bezier(.2,.9,.3,1) both;
-}
-@keyframes bn-seal{from{opacity:0;transform:scale(.82) rotate(-5deg)}to{opacity:1;transform:none}}
+#view-precepts header.mast{padding:.75rem 0 1.75rem; border-bottom:1px solid var(--line)}
 #view-precepts h1{
   font-family:var(--sans); font-weight:300; font-size:clamp(34px,5vw,54px);
   line-height:1.04; letter-spacing:-.022em; margin:0 0 6px;
 }
 #view-precepts h1 em{font-style:italic; color:var(--fast)}
-#view-precepts .sub{
-  font-family:var(--mono); font-size:11px; letter-spacing:.12em;
-  text-transform:uppercase; color:var(--quiet); margin:0 0 20px; line-height:1.75;
-}
 #view-precepts .lede{max-width:63ch; color:var(--ink-soft); font-size:16px; margin:0 0 26px}
 #view-precepts .lede strong{font-weight:600; color:var(--ink)}
 #view-precepts .stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(112px,1fr)); gap:1px; background:var(--hair); border:1px solid var(--hair); border-radius:3px; overflow:hidden}
@@ -863,7 +870,7 @@ td .rec{color:var(--recite);font-weight:600}
 }
 
 /* ---------------------------------------------------------- settings */
-nav button.gear{font-size:1.05rem;line-height:1;padding:.35rem .55rem}
+nav button.gear{font-size:1.37rem;line-height:1;padding:.3rem .5rem}
 .setting{background:var(--panel);border:1px solid var(--line);
   border-top:2px solid var(--ink);padding:1rem 1.1rem;margin:1rem 0;
   max-width:40rem}
@@ -1005,8 +1012,8 @@ body.no-fast .fast-only{display:none}
 
   <header class="masthead">
     <div class="brand">
-      <span class="han" aria-hidden="true">六齋日</span>
-      <h1>Days of Abstinence</h1>
+      <span class="han" id="brand-han" aria-hidden="true">六齋日</span>
+      <h1 id="brand-name">Days of Abstinence</h1>
     </div>
     <nav aria-label="Theme">
       <button type="button" id="theme-toggle" class="gear"></button>
@@ -1188,6 +1195,21 @@ body.no-fast .fast-only{display:none}
     </div>
 
     <div class="setting">
+      <h3>Dhūta period</h3>
+      <p>The stretches of the lunar year over which the dhūta austerities
+        (<span class="han">頭陀</span>, dhutaṅga) are kept: from the 15th of
+        the 1st month to the 15th of the 3rd, and from the 15th of the 8th to
+        the 15th of the 10th. They are drawn as a honeycomb over the days they
+        cover, on both Today and Upcoming.</p>
+      <label class="switch">
+        <input type="checkbox" id="opt-dhuta">
+        <span class="track" aria-hidden="true"></span>
+        <span>Mark the dhūta periods</span>
+      </label>
+      <p class="state" id="opt-dhuta-state"></p>
+    </div>
+
+    <div class="setting">
       <h3>Leap months</h3>
       <p>A leap month repeats a month of the year. Whether the repeat carries
         the long fast with it is a reading rather than a rule, and the DRBA
@@ -1233,9 +1255,7 @@ body.no-fast .fast-only{display:none}
   <main id="view-precepts" class="hidden">
 
   <header class="mast">
-    <div class="seal">戒</div>
     <h1>What actually <em>triggers</em> an offense</h1>
-    <p class="sub">Brahmā's Net Sūtra · 梵網經<br>ten major and forty-eight minor<br>Kalavinka translation</p>
     <details class="acc" id="bn-methodology">
       <summary>Methodology</summary>
       <div class="accbody">
@@ -1465,7 +1485,7 @@ body.no-fast .fast-only{display:none}
   var DEFAULTS = { reciteMode: "sat", reciteDayA: 1, reciteDayB: 15,
                    reciteAnchor: "2026-09-12", leapLongFast: false,
                    filters: [], showEvents: false, theme: "auto",
-                   cardCount: 8, weekStart: "6",
+                   cardCount: 8, weekStart: "6", dhutanga: true,
                    fastRules: FAST_PRESETS[0].rules };
   var settings = {
     reciteMode: DEFAULTS.reciteMode,
@@ -1478,6 +1498,7 @@ body.no-fast .fast-only{display:none}
     theme: DEFAULTS.theme,
     cardCount: DEFAULTS.cardCount,
     weekStart: DEFAULTS.weekStart,
+    dhutanga: DEFAULTS.dhutanga,
     fastRules: cloneRules(DEFAULTS.fastRules),
     from: null
   };
@@ -1530,6 +1551,8 @@ body.no-fast .fast-only{display:none}
       if (isDate(saved.reciteAnchor)) settings.reciteAnchor = saved.reciteAnchor;
       if (typeof saved.leapLongFast === "boolean")
         settings.leapLongFast = saved.leapLongFast;
+      if (typeof saved.dhutanga === "boolean")
+        settings.dhutanga = saved.dhutanga;
       if (Array.isArray(saved.filters))
         settings.filters = saved.filters.filter(function (f) {
           return FILTERS.indexOf(f) > -1;
@@ -1647,6 +1670,26 @@ body.no-fast .fast-only{display:none}
       if (n >= 1 && n <= len && out.indexOf(n) < 0) out.push(n);
     });
     return out.sort(function (a, b) { return a - b; });
+  }
+  /* The dhūta austerities (頭陀, dhutaṅga) are kept over two stretches of the
+     lunar year: from 1月15日 to 3月15日, and from 8月15日 to 10月15日. Read off
+     the month and the day rather than by walking between the two boundary
+     dates, so a period the dataset opens or closes in the middle of still
+     marks the days it does have.
+
+     A leap month inside a span carries it. That is not the same question as
+     the leap long fast, which asks whether a repeated month is itself one of
+     the three named months; this is a stretch of time with two ends, and a
+     month inserted between them falls inside it either way. Nothing in this
+     dataset tests it — the one leap month here is the leap 5th of 2028, which
+     is outside both spans. */
+  function dhutanga(d) {
+    if (!settings.dhutanga) return false;
+    var m = d.monthNum, day = d.dayNum;
+    if (m === 2 || m === 9) return true;
+    if (m === 1 || m === 8) return day >= 15;
+    if (m === 3 || m === 10) return day <= 15;
+    return false;
   }
   /* A leap month repeats a month of the year. Whether the repeat carries the
      long fast with it is a reading rather than a rule, so it is a setting. */
@@ -1881,11 +1924,14 @@ body.no-fast .fast-only{display:none}
       var events = eventsOf(d).map(function (e) {
         return "<li>" + esc(e) + "</li>";
       }).join("");
+      var marks = (longFasting(d) ? ["Long fasting month"] : [])
+        .concat(dhutanga(d) ? ["Dhūta period"] : []);
       html += '<article class="card' + (fasting(d) ? " is-fast" : "") +
         (reciting(d) ? " is-recite" : "") +
         (longFasting(d) ? " is-long" : "") +
+        (dhutanga(d) ? " is-dhuta" : "") +
         (!outOfRange && n === 0 ? " is-today" : "") + '"' +
-        (longFasting(d) ? ' title="Long fasting month"' : "") + ">" +
+        (marks.length ? ' title="' + marks.join(" · ") + '"' : "") + ">" +
         '<div class="rel">' + rel + "</div>" +
         '<div class="greg">' + shortDate(d.date) + "</div>" +
         '<div class="lunar"><span class="lbl">lunar</span>' +
@@ -1991,7 +2037,8 @@ body.no-fast .fast-only{display:none}
          of it rather than as a line of their own. */
       var evs = settings.showEvents ? eventsOf(d) : [];
       var klass = (fasting(d) ? "is-fast " : "") +
-        (longFasting(d) ? "is-long " : "") + (d.moon ? "is-moon" : "");
+        (longFasting(d) ? "is-long " : "") +
+        (dhutanga(d) ? "is-dhuta " : "") + (d.moon ? "is-moon" : "");
       var tail = evs.length ? '<tr class="event-row ' + klass + '">' +
         '<td colspan="6">' + evs.map(esc).join(" &nbsp;·&nbsp; ") +
         "</td></tr>" : "";
@@ -2019,15 +2066,17 @@ body.no-fast .fast-only{display:none}
     alignHatch();
   }
 
-  /* The hatch is drawn per row, so anchor each one to the table's own origin
-     or the diagonals would restart at every row edge. offsetTop reads 0 while
-     Upcoming is hidden and goes stale when the rows reflow, so this runs
-     again whenever the view is shown and after the window is resized, not
-     only when the table is built. */
+  /* The textures are drawn per row, so anchor each one to the table's own
+     origin or the diagonals would restart at every row edge and the hexagons
+     would be cut in half at each one. offsetTop reads 0 while Upcoming is
+     hidden and goes stale when the rows reflow, so this runs again whenever
+     the view is shown and after the window is resized, not only when the
+     table is built. One background-position covers every layer on the row,
+     which is what a day carrying both textures needs. */
   function alignHatch() {
     var body = document.getElementById("table-body");
     if (!body.offsetParent) return;
-    Array.prototype.forEach.call(body.querySelectorAll("tr.is-long"),
+    Array.prototype.forEach.call(body.querySelectorAll("tr.is-long,tr.is-dhuta"),
       function (tr) { tr.style.backgroundPosition = "0 " + -tr.offsetTop + "px"; });
   }
   /* The rows reflow when the window changes width — a phone turned on its
@@ -2117,10 +2166,18 @@ body.no-fast .fast-only{display:none}
   var TABS = [
     { id: "today", label: "Today" },
     { id: "record", label: "Upcoming" },
-    { id: "precepts", label: "Precepts", glyph: "戒" },
+    { id: "precepts", label: "Precepts", glyph: "戒",
+      han: "梵網戒", name: "Brahmā Net Precepts" },
     { id: "settings", label: "Settings" }
   ];
   var VIEWS = TABS.map(function (t) { return t.id; });
+  /* The masthead carries the open view's own name. Three of the four are the
+     calendar, so they take the app's; the Precepts view is a different book
+     and says so, which is why it needs no second heading of its own inside
+     the view. */
+  var BRAND_HAN = "六齋日", BRAND_NAME = "Days of Abstinence";
+  var brandHan = document.getElementById("brand-han");
+  var brandName = document.getElementById("brand-name");
   var sideNav = document.getElementById("side-nav");
   var bottomNav = document.getElementById("bottom-nav");
   var active = "today";
@@ -2146,6 +2203,9 @@ body.no-fast .fast-only{display:none}
   }
   function show(which) {
     active = which;
+    var tab = TABS.filter(function (t) { return t.id === which; })[0];
+    brandHan.textContent = (tab && tab.han) || BRAND_HAN;
+    brandName.textContent = (tab && tab.name) || BRAND_NAME;
     VIEWS.forEach(function (v) {
       document.getElementById("view-" + v).classList.toggle("hidden",
         v !== which);
@@ -2173,6 +2233,7 @@ body.no-fast .fast-only{display:none}
   var fortnightOpts = document.getElementById("fortnight-opts");
   var anchorInput = document.getElementById("opt-anchor");
   var leapBox = document.getElementById("opt-leap");
+  var dhutaBox = document.getElementById("opt-dhuta");
   var dayA = document.getElementById("opt-day-a");
   var dayB = document.getElementById("opt-day-b");
   var dayBLast = document.getElementById("opt-day-b-last");
@@ -2323,6 +2384,11 @@ body.no-fast .fast-only{display:none}
       FORTNIGHT.indexOf(settings.reciteMode) < 0);
     anchorInput.value = settings.reciteAnchor;
     leapBox.checked = settings.leapLongFast;
+    dhutaBox.checked = settings.dhutanga;
+    document.getElementById("opt-dhuta-state").textContent = settings.dhutanga
+      ? "On. The two periods are drawn as a honeycomb, over the long fast's "
+        + "hatch where the two coincide."
+      : "Off. Nothing marks the dhūta periods.";
     document.getElementById("opt-leap-state").textContent =
       settings.leapLongFast
         ? "On. A leap 1st, 5th or 9th month carries the long fast."
@@ -2398,6 +2464,11 @@ body.no-fast .fast-only{display:none}
   });
   leapBox.addEventListener("change", function () {
     settings.leapLongFast = leapBox.checked;
+    saveSettings();
+    applySettings();
+  });
+  dhutaBox.addEventListener("change", function () {
+    settings.dhutanga = dhutaBox.checked;
     saveSettings();
     applySettings();
   });
@@ -2503,6 +2574,7 @@ body.no-fast .fast-only{display:none}
     settings.reciteDayB = DEFAULTS.reciteDayB;
     settings.reciteAnchor = DEFAULTS.reciteAnchor;
     settings.leapLongFast = DEFAULTS.leapLongFast;
+    settings.dhutanga = DEFAULTS.dhutanga;
     settings.filters = DEFAULTS.filters.slice();
     settings.showEvents = DEFAULTS.showEvents;
     settings.theme = DEFAULTS.theme;

@@ -129,6 +129,16 @@ nothing and rebuilds nothing.
   already keeps as fast days. They show as the disc alone, unnamed, so a
   glance at a card or a row gives the phase without another label. Derived in
   the browser, like the recitation days.
+- **Dhūta period** (頭陀, dhutaṅga): the austerities are kept over two
+  stretches of the lunar year — from 1月15日 to 3月15日, and from 8月15日 to
+  10月15日. Read off the month and the day rather than by walking between the
+  boundary dates, so a period the dataset opens or closes in the middle of
+  still marks the days it does have. A leap month falling inside a span
+  carries it: that is a different question from the leap long fast, which
+  asks whether a repeated month is itself one of the three named months,
+  where this is a stretch of time with two ends. Nothing in this dataset
+  tests it — the one leap month here, the leap 5th of 2028, is outside both
+  spans. It is a setting, on out of the box.
 - **Precept Recitation** (布薩, bùsà): the days the assembly gathers to recite
   the precepts. This is the one flag whose days are a choice rather than a
   rule, so it is a setting and the footer says so. Out of the box it is every
@@ -202,8 +212,8 @@ largest thing the app carries and this is not the view it opens on.
 
 Settings is the last tab. Its panels run in the order they are most
 often touched, the rarest last — **Week start**, **Days on the Today view**,
-**Fast days**, **Precept Recitation days**, **Leap months**, **Install**, and
-then **Where this is kept**. The two panels that say which days carry a mark
+**Fast days**, **Precept Recitation days**, **Dhūta period**, **Leap
+months**, **Install**, and then **Where this is kept**. The two panels that say which days carry a mark
 sit together in the middle. A new panel goes second from the bottom, above
 *Where this is kept*, which stays the tail of the page.
 
@@ -273,6 +283,10 @@ ways:
 - **Not at all**, which drops the flag, its filter and its column from every
   view.
 
+**Dhūta period** — whether the two dhūta stretches are drawn, on out of the
+box. They show as a honeycomb over the days they cover, on both Today and
+Upcoming.
+
 **Leap months** — whether a leap month carries the long fast, off out of the
 box. The dataset's one leap month, the leap 5th of 2028, is 29 days.
 
@@ -286,8 +300,9 @@ Reset inside its filter sheet.
 ### What a reader who has set nothing gets
 
 Weeks beginning on Saturday, eight day cards, the default six fast days,
-Precept Recitation on every other Saturday, leap months carrying no long fast,
-and Upcoming showing every day in the dataset with the dharma events hidden.
+Precept Recitation on every other Saturday, the dhūta periods marked, leap
+months carrying no long fast, and Upcoming showing every day in the dataset
+with the dharma events hidden.
 
 ### Upcoming's own controls
 
@@ -331,11 +346,27 @@ paper, and the cinnabar drops back to the dustier clay it dries to.
 
 The masthead sets 六齋日 over *Days of Abstinence*, the glyphs and their
 reading stacked as a title and its gloss rather than run together on one line.
+It carries the open view's own name: three of the four are the calendar and
+take the app's, while Precepts is a different book and says so — 梵網戒 over
+*Brahmā Net Precepts* — which is why that view needs no second heading inside
+itself.
 The launcher and the browser tab carry the app's own name instead, *Bodhi
 Precepts 齋日*, shortened to *Bodhi Precepts* where a home screen has no room
 for it.
 
-A long fasting month is a hatch — Indra's net — laid over whatever colour the
+Two stretches of time are drawn as textures rather than as marks on the days
+inside them. A long fasting month is a hatch — Indra's net; a dhūta period is
+a honeycomb. They overlap for weeks at a time — the 1st and 9th months sit
+inside a dhūta period entire — so a day can carry both at once, and they stay
+separable by working at different scales rather than by fighting over the
+same one: the hatch is a 9px pitch of hairlines, the honeycomb a 17×30 tile.
+The honeycomb is a tiled SVG because hexagons cannot be drawn with repeating
+gradients, and an SVG in a `background-image` has no CSS context to read a
+token from, so its colour is written into the tile and restated for the dark
+ground. That is the one colour in the stylesheet kept twice; the two sit
+beside each other so they cannot drift apart unseen.
+
+The hatch is laid over whatever colour the
 row or card already carries, on both Today and Upcoming. It reads as one
 continuous stretch rather than a run of separate days, and because it sits
 over the colour rather than replacing it, the marks for the single days inside

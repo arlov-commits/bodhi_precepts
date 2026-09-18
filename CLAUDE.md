@@ -58,11 +58,18 @@ looking right.
 - **The hatch is anchored per row** from `offsetTop`, which reads 0 while
   Upcoming is hidden and goes stale when rows reflow. `alignHatch()` has to
   run when the view is shown and after a resize, not only when the table is
-  built.
+  built. It anchors `tr.is-long` **and** `tr.is-dhuta`: one
+  `background-position` covers every layer on a row, which is what a day
+  carrying both textures needs.
 - **Nothing derived from the wall clock may be read once.** Which day is today
   and which theme `auto` resolves to are both rechecked on a timer, because
   the page gets left open across midnight.
-- **Colours come from the tokens**, not from a second copy. The browser
+- **Colours come from the tokens**, not from a second copy. The one exception
+  is `--comb`, the dhūta honeycomb: it is a tiled SVG (hexagons cannot be made
+  with repeating gradients) and an SVG in a `background-image` has no CSS
+  context, so it cannot read `--netline` and its colour is written into the
+  tile once per theme. The two sit next to each other for that reason — change
+  one and change the other. The browser
   `theme-color` reads `--paper` back off the root for this reason, and the
   pre-paint shim in the head sits after the stylesheet so it can do the same.
 - **The manifest must not carry a `theme_color`.** In an installed app it
