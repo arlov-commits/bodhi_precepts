@@ -129,7 +129,8 @@ nothing and rebuilds nothing.
   already keeps as fast days. They show as the disc alone, unnamed, so a
   glance at a card or a row gives the phase without another label. Derived in
   the browser, like the recitation days.
-- **Dhūta period** (頭陀, dhutaṅga): the austerities are kept over two
+- **Dhūta period** (頭陀, dhutaṅga): off out of the box. The austerities are
+  kept over two
   stretches of the lunar year — from 1月15日 to 3月15日, and from 8月15日 to
   10月15日. Read off the month and the day rather than by walking between the
   boundary dates, so a period the dataset opens or closes in the middle of
@@ -138,7 +139,7 @@ nothing and rebuilds nothing.
   asks whether a repeated month is itself one of the three named months,
   where this is a stretch of time with two ends. Nothing in this dataset
   tests it — the one leap month here, the leap 5th of 2028, is outside both
-  spans. It is a setting, on out of the box.
+  spans.
 - **Precept Recitation** (布薩, bùsà): the days the assembly gathers to recite
   the precepts. This is the one flag whose days are a choice rather than a
   rule, so it is a setting and the footer says so. Out of the box it is every
@@ -155,8 +156,9 @@ rule counted from the end simply does not fire, rather than firing on a guess.
 ## Getting around
 
 Four views, and one set of tabs drawn twice. On a phone they are a bar across
-the foot of the screen; from 820px up the same cells stand on end as a rail
-down the left, with the active one marked by a leading rule rather than a
+the foot of the screen; from 820px up the same cells stand on end as a narrow
+rail down the left — 6.5rem, half what it began at, because it is a place to
+change view from rather than a column of the page — with the active one marked by a leading rule rather than a
 filled cell — a cell a quarter of the screen tall, filled, reads as a slab
 rather than a selection. Both navs are always in the markup and the media
 query alone decides which one shows, so turning a tablet on its side costs
@@ -283,9 +285,10 @@ ways:
 - **Not at all**, which drops the flag, its filter and its column from every
   view.
 
-**Dhūta period** — whether the two dhūta stretches are drawn, on out of the
-box. They show as a honeycomb over the days they cover, on both Today and
-Upcoming.
+**Dhūta period** — whether the two dhūta stretches are drawn, off out of the
+box. They show as a houndstooth over the days they cover, on both Today and
+Upcoming, and when they are on they also get a filter chip and a line on
+Upcoming's third card.
 
 **Leap months** — whether a leap month carries the long fast, off out of the
 box. The dataset's one leap month, the leap 5th of 2028, is 29 days.
@@ -300,7 +303,7 @@ Reset inside its filter sheet.
 ### What a reader who has set nothing gets
 
 Weeks beginning on Saturday, eight day cards, the default six fast days,
-Precept Recitation on every other Saturday, the dhūta periods marked, leap
+Precept Recitation on every other Saturday, the dhūta periods unmarked, leap
 months carrying no long fast, and Upcoming showing every day in the dataset
 with the dharma events hidden.
 
@@ -317,6 +320,12 @@ block. A start date trims the front of the table, and the first 500 matching
 days are drawn; past that it says so and points at `data.csv`. **Copy what is
 shown** puts every matching day on the clipboard as TSV, not only the drawn
 500.
+
+The chips and the start date share one wrapping row. The date carries no
+`margin-left:auto` — pushing it to the far edge is what stranded it on a line
+of its own as soon as the chips filled the first — so it flows with them and
+wraps only when it has to. **Dhūta periods** appears among them only while
+that setting is on, the way the Precept Recitation chip does.
 
 The `fast` column in `data.csv` and `data.json` is the **default** six, fixed
 when they were generated; the page reads whichever days are set under the
@@ -355,18 +364,22 @@ Precepts 齋日*, shortened to *Bodhi Precepts* where a home screen has no room
 for it.
 
 Two stretches of time are drawn as textures rather than as marks on the days
-inside them. A long fasting month is a hatch — Indra's net; a dhūta period is
-a honeycomb. They overlap for weeks at a time — the 1st and 9th months sit
-inside a dhūta period entire — so a day can carry both at once, and they stay
-separable by working at different scales rather than by fighting over the
-same one: the hatch is a 9px pitch of hairlines, the honeycomb a 17×30 tile.
-The honeycomb is a tiled SVG because hexagons cannot be drawn with repeating
-gradients, and an SVG in a `background-image` has no CSS context to read a
-token from, so its colour is written into the tile and restated for the dark
-ground. That is the one colour in the stylesheet kept twice; the two sit
-beside each other so they cannot drift apart unseen.
+inside them. A long fasting month is a hexagonal net — Indra's net; a dhūta
+period is a houndstooth. They overlap for weeks at a time — the 1st and 9th
+months sit inside a dhūta period entire — so a day can carry both at once,
+and they stay separable by working at different scales and in different
+marks rather than by fighting over the same one: hairlines on a 17×30 tile
+against a woven check at 24px.
 
-The hatch is laid over whatever colour the
+Both are tiled SVGs: neither hexagons nor a houndstooth weave can be drawn
+with repeating gradients, and an SVG in a `background-image` has no CSS
+context to read a token from, so each carries its colour and is restated for
+the dark ground. Those are the only colours in the stylesheet kept twice; they
+sit beside each other so they cannot drift apart unseen. The houndstooth is
+generated from its weave — a 2/2 twill with a four-thread colour repeat —
+rather than drawn by hand, which is the only way the teeth come out right.
+
+Each is laid over whatever colour the
 row or card already carries, on both Today and Upcoming. It reads as one
 continuous stretch rather than a run of separate days, and because it sits
 over the colour rather than replacing it, the marks for the single days inside
@@ -466,6 +479,16 @@ day's own fast marked under it as 齋. Recitation is the pole star and the moon
 is the same disc the band draws. The day cards name their marks and carry the
 same glyphs — *Fast day 齋*, *Precept Recitation ✦*, *Full moon* with its
 disc.
+
+## The footer
+
+It opens with **what this page is marking** rather than what the tradition
+says in general: a term and its reading, one row each, built from the
+settings as they actually stand. Most of what the calendar draws is a setting,
+and a reader who has changed one should not have to remember that they did.
+A star marks the rows Settings can change, and a note under the list says so
+once instead of every row repeating it. The dataset's own extent and the
+sources follow.
 
 ## Sources
 

@@ -56,21 +56,22 @@
   --moonc-line:#BDB7A8;
   --leap:#9E2A24;
   --leap-dim:#F7EAE6;
-  --netline:rgba(28,26,22,.067);
-  --hatch:repeating-linear-gradient(45deg,var(--netline) 0 1px,transparent 1px 9px),
-          repeating-linear-gradient(-45deg,var(--netline) 0 1px,transparent 1px 9px);
-  /* The dhūta period's honeycomb. It is a tiled SVG rather than gradients
-     because hexagons cannot be drawn by repeating-linear-gradient, and an SVG
-     in a background-image has no CSS context, so it cannot read --netline: the
-     colour is written into the tile and therefore restated for the dark ground
-     below. That is the one place in this file a colour is kept twice; the two
-     sit beside each other so they cannot drift apart unseen.
+  /* Two stretches of time, two textures, and they have to share a day: the
+     1st and 9th months sit inside a dhūta period entire. They stay separable
+     by working at different scales and in different marks — the long fast is
+     a hexagonal net of hairlines at a 17×30 tile, the dhūta period a woven
+     houndstooth at 24px — rather than by fighting over the same one.
 
-     It is deliberately coarse — a 17×30 tile against the hatch's 9px pitch.
-     The two textures have to share a day wherever a dhūta period runs through
-     a long fasting month, and they stay separable by working at different
-     scales rather than by fighting for the same one. */
-  --comb:url(data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2717.32%27%20height%3D%2730.00%27%20viewBox%3D%270%200%2017.32%2030.00%27%3E%3Cpath%20d%3D%27M8.66%2010.00L-0.00%205.00L0.00%20-5.00L8.66%20-10.00L17.32%20-5.00L17.32%205.00Z%20M0.00%2025.00L-8.66%2020.00L-8.66%2010.00L-0.00%205.00L8.66%2010.00L8.66%2020.00Z%20M17.32%2025.00L8.66%2020.00L8.66%2010.00L17.32%205.00L25.98%2010.00L25.98%2020.00Z%20M8.66%2040.00L-0.00%2035.00L0.00%2025.00L8.66%2020.00L17.32%2025.00L17.32%2035.00Z%27%20fill%3D%27none%27%20stroke%3D%27rgba%2828%2C26%2C22%2C.11%29%27%20stroke-width%3D%271%27%2F%3E%3C%2Fsvg%3E);
+     Both are tiled SVGs: neither hexagons nor a houndstooth weave can be
+     drawn with repeating gradients, and an SVG in a background-image has no
+     CSS context to read a token from, so each carries its colour and is
+     restated for the dark ground below. Those are the only colours in this
+     file kept twice; they sit beside each other so they cannot drift apart
+     unseen. The houndstooth is generated from its weave — a 2/2 twill with a
+     four-thread colour repeat — rather than drawn by hand, which is the only
+     way the teeth come out right. */
+  --comb:url(data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2717.32%27%20height%3D%2730.00%27%20viewBox%3D%270%200%2017.32%2030.00%27%3E%3Cpath%20d%3D%27M8.66%2010.00L-0.00%205.00L0.00%20-5.00L8.66%20-10.00L17.32%20-5.00L17.32%205.00Z%20M0.00%2025.00L-8.66%2020.00L-8.66%2010.00L-0.00%205.00L8.66%2010.00L8.66%2020.00Z%20M17.32%2025.00L8.66%2020.00L8.66%2010.00L17.32%205.00L25.98%2010.00L25.98%2020.00Z%20M8.66%2040.00L-0.00%2035.00L0.00%2025.00L8.66%2020.00L17.32%2025.00L17.32%2035.00Z%27%20fill%3D%27none%27%20stroke%3D%27rgba%2828%2C26%2C22%2C.0825%29%27%20stroke-width%3D%271%27%2F%3E%3C%2Fsvg%3E);
+  --hound:url(data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2724%27%20height%3D%2724%27%20viewBox%3D%270%200%2024%2024%27%3E%3Cg%20fill%3D%27rgba%2828%2C26%2C22%2C.065%29%27%3E%3Crect%20x%3D%270%27%20y%3D%270%27%20width%3D%2712%27%20height%3D%273%27%2F%3E%3Crect%20x%3D%2718%27%20y%3D%270%27%20width%3D%276%27%20height%3D%273%27%2F%3E%3Crect%20x%3D%270%27%20y%3D%273%27%20width%3D%2715%27%20height%3D%273%27%2F%3E%3Crect%20x%3D%2721%27%20y%3D%273%27%20width%3D%273%27%20height%3D%273%27%2F%3E%3Crect%20x%3D%270%27%20y%3D%276%27%20width%3D%2718%27%20height%3D%273%27%2F%3E%3Crect%20x%3D%270%27%20y%3D%279%27%20width%3D%2712%27%20height%3D%273%27%2F%3E%3Crect%20x%3D%2715%27%20y%3D%279%27%20width%3D%276%27%20height%3D%273%27%2F%3E%3Crect%20x%3D%270%27%20y%3D%2712%27%20width%3D%276%27%20height%3D%273%27%2F%3E%3Crect%20x%3D%273%27%20y%3D%2715%27%20width%3D%276%27%20height%3D%273%27%2F%3E%3Crect%20x%3D%276%27%20y%3D%2718%27%20width%3D%276%27%20height%3D%273%27%2F%3E%3Crect%20x%3D%270%27%20y%3D%2721%27%20width%3D%273%27%20height%3D%273%27%2F%3E%3Crect%20x%3D%279%27%20y%3D%2721%27%20width%3D%273%27%20height%3D%273%27%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E);
   --sans:"Optima","Avenir Next","Gill Sans MT","Gill Sans","Trebuchet MS",sans-serif;
   --han:"Songti SC","STSong","Noto Serif CJK SC","Noto Serif SC","SimSun",serif;
   --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
@@ -137,8 +138,8 @@
   --moonc-line:#505860;
   --leap:#DE9184;
   --leap-dim:#3A302E;
-  --netline:rgba(233,231,222,.067);
-  --comb:url(data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2717.32%27%20height%3D%2730.00%27%20viewBox%3D%270%200%2017.32%2030.00%27%3E%3Cpath%20d%3D%27M8.66%2010.00L-0.00%205.00L0.00%20-5.00L8.66%20-10.00L17.32%20-5.00L17.32%205.00Z%20M0.00%2025.00L-8.66%2020.00L-8.66%2010.00L-0.00%205.00L8.66%2010.00L8.66%2020.00Z%20M17.32%2025.00L8.66%2020.00L8.66%2010.00L17.32%205.00L25.98%2010.00L25.98%2020.00Z%20M8.66%2040.00L-0.00%2035.00L0.00%2025.00L8.66%2020.00L17.32%2025.00L17.32%2035.00Z%27%20fill%3D%27none%27%20stroke%3D%27rgba%28233%2C231%2C222%2C.12%29%27%20stroke-width%3D%271%27%2F%3E%3C%2Fsvg%3E);
+  --comb:url(data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2717.32%27%20height%3D%2730.00%27%20viewBox%3D%270%200%2017.32%2030.00%27%3E%3Cpath%20d%3D%27M8.66%2010.00L-0.00%205.00L0.00%20-5.00L8.66%20-10.00L17.32%20-5.00L17.32%205.00Z%20M0.00%2025.00L-8.66%2020.00L-8.66%2010.00L-0.00%205.00L8.66%2010.00L8.66%2020.00Z%20M17.32%2025.00L8.66%2020.00L8.66%2010.00L17.32%205.00L25.98%2010.00L25.98%2020.00Z%20M8.66%2040.00L-0.00%2035.00L0.00%2025.00L8.66%2020.00L17.32%2025.00L17.32%2035.00Z%27%20fill%3D%27none%27%20stroke%3D%27rgba%28233%2C231%2C222%2C.09%29%27%20stroke-width%3D%271%27%2F%3E%3C%2Fsvg%3E);
+  --hound:url(data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2724%27%20height%3D%2724%27%20viewBox%3D%270%200%2024%2024%27%3E%3Cg%20fill%3D%27rgba%28233%2C231%2C222%2C.075%29%27%3E%3Crect%20x%3D%270%27%20y%3D%270%27%20width%3D%2712%27%20height%3D%273%27%2F%3E%3Crect%20x%3D%2718%27%20y%3D%270%27%20width%3D%276%27%20height%3D%273%27%2F%3E%3Crect%20x%3D%270%27%20y%3D%273%27%20width%3D%2715%27%20height%3D%273%27%2F%3E%3Crect%20x%3D%2721%27%20y%3D%273%27%20width%3D%273%27%20height%3D%273%27%2F%3E%3Crect%20x%3D%270%27%20y%3D%276%27%20width%3D%2718%27%20height%3D%273%27%2F%3E%3Crect%20x%3D%270%27%20y%3D%279%27%20width%3D%2712%27%20height%3D%273%27%2F%3E%3Crect%20x%3D%2715%27%20y%3D%279%27%20width%3D%276%27%20height%3D%273%27%2F%3E%3Crect%20x%3D%270%27%20y%3D%2712%27%20width%3D%276%27%20height%3D%273%27%2F%3E%3Crect%20x%3D%273%27%20y%3D%2715%27%20width%3D%276%27%20height%3D%273%27%2F%3E%3Crect%20x%3D%276%27%20y%3D%2718%27%20width%3D%276%27%20height%3D%273%27%2F%3E%3Crect%20x%3D%270%27%20y%3D%2721%27%20width%3D%273%27%20height%3D%273%27%2F%3E%3Crect%20x%3D%279%27%20y%3D%2721%27%20width%3D%273%27%20height%3D%273%27%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E);
   /* The same set, lifted off the slate. Every accent is now the light half of
      its pair, so text sitting on one goes dark instead. */
   --t1:#DE9184; --t2:#CFA267; --t3:#7FAFC9; --t4:#A99AC4; --t5:#8BB791;
@@ -328,6 +329,9 @@ h2{font-size:1rem;font-weight:600;letter-spacing:.02em;margin:2.25rem 0 .5rem}
   width:100%;border-top:1px solid var(--hair)}
 .card .events li{font-size:.82rem;color:var(--ink-soft);margin-top:.3rem}
 .card .events li:first-child{margin-top:0}
+/* Kept together so the line breaks before the bracket rather than inside it.
+   It can still break internally if it is too long to fit a line by itself. */
+.card .events .paren{display:inline-block}
 
 /* ------------------------------------------------------------ record */
 .filters{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;
@@ -340,7 +344,11 @@ h2{font-size:1rem;font-weight:600;letter-spacing:.02em;margin:2.25rem 0 .5rem}
 .chip:disabled{opacity:.45;cursor:default}
 .filter-sep{width:1px;align-self:stretch;background:var(--line);
   margin:0 .15rem}
-label.jump{font-size:.85rem;color:var(--quiet);margin-left:auto}
+/* No `margin-left:auto`: pushing this to the far edge is what stranded it on
+   a row of its own as soon as the chips filled the line. It flows with them
+   and wraps only when it has to. */
+label.jump{font-size:.85rem;color:var(--quiet);
+  display:inline-flex;align-items:center;gap:.4rem;white-space:nowrap}
 input[type=date],input[type=number],select{font:inherit;font-size:.85rem;
   padding:.25rem .4rem;border:1px solid var(--line);background:var(--raised);
   color:var(--ink)}
@@ -375,16 +383,17 @@ td.wd{color:var(--quiet);font-size:.85rem}
 td .longfast,td .yes{display:block}
 td .longfast{color:var(--ink-soft);font-size:.75rem;letter-spacing:.05em;
   text-transform:uppercase;white-space:nowrap}
-/* Indra's net: a hatch laid over whatever colour the row already carries,
-   so a long fasting month reads as one stretch without displacing the marks
-   for the single days inside it. The dhūta period is a honeycomb laid the
-   same way, and the two overlap for weeks at a time — the 1st and 9th months
-   sit inside a dhūta period entire — so a day can carry both at once and the
-   combined rule stacks them rather than letting either win. */
-tbody tr.is-long,.card.is-long{background-image:var(--hatch)}
-tbody tr.is-dhuta,.card.is-dhuta{background-image:var(--comb)}
+/* Indra's net: a hexagonal mesh laid over whatever colour the row already
+   carries, so a long fasting month reads as one stretch without displacing
+   the marks for the single days inside it. The dhūta period is a houndstooth
+   laid the same way, and the two overlap for weeks at a time — the 1st and
+   9th months sit inside a dhūta period entire — so a day can carry both at
+   once and the combined rule stacks them rather than letting either win. The
+   weave goes under the mesh, which is the lighter of the two. */
+tbody tr.is-long,.card.is-long{background-image:var(--comb)}
+tbody tr.is-dhuta,.card.is-dhuta{background-image:var(--hound)}
 tbody tr.is-long.is-dhuta,
-.card.is-long.is-dhuta{background-image:var(--comb),var(--hatch)}
+.card.is-long.is-dhuta{background-image:var(--comb),var(--hound)}
 /* A day's events sit under it, sharing its colour, with the day's own rule
    held back so the two read as one block. */
 tbody tr.has-event td{border-bottom:0}
@@ -460,30 +469,33 @@ td .rec{color:var(--recite);font-weight:600}
   font-size:20px;line-height:1;color:var(--quiet)}
 .bn-item .nav-icon,.bn-item .nav-glyph{width:24px;height:24px}
 .bn-item .nav-glyph{font-size:21px}
-.nav-item .nav-icon,.nav-item .nav-glyph{width:26px;height:26px}
-.nav-item .nav-glyph{font-size:23px}
+.nav-item .nav-icon,.nav-item .nav-glyph{width:18px;height:18px}
+.nav-item .nav-glyph{font-size:16px}
 .nav-item:hover .nav-icon,.nav-item.active .nav-icon,
 .bn-item.active .nav-icon{background-color:var(--ink)}
 .nav-item:hover .nav-glyph,.nav-item.active .nav-glyph,
 .bn-item.active .nav-glyph{color:var(--fast)}
 
-.sidenav{display:none;flex:0 0 13rem;background:var(--panel);
+/* Half the width it began at, and scaled to match: the rail is a place to
+   change view from, not a column of the page, and at 13rem it was taking
+   width the table wanted. */
+.sidenav{display:none;flex:0 0 6.5rem;background:var(--panel);
   border-right:1px solid var(--line);flex-direction:column;
-  padding:.9rem .6rem;gap:.35rem;overflow-y:auto}
-.sidenav-title{font-family:var(--han);font-size:1.15rem;letter-spacing:.12em;
-  color:var(--fast);padding:.3rem .5rem .7rem;flex:0 0 auto}
+  padding:.6rem .3rem;gap:.2rem;overflow-y:auto}
+.sidenav-title{font-family:var(--han);font-size:.82rem;letter-spacing:.08em;
+  color:var(--fast);padding:.25rem .3rem .5rem;flex:0 0 auto;text-align:center}
 /* The cell divides the rail's height; the FACE is what gets marked. Filling a
    cell a quarter of the screen tall with the active ground reads as a slab,
    so the ground sits on the icon-and-label group and the cell keeps only the
    leading rule - the bar's active rule, turned a quarter circle. The border
    is reserved as transparent on every item, never added on selection, or the
    button would jump by its own width when picked. */
-.nav-item{flex:1 1 0;min-height:4rem;display:flex;align-items:center;
+.nav-item{flex:1 1 0;min-height:2.6rem;display:flex;align-items:center;
   justify-content:center;width:100%;background:none;
-  border:0;border-left:3px solid transparent;color:var(--quiet);
-  font:inherit;font-size:.92rem;font-weight:600;padding:.4rem;cursor:pointer}
-.nav-face{display:flex;flex-direction:column;align-items:center;gap:.5rem;
-  padding:.85rem 1.25rem}
+  border:0;border-left:2px solid transparent;color:var(--quiet);
+  font:inherit;font-size:.7rem;font-weight:600;padding:.2rem;cursor:pointer}
+.nav-face{display:flex;flex-direction:column;align-items:center;gap:.3rem;
+  padding:.5rem .4rem}
 .nav-item:hover{color:var(--ink)}
 .nav-item:hover .nav-face{background:var(--raised)}
 .nav-item.active{color:var(--ink);border-left-color:var(--fast)}
@@ -935,9 +947,28 @@ input[type=number].day{width:3.6rem;text-align:center}
 .setting .state{color:var(--quiet);font-size:.85rem;letter-spacing:.04em;
   border-left:2px solid var(--fast);padding-left:.6rem;margin-top:.9rem}
 
-footer{margin-top:3rem;padding-top:1rem;border-top:1px solid var(--line);
-  font-size:.82rem;color:var(--quiet);max-width:60ch}
-footer p{margin:.4rem 0}
+footer{margin-top:3.5rem;padding-top:1.1rem;border-top:1px solid var(--line);
+  font-size:.82rem;color:var(--quiet)}
+footer p{max-width:78ch}
+footer p{margin:.85rem 0}
+.foot-head{font-size:.7rem;font-weight:600;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--quiet);margin:0 0 .7rem}
+/* A term and its reading, on one line each where there is room and stacked
+   where there is not. The terms are set on a column of their own so the
+   readings line up down the page rather than each starting where its own
+   term happens to end. */
+#foot-marks{display:grid;grid-template-columns:max-content minmax(0,1fr);
+  gap:.5rem 1.5rem;margin:0;max-width:96ch}
+#foot-marks dt{color:var(--ink-soft);font-weight:600;white-space:nowrap}
+#foot-marks dd{margin:0}
+#foot-marks .han{font-family:var(--han);color:var(--fast);font-weight:400}
+.cfg{color:var(--fast);font-weight:700;padding-left:.12em}
+.foot-note{border-left:2px solid var(--line);padding-left:.7rem}
+.foot-note b{color:var(--ink-soft);font-weight:600}
+@media (max-width:640px){
+  #foot-marks{grid-template-columns:1fr;gap:.15rem}
+  #foot-marks dd{margin-bottom:.55rem}
+}
 footer .han{font-family:var(--han);color:var(--fast)}
 .hidden{display:none}
 body.no-recite .recite-only{display:none}
@@ -945,6 +976,7 @@ body.no-recite .recite-only{display:none}
    except the table's Fast column, which also carries the long fasting
    months and is not the rule set's to take away. */
 body.no-fast .fast-only{display:none}
+body.no-dhuta .dhuta-only{display:none}
 .notice{background:var(--leap-dim);border-left:3px solid var(--leap);
   padding:.7rem .9rem;font-size:.9rem;margin:1rem 0;color:var(--ink)}
 @media (max-width:640px){
@@ -953,7 +985,6 @@ body.no-fast .fast-only{display:none}
   .discs{min-width:max-content;gap:.34rem}
   .disc{flex:0 0 1.55rem}
   .disc svg{max-width:1.55rem}
-  label.jump{margin-left:0}
   /* Too narrow for the reading to sit beside the controls, so it drops to a
      line of its own underneath them - with the × kept up on the controls'
      row, where it still reads as belonging to that day. */
@@ -1049,8 +1080,9 @@ body.no-fast .fast-only{display:none}
       <button class="chip" type="button" data-filter="moon" aria-pressed="false">New and full moons</button>
       <button class="chip recite-only" type="button" data-filter="recite" aria-pressed="false">Precept Recitation</button>
       <button class="chip" type="button" data-filter="long" aria-pressed="false">Long fasting months</button>
+      <button class="chip dhuta-only" type="button" data-filter="dhuta" aria-pressed="false">Dhūta periods</button>
       <span class="filter-sep" aria-hidden="true"></span>
-      <button class="chip" type="button" id="opt-events" aria-pressed="false">Show dharma events</button>
+      <button class="chip" type="button" id="opt-events" aria-pressed="false">Dharma events</button>
       <label class="jump">Start at
         <input type="date" id="from-date">
       </label>
@@ -1199,8 +1231,9 @@ body.no-fast .fast-only{display:none}
       <p>The stretches of the lunar year over which the dhūta austerities
         (<span class="han">頭陀</span>, dhutaṅga) are kept: from the 15th of
         the 1st month to the 15th of the 3rd, and from the 15th of the 8th to
-        the 15th of the 10th. They are drawn as a honeycomb over the days they
-        cover, on both Today and Upcoming.</p>
+        the 15th of the 10th. They are drawn as a houndstooth over the days
+        they cover, on both Today and Upcoming. Turning them on also adds a
+        filter chip on Upcoming and a line to its third card.</p>
       <label class="switch">
         <input type="checkbox" id="opt-dhuta">
         <span class="track" aria-hidden="true"></span>
@@ -1348,18 +1381,16 @@ body.no-fast .fast-only{display:none}
   </main>
 
   <footer>
+    <h2 class="foot-head">What this page is marking</h2>
+    <dl id="foot-marks"></dl>
+    <p class="foot-note">Everything above with a
+      <span class="cfg" aria-hidden="true">*</span> is a setting rather than a
+      fixed rule: change it under <b>Settings</b>, and put the lot back with
+      <b>Reset to defaults</b> there.</p>
     <p id="foot-meta"></p>
     <p>Lunar dates come from the Hong Kong Observatory conversion tables.
       Dharma events and everything up to 31 January 2027 come from the DRBA
       printed calendar for 2026.</p>
-    <p>Precept Recitation (<span class="han">布薩</span>) begins here as every
-      other Saturday. Which days carry it — two lunar days a month, a
-      fortnight of Saturdays or of Sundays, or none at all — is a setting,
-      under the gear.</p>
-    <p id="foot-fast"></p>
-    <p>The long fasting months are the 1st, 5th and 9th. New and full moon
-      follow the calendar convention, day 1 and day 15, not the astronomical
-      instant.</p>
   </footer>
       </div>
     </div>
@@ -1418,7 +1449,7 @@ body.no-fast .fast-only{display:none}
 
   /* settings ---------------------------------------------------------- */
   var SETTINGS_KEY = "bodhi.settings";
-  var FILTERS = ["fast", "moon", "recite", "long"];
+  var FILTERS = ["fast", "moon", "recite", "long", "dhuta"];
   var THEMES = ["auto", "light", "dark"];
   var CARDS_MIN = 1, CARDS_MAX = 366;
   var WEEK_STARTS = ["none", "0", "1", "2", "3", "4", "5", "6"];
@@ -1485,7 +1516,7 @@ body.no-fast .fast-only{display:none}
   var DEFAULTS = { reciteMode: "sat", reciteDayA: 1, reciteDayB: 15,
                    reciteAnchor: "2026-09-12", leapLongFast: false,
                    filters: [], showEvents: false, theme: "auto",
-                   cardCount: 8, weekStart: "6", dhutanga: true,
+                   cardCount: 8, weekStart: "6", dhutanga: false,
                    fastRules: FAST_PRESETS[0].rules };
   var settings = {
     reciteMode: DEFAULTS.reciteMode,
@@ -1721,6 +1752,16 @@ body.no-fast .fast-only{display:none}
     return iso(dt);
   }
 
+  /* A card is narrow enough that a long event name wraps, and left alone it
+     wraps wherever the space happens to fall - "Mid-Autumn Moon Festival (
+     begins at / sundown)". A trailing parenthetical is the common shape, so
+     it is kept whole and allowed to take the next line entire. */
+  function eventHtml(e) {
+    var m = /^(.*?)\s*\(\s*([^()]*?)\s*\)\s*$/.exec(e);
+    return m
+      ? esc(m[1]) + ' <span class="paren">(' + esc(m[2]) + ")</span>"
+      : esc(e);
+  }
   /* the spreadsheet packs same-day events into one cell, pipe separated */
   function eventsOf(d) {
     return d.event ? d.event.split("|").map(function (e) {
@@ -1922,7 +1963,7 @@ body.no-fast .fast-only{display:none}
       if (moonLabel(d)) tags += '<li class="moon">' +
         (d.moon ? moonLabel(d) + " " : "") + moonIcon(d) + "</li>";
       var events = eventsOf(d).map(function (e) {
-        return "<li>" + esc(e) + "</li>";
+        return "<li>" + eventHtml(e) + "</li>";
       }).join("");
       var marks = (longFasting(d) ? ["Long fasting month"] : [])
         .concat(dhutanga(d) ? ["Dhūta period"] : []);
@@ -1967,16 +2008,32 @@ body.no-fast .fast-only{display:none}
      is a setting, so which month comes next can change under it. */
   /* From the start of the month today is in, not from today, or a month
      already under way would be reported as though it were not coming. */
+  /* The first day from today on which a span is running. A plain scan, not a
+     hunt for the next day 1: a long fasting month does begin on one, but a
+     dhūta period begins on the 15th, and looking only at day 1s walked past
+     it to the next month start inside the same period. Where today is itself
+     inside the span, spanNote takes its other branch before asking. */
   function firstWhere(test) {
-    var start = cursor;
-    while (start > 0 && days[start].dayNum !== 1) start--;
-    for (var i = start; i < days.length; i++)
-      if (days[i].dayNum === 1 && test(days[i])) return days[i];
+    for (var i = cursor; i < days.length; i++)
+      if (test(days[i])) return days[i];
     return null;
   }
+  /* Where a stretch of time stands right now: inside it and when it ends, or
+     outside it and when the next one opens. */
+  function spanNote(pred, noun, label) {
+    var here = days[cursor];
+    if (pred(here)) {
+      var i = cursor;
+      while (i + 1 < days.length && pred(days[i + 1])) i++;
+      return "<p>Now in " + label(here) + ", to " + shortDate(days[i].date) +
+        ".</p>";
+    }
+    var next = firstWhere(pred);
+    return next
+      ? "<p>Next is " + label(next) + ", from " + shortDate(next.date) + ".</p>"
+      : "<p>No " + noun + " left in the dataset.</p>";
+  }
   function renderUpcoming() {
-    var nextLong = firstWhere(longFasting);
-    var here = days[cursor].date;
     document.getElementById("upcoming").innerHTML =
       (fastOn() ? "<section><h3>Next eight fast days</h3>" +
         ul(listOf(function (d) { return fasting(d); }, 8)) + "</section>"
@@ -1984,10 +2041,17 @@ body.no-fast .fast-only{display:none}
       (reciteOn() ?
         "<section><h3>Next Precept Recitations</h3>" +
         ul(listOf(reciting, 6)) + "</section>" : "") +
-      "<section><h3>Long fasting months</h3>" +
-      (nextLong ? "<p>" + (nextLong.date <= here ? "Now in the " : "Next is the ") +
-        nextLong.monthLabel + ", from " + shortDate(nextLong.date) + ".</p>"
-        : "<p>None left in the dataset.</p>") +
+      "<section><h3>" +
+      (settings.dhutanga ? "Long fasts and dhūta" : "Long fasting months") +
+      "</h3>" +
+      spanNote(longFasting, "long fasting month", function (d) {
+        return "the " + d.monthLabel;
+      }) +
+      (settings.dhutanga
+        ? spanNote(dhutanga, "dhūta period", function () {
+            return "a dhūta period";
+          })
+        : "") +
       "</section>";
   }
 
@@ -2002,7 +2066,8 @@ body.no-fast .fast-only{display:none}
     fast: function (d) { return fasting(d); },
     moon: function (d) { return !!d.moon; },
     recite: reciting,
-    long: longFasting
+    long: longFasting,
+    dhuta: dhutanga
   };
   /* The filters gather rather than replace each other: a day shows if any
      chosen one matches it, and with none chosen every day shows. */
@@ -2033,7 +2098,7 @@ body.no-fast .fast-only{display:none}
       /* The year lives on the week heading. With weeks off there is no
          heading to carry it, so it stays on the row. */
       /* The events hang under the day as a second row wearing the same
-         classes, so they take that day's colour and hatch and read as part
+         classes, so they take that day's colour and texture and read as part
          of it rather than as a line of their own. */
       var evs = settings.showEvents ? eventsOf(d) : [];
       var klass = (fasting(d) ? "is-fast " : "") +
@@ -2343,17 +2408,54 @@ body.no-fast .fast-only{display:none}
       (fromEnd ? " The last day of the month is the 29th or the 30th as the "
                + "month falls." : "");
   }
-  function renderFootFast() {
-    var here = currentPreset();
-    document.getElementById("foot-fast").innerHTML =
-      "The six fast days begin here as the 8th, 14th, 15th, 23rd and the " +
-      "last two days of each lunar month, the list given in " +
-      '<span class="han">佛說四天王經</span> (Fo shuo si tianwang jing, ' +
-      "Taisho T15n0590). Which days carry the fast is a setting, under the " +
-      "gear." + (here && here.key === "six" ? "" :
-        " This page is set to " +
-        (here ? here.name.toLowerCase() + " — " + here.note
-              : "a rule set of your own") + ".");
+  /* The footer says what this page is actually marking rather than what the
+     tradition says in general, because most of it is a setting and a reader
+     who has changed one should not have to remember that they did. A star
+     marks the lines Settings can change, and the note under the list says so
+     once rather than every line repeating it. */
+  var CFG = ' <span class="cfg" title="a setting">*</span>';
+  function renderFootMarks() {
+    var rows = [];
+    function row(term, body) {
+      rows.push("<dt>" + term + "</dt><dd>" + body + "</dd>");
+    }
+    var preset = currentPreset();
+    row("Fast days" + CFG, !fastOn()
+      ? "Nothing is marked. Out of the box these are the 8th, 14th, 15th, "
+        + "23rd and the last two days of each lunar month."
+      : (preset
+          ? (preset.key === "six" ? "The default six — " : preset.name + " — ")
+            + preset.note
+          : "A rule set of your own, " + settings.fastRules.length +
+            " days a month") +
+        ", following <span class=\"han\">佛說四天王經</span> " +
+        "(Fo shuo si tianwang jing, Taisho T15n0590).");
+    row("Long fasting months" + CFG, "The 1st, 5th and 9th, drawn as a " +
+      "hexagonal net over the days they cover. Which months they are is " +
+      "fixed; what is set here is whether a leap month of those numbers " +
+      "carries it — right now it " +
+      (settings.leapLongFast ? "does." : "does not."));
+    row("Dhūta period" + CFG, settings.dhutanga
+      ? "Drawn as a houndstooth, from the 15th of the 1st month to the 15th "
+        + "of the 3rd, and from the 15th of the 8th to the 15th of the 10th."
+      : "Not marked.");
+    row("Precept Recitation" + CFG,
+      '<span class="han">布薩</span> — ' + reciteSentence());
+    row("New and full moon", "Day 1 and day 15, by the calendar convention " +
+      "rather than the astronomical instant. The quarter moons follow from " +
+      "it, at lunar 8 and 23.");
+    document.getElementById("foot-marks").innerHTML = rows.join("");
+  }
+  /* the same reckoning the Settings panel reports, said as a sentence */
+  function reciteSentence() {
+    if (settings.reciteMode === "none") return "Not marked.";
+    if (settings.reciteMode !== "lunar")
+      return "Every other " + WEEK[parse(settings.reciteAnchor).getDay()] +
+        ", in step with " + shortDate(settings.reciteAnchor) + ".";
+    var chosen = [settings.reciteDayA, settings.reciteDayB]
+      .filter(function (n) { return n !== null; });
+    if (!chosen.length) return "Not marked.";
+    return chosen.map(dayName).join(" and ") + " of each lunar month.";
   }
 
   function stateText() {
@@ -2372,11 +2474,13 @@ body.no-fast .fast-only{display:none}
   }
 
   function applySettings() {
-    var on = reciteOn(), fastsOn = fastOn();
+    var on = reciteOn(), fastsOn = fastOn(), dhutaOn = settings.dhutanga;
     document.body.classList.toggle("no-recite", !on);
     document.body.classList.toggle("no-fast", !fastsOn);
+    document.body.classList.toggle("no-dhuta", !dhutaOn);
     settings.filters = settings.filters.filter(function (f) {
-      return (on || f !== "recite") && (fastsOn || f !== "fast");
+      return (on || f !== "recite") && (fastsOn || f !== "fast") &&
+             (dhutaOn || f !== "dhuta");
     });
     modeSel.value = settings.reciteMode;
     lunarOpts.classList.toggle("hidden", settings.reciteMode !== "lunar");
@@ -2386,8 +2490,8 @@ body.no-fast .fast-only{display:none}
     leapBox.checked = settings.leapLongFast;
     dhutaBox.checked = settings.dhutanga;
     document.getElementById("opt-dhuta-state").textContent = settings.dhutanga
-      ? "On. The two periods are drawn as a honeycomb, over the long fast's "
-        + "hatch where the two coincide."
+      ? "On. The two periods are drawn as a houndstooth, under the long "
+        + "fast's hexagonal net where the two coincide."
       : "Off. Nothing marks the dhūta periods.";
     document.getElementById("opt-leap-state").textContent =
       settings.leapLongFast
@@ -2407,7 +2511,7 @@ body.no-fast .fast-only{display:none}
     document.getElementById("fast-add").disabled =
       settings.fastRules.length >= RULES_MAX;
     renderFastPreview();
-    renderFootFast();
+    renderFootMarks();
     document.getElementById("opt-fast-state").textContent = fastStateText();
     var room = days.length - cursor;
     document.getElementById("opt-cards-state").textContent =

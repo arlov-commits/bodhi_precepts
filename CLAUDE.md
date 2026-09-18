@@ -61,15 +61,23 @@ looking right.
   built. It anchors `tr.is-long` **and** `tr.is-dhuta`: one
   `background-position` covers every layer on a row, which is what a day
   carrying both textures needs.
+- **`firstWhere()` scans forward day by day; it does not look for a day 1.**
+  It used to, back when the only span was a long fasting month, which always
+  starts on one. A dhūta period starts on the 15th, and the old version walked
+  straight past it to the next month start inside the same period — giving the
+  wrong "next is…" date on Upcoming's third card.
 - **Nothing derived from the wall clock may be read once.** Which day is today
   and which theme `auto` resolves to are both rechecked on a timer, because
   the page gets left open across midnight.
-- **Colours come from the tokens**, not from a second copy. The one exception
-  is `--comb`, the dhūta honeycomb: it is a tiled SVG (hexagons cannot be made
-  with repeating gradients) and an SVG in a `background-image` has no CSS
-  context, so it cannot read `--netline` and its colour is written into the
-  tile once per theme. The two sit next to each other for that reason — change
-  one and change the other. The browser
+- **Colours come from the tokens**, not from a second copy. The two exceptions
+  are the period textures, `--comb` (the long fast's hexagonal net) and
+  `--hound` (the dhūta houndstooth): both are tiled SVGs, because neither
+  hexagons nor a houndstooth weave can be made with repeating gradients, and
+  an SVG in a `background-image` has no CSS context, so each carries its own
+  colour once per theme. All four sit next to each other for that reason —
+  change one and change its pair. The houndstooth tile is generated from its
+  weave (a 2/2 twill, four-thread colour repeat), not drawn by hand. The
+  browser
   `theme-color` reads `--paper` back off the root for this reason, and the
   pre-paint shim in the head sits after the stylesheet so it can do the same.
 - **The manifest must not carry a `theme_color`.** In an installed app it
