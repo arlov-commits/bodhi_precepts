@@ -364,20 +364,30 @@ Precepts 齋日*, shortened to *Bodhi Precepts* where a home screen has no room
 for it.
 
 Two stretches of time are drawn as textures rather than as marks on the days
-inside them. A long fasting month is a hexagonal net — Indra's net; a dhūta
+inside them. A long fasting month is an ogee lattice — Indra's net; a dhūta
 period is a houndstooth. They overlap for weeks at a time — the 1st and 9th
 months sit inside a dhūta period entire — so a day can carry both at once,
-and they stay separable by working at different scales and in different
-marks rather than by fighting over the same one: hairlines on a 17×30 tile
-against a woven check at 24px.
+and they stay separable by being different kinds of mark: an open line
+lattice over a fine woven grain.
 
-Both are tiled SVGs: neither hexagons nor a houndstooth weave can be drawn
+The two are not balanced by giving them the same alpha, because they are not
+the same kind of texture. The houndstooth covers half its tile where the
+lattice covers a fifth, so at equal alpha the weave is three or four times
+the weight and swamps both the lattice and the text under it. They are set by
+measured weight instead: the houndstooth's darkest mark lands just under the
+lattice's line, and its mean draw-down near it. It is also inset by a third
+of a pixel on every cell, which opens a hairline of paper between the teeth.
+
+Both are tiled SVGs: neither an ogee nor a houndstooth weave can be drawn
 with repeating gradients, and an SVG in a `background-image` has no CSS
 context to read a token from, so each carries its colour and is restated for
 the dark ground. Those are the only colours in the stylesheet kept twice; they
 sit beside each other so they cannot drift apart unseen. The houndstooth is
 generated from its weave — a 2/2 twill with a four-thread colour repeat —
 rather than drawn by hand, which is the only way the teeth come out right.
+The ogee draws each lattice edge exactly once, as the left flank of one lobe;
+drawing whole lobes laid two strokes along every shared edge and made half
+the lattice twice as dark as the other half.
 
 Each is laid over whatever colour the
 row or card already carries, on both Today and Upcoming. It reads as one

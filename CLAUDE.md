@@ -61,6 +61,16 @@ looking right.
   built. It anchors `tr.is-long` **and** `tr.is-dhuta`: one
   `background-position` covers every layer on a row, which is what a day
   carrying both textures needs.
+- **A fill texture and a line texture are not comparable at equal alpha.** The
+  houndstooth covers half its tile, the ogee lattice a fifth, so the same
+  alpha makes the weave three or four times the weight and it swamps both the
+  lattice and the text. Set a new texture by measuring: tile it onto the panel
+  colour in a canvas and compare mean draw-down and darkest mark against the
+  one already there, rather than by picking an alpha that sounds similar.
+- **The ogee draws each lattice edge once**, as the left flank of a single
+  lobe. Drawing whole lobes laid two strokes along every shared edge, which
+  made half the lattice twice as dark as the other half — visible as banding,
+  and it doubled the measured darkest mark from 0.185 to 0.30.
 - **`firstWhere()` scans forward day by day; it does not look for a day 1.**
   It used to, back when the only span was a long fasting month, which always
   starts on one. A dhūta period starts on the 15th, and the old version walked
@@ -70,14 +80,13 @@ looking right.
   and which theme `auto` resolves to are both rechecked on a timer, because
   the page gets left open across midnight.
 - **Colours come from the tokens**, not from a second copy. The two exceptions
-  are the period textures, `--comb` (the long fast's hexagonal net) and
-  `--hound` (the dhūta houndstooth): both are tiled SVGs, because neither
-  hexagons nor a houndstooth weave can be made with repeating gradients, and
-  an SVG in a `background-image` has no CSS context, so each carries its own
-  colour once per theme. All four sit next to each other for that reason —
-  change one and change its pair. The houndstooth tile is generated from its
-  weave (a 2/2 twill, four-thread colour repeat), not drawn by hand. The
-  browser
+  are the period textures, `--ogee` (the long fast's lattice) and `--hound`
+  (the dhūta houndstooth): both are tiled SVGs, because neither an ogee nor a
+  houndstooth weave can be made with repeating gradients, and an SVG in a
+  `background-image` has no CSS context, so each carries its own colour once
+  per theme. All four sit next to each other for that reason — change one and
+  change its pair. The houndstooth tile is generated from its weave (a 2/2
+  twill, four-thread colour repeat), not drawn by hand. The browser
   `theme-color` reads `--paper` back off the root for this reason, and the
   pre-paint shim in the head sits after the stylesheet so it can do the same.
 - **The manifest must not carry a `theme_color`.** In an installed app it
