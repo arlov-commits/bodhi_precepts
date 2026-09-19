@@ -330,8 +330,10 @@ line opens under that day offering to move it. Nothing else appears on screen
 until one is pressed, which is the point; this is for one-offs, not a second
 rule system.
 
-A day the mark has left keeps a ghost of it, struck through and grey; the day
-it arrived on carries it underscored. So a move reads from both ends, and
+A day the mark has left keeps a ghost of it: the 齋 struck through and grey,
+the ✦ hollowed to its outline — text-decoration does not cross an inline-block
+SVG, so a struck star was simply a star. The day it arrived on carries the
+mark underscored in cinnabar, the same for both. So a move reads from both ends, and
 pressing either offers to put it back. Moving onto a day that already carries
 the mark is refused rather than silently swallowing it, since that would look
 like the mark had vanished.

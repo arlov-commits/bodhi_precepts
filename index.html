@@ -417,18 +417,25 @@ td.num{font-variant-numeric:tabular-nums}
 td .yes{color:var(--fast);font-weight:600}
 /* The marks are buttons, but they have to go on looking like marks: no
    chrome until the pointer is over one. */
-.mark{font:inherit;background:none;border:0;padding:.1rem .3rem;margin:-.1rem;
+/* inline-flex and line-height:1 so the button hugs its mark: the arrival
+   underline below is an inset shadow at the foot of the box, and on a
+   line-height box it landed well under the star rather than against it. */
+.mark{font:inherit;background:none;border:0;padding:.14rem .3rem;margin:-.1rem;
   cursor:pointer;color:var(--fast);font-weight:600;border-radius:2px;
-  line-height:inherit}
+  display:inline-flex;align-items:center;line-height:1}
 td .mark .star-ic{width:.8rem;display:inline-block;vertical-align:-.05rem}
 .mark:hover{background:var(--raised);box-shadow:inset 0 0 0 1px var(--hair)}
 .mark:focus-visible{outline:2px solid var(--fast);outline-offset:0}
-/* The day a mark left keeps it as an outline, struck through: the move is
-   legible from the end it came from as well as the end it went to. */
-/* Faded, but not below the floor for something you can press: the strike is
-   what says the mark has gone, so the ink does not have to drop out of
-   legibility to say it too. At .55 this measured 2.2:1. */
+/* The day a mark left keeps a ghost of it, so the move is legible from the
+   end it came from as well as the end it went to. Faded, but not below the
+   floor for something you can press: at .55 this measured 2.2:1.
+
+   The 齋 is struck through. The star is hollowed instead, because
+   text-decoration does not cross an inline-block SVG - a struck star was
+   simply a star, and the move read as nothing but a slight fade. */
 .mark.ghost{color:var(--quiet);opacity:.8;text-decoration:line-through}
+.mark.ghost .star path{fill:none;stroke:currentColor;stroke-width:10;
+  stroke-linejoin:round}
 .mark.ghost:hover{opacity:1}
 /* and the day it arrived on is underscored, so a moved mark is never
    mistaken for one the rule put there */
