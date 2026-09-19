@@ -321,6 +321,36 @@ days are drawn; past that it says so and points at `data.csv`. **Copy what is
 shown** puts every matching day on the clipboard as TSV, not only the drawn
 500.
 
+### Moving a day, once
+
+A rule says which days carry a mark in general. For the occasion that does
+not follow it — the assembly gathers a day early, a fast is deferred — the
+marks on Upcoming's table are themselves the control: press a 齋 or a ✦ and a
+line opens under that day offering to move it. Nothing else appears on screen
+until one is pressed, which is the point; this is for one-offs, not a second
+rule system.
+
+A day the mark has left keeps a ghost of it, struck through and grey; the day
+it arrived on carries it underscored. So a move reads from both ends, and
+pressing either offers to put it back. Moving onto a day that already carries
+the mark is refused rather than silently swallowing it, since that would look
+like the mark had vanished.
+
+Moves live in `settings.moves` as source date → target date, one map per
+kind, and are applied ahead of the rules: a day the mark was sent from loses
+it, a day it was sent to gains it, and everything else falls through to the
+rule. Both ends must be days the dataset holds or the move is dropped on
+load. A move only speaks while its mark is switched on at all — with the fast
+or the recitation off there is nothing to have moved. Every move is listed in
+the footer, and **Reset to defaults** clears them with the rest.
+
+A mark that has arrived somewhere offers to be put back rather than moved on,
+so chains cannot be built through the page. The precedence rule handles one
+anyway, should a hand-edited store hold it: the send wins over the arrival, so
+the middle day of a chain ends bare.
+
+### The filters row
+
 The chips and the start date share one wrapping row. The date carries no
 `margin-left:auto` — pushing it to the far edge is what stranded it on a line
 of its own as soon as the chips filled the first — so it flows with them and

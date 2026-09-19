@@ -415,6 +415,29 @@ tbody tr.is-fast.is-moon{background-color:var(--fast-moon)}
 td.han{font-family:var(--han);font-size:1.05rem}
 td.num{font-variant-numeric:tabular-nums}
 td .yes{color:var(--fast);font-weight:600}
+/* The marks are buttons, but they have to go on looking like marks: no
+   chrome until the pointer is over one. */
+.mark{font:inherit;background:none;border:0;padding:.1rem .3rem;margin:-.1rem;
+  cursor:pointer;color:var(--fast);font-weight:600;border-radius:2px;
+  line-height:inherit}
+td .mark .star-ic{width:.8rem;display:inline-block;vertical-align:-.05rem}
+.mark:hover{background:var(--raised);box-shadow:inset 0 0 0 1px var(--hair)}
+.mark:focus-visible{outline:2px solid var(--fast);outline-offset:0}
+/* The day a mark left keeps it as an outline, struck through: the move is
+   legible from the end it came from as well as the end it went to. */
+/* Faded, but not below the floor for something you can press: the strike is
+   what says the mark has gone, so the ink does not have to drop out of
+   legibility to say it too. At .55 this measured 2.2:1. */
+.mark.ghost{color:var(--quiet);opacity:.8;text-decoration:line-through}
+.mark.ghost:hover{opacity:1}
+/* and the day it arrived on is underscored, so a moved mark is never
+   mistaken for one the rule put there */
+.mark.came{box-shadow:inset 0 -2px 0 var(--fast-line)}
+tbody tr.move-row td{padding:.15rem .5rem .55rem;font-size:.82rem;
+  color:var(--ink-soft);line-height:1.5;text-align:left}
+tbody tr.move-row input[type=date]{margin:0 .2rem}
+.chip.quiet{border-color:transparent;color:var(--quiet)}
+.chip.quiet:hover{border-color:var(--line)}
 td .yes.han{font-size:1.15rem;font-weight:400;line-height:1.2}
 td .rec{color:var(--recite);font-weight:600}
 .upcoming{display:grid;gap:1.25rem;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));
@@ -1520,6 +1543,7 @@ body.no-dhuta .dhuta-only{display:none}
   function sameRules(a, b) {
     return rulesKey(a) === rulesKey(b);
   }
+  var MOVE_KINDS = ["fast", "recite"];
   var DEFAULTS = { reciteMode: "sat", reciteDayA: 1, reciteDayB: 15,
                    reciteAnchor: "2026-09-12", leapLongFast: false,
                    filters: [], showEvents: false, theme: "auto",
@@ -1538,6 +1562,10 @@ body.no-dhuta .dhuta-only{display:none}
     weekStart: DEFAULTS.weekStart,
     dhutanga: DEFAULTS.dhutanga,
     fastRules: cloneRules(DEFAULTS.fastRules),
+    /* One-off moves, source date -> target date, per kind. A rule says which
+       days carry a mark in general; this is for the occasion the assembly
+       keeps a day early, or a fast is deferred, without touching the rule. */
+    moves: { fast: {}, recite: {} },
     from: null
   };
   /* A lunar day, or null for a blank box — one recitation a month. */
@@ -1608,6 +1636,18 @@ body.no-dhuta .dhuta-only{display:none}
         if (kept.length || saved.fastRules.length === 0)
           settings.fastRules = kept;
       }
+      if (saved.moves) MOVE_KINDS.forEach(function (k) {
+        var m = saved.moves[k];
+        if (!m || typeof m !== "object") return;
+        for (var src in m) {
+          /* Both ends have to be days the dataset actually holds, or the
+             move points at nothing and the mark simply vanishes. */
+          if (m.hasOwnProperty(src) && index[src] !== undefined &&
+              typeof m[src] === "string" && index[m[src]] !== undefined &&
+              m[src] !== src)
+            settings.moves[k][src] = m[src];
+        }
+      });
       if (typeof saved.from === "string" && index[saved.from] !== undefined)
         settings.from = saved.from;
     } catch (err) { /* private mode, or file:// with storage blocked */ }
@@ -1674,6 +1714,40 @@ body.no-dhuta .dhuta-only{display:none}
     var gap = (parse(d.date) - parse(settings.reciteAnchor)) / 86400000;
     return Math.round(gap) % 14 === 0;
   }
+  /* A move is stored one way, source -> target, because that is the thing a
+     reader sets. Both directions get asked on every row of a redraw, so the
+     reverse is kept indexed rather than searched for. */
+  var moveBack = { fast: {}, recite: {} };
+  function indexMoves() {
+    moveBack = { fast: {}, recite: {} };
+    MOVE_KINDS.forEach(function (k) {
+      var m = settings.moves[k];
+      for (var src in m)
+        if (m.hasOwnProperty(src)) moveBack[k][m[src]] = src;
+    });
+  }
+  /* Where a day stands in the moves: the day it was sent to, the day it came
+     from, or nothing. A day can be both — moved in and then moved on again —
+     and the send wins, which is what makes a chain resolve correctly. */
+  function movedTo(kind, date) { return settings.moves[kind][date] || null; }
+  function movedFrom(kind, date) { return moveBack[kind][date] || null; }
+  function moveCount() {
+    var n = 0;
+    MOVE_KINDS.forEach(function (k) {
+      for (var src in settings.moves[k])
+        if (settings.moves[k].hasOwnProperty(src)) n++;
+    });
+    return n;
+  }
+  /* A move only speaks where the mark itself is switched on; with the fast or
+     the recitation off there is nothing to have moved. */
+  function moveSays(kind, d, on) {
+    if (!on) return null;
+    if (movedTo(kind, d.date)) return false;
+    if (movedFrom(kind, d.date)) return true;
+    return null;
+  }
+
   /* With no days set nothing can be a fast day, so the filter, the band's
      legend entry and Upcoming's list of the next eight all go - the way the
      recitation's own marks go when it is switched off. */
@@ -1690,6 +1764,8 @@ body.no-dhuta .dhuta-only{display:none}
      Pure, and called once per day per render rather than cached, because the
      rule set can change under it at any moment from Settings. */
   function fasting(d) {
+    var said = moveSays("fast", d, fastOn());
+    if (said !== null) return said;
     var rs = settings.fastRules;
     for (var i = 0; i < rs.length; i++) {
       if (rs[i].f === "start" ? d.dayNum === rs[i].n
@@ -1741,6 +1817,8 @@ body.no-dhuta .dhuta-only{display:none}
     return settings.reciteDayA !== null || settings.reciteDayB !== null;
   }
   function reciting(d) {
+    var said = moveSays("recite", d, reciteOn());
+    if (said !== null) return said;
     if (FORTNIGHT.indexOf(settings.reciteMode) > -1) return fortnightly(d);
     if (settings.reciteMode === "none") return false;
     if (settings.reciteDayB === "last" && d.lastOfMonth) return true;
@@ -2084,6 +2162,54 @@ body.no-dhuta .dhuta-only{display:none}
     return settings.filters.some(function (f) { return MATCH[f](d); });
   }
   var shown = [];
+  /* Which mark, if any, is being moved right now. The table is redrawn whole
+     on every change, so the open editor is a piece of state the redraw reads
+     rather than a node anyone has to keep alive. */
+  var moving = null;
+
+  /* The 齋 and the ✦ are the whole affordance: nothing new appears on screen
+     until one is pressed. A day the mark has left keeps a ghost of it, so a
+     move is visible from both ends and can be undone from either. */
+  function markCell(kind, d, on, marked, glyph, noun) {
+    if (!on) return "";
+    var away = movedTo(kind, d.date), here = movedFrom(kind, d.date);
+    if (away)
+      return '<button type="button" class="mark ghost" data-move="' + kind +
+        '" data-date="' + d.date + '" title="This ' + noun + ' was moved to ' +
+        shortDate(away) + '. Press to put it back.">' + glyph + "</button>";
+    if (!marked) return "";
+    return '<button type="button" class="mark' + (here ? " came" : "") +
+      '" data-move="' + kind + '" data-date="' + d.date + '" title="' +
+      (here ? "Moved here from " + shortDate(here) + ". Press to put it back."
+            : "Move this " + noun + " to another day.") + '">' + glyph +
+      "</button>";
+  }
+
+  /* The editor, drawn under the day it belongs to and wearing that day's own
+     classes, so it reads as part of the row rather than as a panel over it -
+     the same trick the dharma events use. */
+  function moverRow(kind, d, klass) {
+    var noun = kind === "fast" ? "fast day" : "Precept Recitation";
+    var away = movedTo(kind, d.date), here = movedFrom(kind, d.date);
+    var body;
+    if (away)
+      body = "This " + noun + " sits on " + shortDate(away) + ". " +
+        '<button type="button" class="chip" data-move-put="1">Put it back' +
+        "</button>";
+    else if (here)
+      body = "This " + noun + " came from " + shortDate(here) + ". " +
+        '<button type="button" class="chip" data-move-put="1">Put it back' +
+        "</button>";
+    else
+      body = "Move this " + noun + " to " +
+        '<input type="date" id="move-to" value="' + d.date + '" min="' +
+        days[0].date + '" max="' + days[days.length - 1].date + '"> ' +
+        '<button type="button" class="chip" data-move-do="1">Move</button>';
+    return '<tr class="move-row ' + klass + '"><td colspan="6">' + body +
+      ' <button type="button" class="chip quiet" data-move-cancel="1">' +
+      "Cancel</button></td></tr>";
+  }
+
   function renderTable() {
     shown = days.filter(passes);
     var cap = shown.length + " days" +
@@ -2092,6 +2218,12 @@ body.no-dhuta .dhuta-only{display:none}
             : "this filter") : "") +
       ", from " + shortDate(from) + " to " +
       shortDate(days[days.length - 1].date) + ".";
+    var n = moveCount();
+    if (fastOn() || reciteOn())
+      cap += n ? "  " + n + (n === 1 ? " day has been moved" :
+                             " days have been moved") +
+                 " — press a mark to see where, or to put it back."
+               : "  Press a 齋 or a ✦ to move that day.";
     document.getElementById("table-caption").textContent = cap;
     var prevWeek = null;
     var rows = shown.slice(0, 500).map(function (d) {
@@ -2114,6 +2246,8 @@ body.no-dhuta .dhuta-only{display:none}
       var tail = evs.length ? '<tr class="event-row ' + klass + '">' +
         '<td colspan="6">' + evs.map(esc).join(" &nbsp;·&nbsp; ") +
         "</td></tr>" : "";
+      if (moving && moving.date === d.date)
+        tail += moverRow(moving.kind, d, klass);
       return lead + '<tr class="' + klass + (evs.length ? " has-event" : "") +
         '">' +
         '<td class="num">' +
@@ -2122,10 +2256,12 @@ body.no-dhuta .dhuta-only{display:none}
         '<td class="han">' + lunarCell(d) + "</td>" +
         "<td>" +
         (longFasting(d) ? '<span class="longfast">Long Fast</span>' : "") +
-        (fasting(d) ? '<span class="yes han">齋</span>' : "") + "</td>" +
+        markCell("fast", d, fastOn(), fasting(d),
+                 '<span class="han">齋</span>', "fast day") + "</td>" +
         '<td class="recite-only">' +
-        (reciting(d) ? '<span class="star-ic" title="Precept Recitation">' +
-          STAR + "</span>" : "") + "</td>" +
+        markCell("recite", d, reciteOn(), reciting(d),
+                 '<span class="star-ic">' + STAR + "</span>",
+                 "Precept Recitation") + "</td>" +
         '<td class="moon-cell">' +
         (moonLabel(d) ? moonIcon(d) : "") + "</td>" +
         "</tr>" + tail;
@@ -2158,6 +2294,63 @@ body.no-dhuta .dhuta-only{display:none}
     clearTimeout(hatchTimer);
     hatchTimer = setTimeout(alignHatch, 120);
   });
+
+  /* One listener on the table body, because the rows are replaced wholesale
+     on every redraw and per-node handlers would not survive it. */
+  document.getElementById("table-body").addEventListener("click",
+    function (e) {
+      var el = e.target, btn = null;
+      while (el && el !== this) {
+        if (el.tagName === "BUTTON") { btn = el; break; }
+        el = el.parentNode;
+      }
+      if (!btn) return;
+      if (btn.getAttribute("data-move")) {
+        var kind = btn.getAttribute("data-move"),
+            date = btn.getAttribute("data-date");
+        /* pressing the open one again closes it */
+        moving = (moving && moving.kind === kind && moving.date === date)
+          ? null : { kind: kind, date: date };
+        renderTable();
+        var input = document.getElementById("move-to");
+        if (input) input.focus();
+        return;
+      }
+      if (!moving) return;
+      if (btn.getAttribute("data-move-cancel")) {
+        moving = null; renderTable(); return;
+      }
+      if (btn.getAttribute("data-move-put")) {
+        /* Undo from either end: the pressed day is the source or the target,
+           and the pair goes either way. */
+        var src = movedTo(moving.kind, moving.date) ? moving.date
+          : movedFrom(moving.kind, moving.date);
+        delete settings.moves[moving.kind][src];
+        indexMoves(); moving = null; saveSettings(); applySettings(); return;
+      }
+      if (btn.getAttribute("data-move-do")) {
+        var to = document.getElementById("move-to");
+        var target = to ? to.value : "";
+        if (!target || index[target] === undefined ||
+            target === moving.date) { moving = null; renderTable(); return; }
+        /* Landing on a day that already carries the mark would leave the
+           source blank and the target unchanged, which reads as the mark
+           having vanished. Nothing to do, so say so and leave it alone. */
+        var already = moving.kind === "fast"
+          ? fasting(days[index[target]]) : reciting(days[index[target]]);
+        if (already) {
+          var row = document.querySelector(".move-row td");
+          if (row) row.innerHTML = shortDate(target) +
+            " already carries it. " +
+            '<button type="button" class="chip quiet" data-move-cancel="1">' +
+            "Close</button>";
+          return;
+        }
+        settings.moves[moving.kind][moving.date] = target;
+        indexMoves(); moving = null; saveSettings(); applySettings();
+        return;
+      }
+    });
 
   var eventsBtn = document.getElementById("opt-events");
   function markChips() {
@@ -2285,6 +2478,7 @@ body.no-dhuta .dhuta-only{display:none}
     drawNavs();
     /* The document itself no longer scrolls; #scroll is what moves. */
     scroller().scrollTop = 0;
+    if (which !== "record" && moving) { moving = null; renderTable(); }
     if (which === "record") alignHatch();
     /* The precepts dataset is large and is not what the app opens on, so
        nothing there is drawn until it is first looked at. */
@@ -2448,6 +2642,16 @@ body.no-dhuta .dhuta-only{display:none}
       : "Not marked.");
     row("Precept Recitation" + CFG,
       '<span class="han">布薩</span> — ' + reciteSentence());
+    var moved = [];
+    MOVE_KINDS.forEach(function (k) {
+      var m = settings.moves[k], noun = k === "fast" ? "fast day"
+        : "Precept Recitation";
+      for (var src in m) if (m.hasOwnProperty(src))
+        moved.push(noun + " " + shortDate(src) + " → " + shortDate(m[src]));
+    });
+    if (moved.length)
+      row("One-off moves" + CFG, moved.join("; ") +
+        ". Set on Upcoming by pressing a mark, and put back the same way.");
     row("New and full moon", "Day 1 and day 15, by the calendar convention " +
       "rather than the astronomical instant. The quarter moons follow from " +
       "it, at lunar 8 and 23.");
@@ -2692,6 +2896,8 @@ body.no-dhuta .dhuta-only{display:none}
     settings.cardCount = DEFAULTS.cardCount;
     settings.weekStart = DEFAULTS.weekStart;
     settings.fastRules = cloneRules(DEFAULTS.fastRules);
+    settings.moves = { fast: {}, recite: {} };
+    indexMoves();
     settings.from = null;
     renderFastRules();
     from = days[cursor].date;
@@ -2764,6 +2970,7 @@ body.no-dhuta .dhuta-only{display:none}
     });
   }
 
+  indexMoves();
   renderFastRules();
   applySettings();
 

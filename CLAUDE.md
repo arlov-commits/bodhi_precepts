@@ -71,6 +71,17 @@ looking right.
   lobe. Drawing whole lobes laid two strokes along every shared edge, which
   made half the lattice twice as dark as the other half — visible as banding,
   and it doubled the measured darkest mark from 0.185 to 0.30.
+- **One-off moves are applied before the rules, not after.** `fasting()` and
+  `reciting()` each ask `moveSays()` first: a day the mark was sent from
+  returns false, a day it was sent to returns true, and only the rest falls
+  through to the rule. A move is also gated on the mark being switched on at
+  all, or a stale move could resurrect a recitation after the mode was set to
+  none. Anything new that decides whether a day carries one of these marks has
+  to go through those two functions, not re-derive the rule.
+- **The table body's listener is delegated to the body**, because the rows are
+  replaced wholesale on every redraw and per-node handlers would not survive
+  it. The open move editor is state (`moving`) that the redraw reads, not a
+  node anyone keeps alive.
 - **`firstWhere()` scans forward day by day; it does not look for a day 1.**
   It used to, back when the only span was a long fasting month, which always
   starts on one. A dhūta period starts on the 15th, and the old version walked
