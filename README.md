@@ -316,10 +316,15 @@ any chosen chip matches it, and with none chosen every day shows. **Show
 dharma events** sits apart from them and is not a filter at all — it decides
 whether the events are drawn, and they arrive not as a column but as a second
 line under the day, wearing that day's colour and hatch so the two read as one
-block. A start date trims the front of the table, and the first 500 matching
-days are drawn; past that it says so and points at `data.csv`. **Copy what is
-shown** puts every matching day on the clipboard as TSV, not only the drawn
-500.
+block. A start date trims the front of the table. It holds for three days,
+counted from the day it was chosen rather than from the date itself — a date
+looked back at would otherwise lapse the moment it was picked, and one far
+ahead would hold for months — and the caption names the day it lets go.
+**Back to today**, beside it while one is set, lets go sooner, and so does
+clearing the box or choosing the day it would start on anyway. The first 500
+matching days are drawn; past that it says so and points at `data.csv`.
+**Copy what is shown** puts every matching day on the clipboard as TSV, not
+only the drawn 500.
 
 ### Moving a day, once
 
@@ -357,7 +362,9 @@ The chips and the start date share one wrapping row. The date carries no
 `margin-left:auto` — pushing it to the far edge is what stranded it on a line
 of its own as soon as the chips filled the first — so it flows with them and
 wraps only when it has to. **Dhūta periods** appears among them only while
-that setting is on, the way the Precept Recitation chip does.
+that setting is on, the way the Precept Recitation chip does. **Back to
+today** wraps with the date as one piece, so on a phone it never lands on a
+line of its own away from the date it lets go of.
 
 The `fast` column in `data.csv` and `data.json` is the **default** six, fixed
 when they were generated; the page reads whichever days are set under the
@@ -370,12 +377,15 @@ These settings — the fast-day rules among them — the theme, and Upcoming's
 filters and start date are kept in `localStorage` under `bodhi.settings`. Nothing is sent anywhere, and storage
 failures — private mode, or a browser that blocks it over `file://` — fall
 back to the defaults silently. Settings saved by an older version are read
-where they still make sense and ignored where they do not.
+where they still make sense and ignored where they do not; a start date saved
+before it could lapse carries no day to count its three from, so it is let go
+of on load.
 
 Which day is today is rechecked every minute rather than read once at load, so
 a page left open overnight — the usual state of a phone — moves on at midnight
 instead of holding yesterday. A start date on Upcoming that the reader never
-chose follows along; one they did choose stays where they put it.
+chose follows along; one they did choose stays where they put it until its
+three days are up, and that is checked on the same tick.
 
 ## The look
 

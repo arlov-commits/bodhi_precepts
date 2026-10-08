@@ -356,6 +356,9 @@ h2{font-size:1rem;font-weight:600;letter-spacing:.02em;margin:2.25rem 0 .5rem}
    and wraps only when it has to. */
 label.jump{font-size:.85rem;color:var(--quiet);
   display:inline-flex;align-items:center;gap:.4rem;white-space:nowrap}
+/* The date and the button that lets go of it wrap as one, or on a phone the
+   button lands on a line of its own, away from the date it acts on. */
+.jump-set{display:inline-flex;align-items:center;gap:.5rem}
 input[type=date],input[type=number],select{font:inherit;font-size:.85rem;
   padding:.25rem .4rem;border:1px solid var(--line);background:var(--raised);
   color:var(--ink)}
@@ -1120,9 +1123,12 @@ body.no-dhuta .dhuta-only{display:none}
       <button class="chip dhuta-only" type="button" data-filter="dhuta" aria-pressed="false">Dhūta periods</button>
       <span class="filter-sep" aria-hidden="true"></span>
       <button class="chip" type="button" id="opt-events" aria-pressed="false">Dharma events</button>
-      <label class="jump">Start at
-        <input type="date" id="from-date">
-      </label>
+      <span class="jump-set">
+        <label class="jump">Start at
+          <input type="date" id="from-date">
+        </label>
+        <button class="chip" type="button" id="from-release" hidden>Back to today</button>
+      </span>
     </div>
 
     <table>
@@ -1307,7 +1313,8 @@ body.no-dhuta .dhuta-only{display:none}
     <div class="setting">
       <h3>Where this is kept</h3>
       <p>These settings, the theme picked from the masthead, and the filters
-        chosen on Upcoming are saved in this browser only, under the key
+        and start date chosen on Upcoming are saved in this browser only,
+        under the key
         <code>bodhi.settings</code>. Nothing is sent anywhere. Clearing your
         browser data resets them.</p>
       <button class="chip" type="button" id="opt-reset">Reset to defaults</button>
@@ -1573,7 +1580,10 @@ body.no-dhuta .dhuta-only{display:none}
        days carry a mark in general; this is for the occasion the assembly
        keeps a day early, or a fast is deferred, without touching the rule. */
     moves: { fast: {}, recite: {} },
-    from: null
+    /* A start date the reader chose on Upcoming, and the day they chose it
+       on, which is what lets it lapse. Both null means it follows today. */
+    from: null,
+    fromSet: null
   };
   /* A lunar day, or null for a blank box — one recitation a month. */
   function clampDay(v) {
@@ -1655,8 +1665,13 @@ body.no-dhuta .dhuta-only{display:none}
             settings.moves[k][src] = m[src];
         }
       });
-      if (typeof saved.from === "string" && index[saved.from] !== undefined)
+      /* A start date saved without the day it was chosen on predates the
+         hold, and has nothing to lapse from, so it is let go of here. */
+      if (typeof saved.from === "string" && index[saved.from] !== undefined &&
+          isDate(saved.fromSet)) {
         settings.from = saved.from;
+        settings.fromSet = saved.fromSet;
+      }
     } catch (err) { /* private mode, or file:// with storage blocked */ }
   })();
   function saveSettings() {
@@ -2148,11 +2163,34 @@ body.no-dhuta .dhuta-only{display:none}
   }
 
   /* the table -------------------------------------------------------- */
-  var from = settings.from || days[cursor].date;
+  /* A start date the reader chose holds for three days, counted from the day
+     it was chosen rather than from the date itself: a date looked back at
+     would lapse the moment it was picked, and one far ahead would hold for
+     months, which is the being-stuck this is here to end. */
+  var FROM_HOLD = 3;
   var fromInput = document.getElementById("from-date");
-  fromInput.value = from;
+  var releaseBtn = document.getElementById("from-release");
   fromInput.min = days[0].date;
   fromInput.max = days[days.length - 1].date;
+  var from;
+  /* the day a chosen start date lets go, as an ISO string */
+  function fromLapse() {
+    var d = parse(settings.fromSet);
+    d.setDate(d.getDate() + FROM_HOLD);
+    return iso(d);
+  }
+  /* Where the table starts: the chosen date while it holds, today otherwise.
+     Asked at load and again whenever the day turns over, since the page can
+     sit open across all three days. */
+  function placeFrom() {
+    if (settings.from && todayIso >= fromLapse()) {
+      settings.from = settings.fromSet = null;
+      saveSettings();
+    }
+    from = settings.from || days[cursor].date;
+    fromInput.value = from;
+  }
+  placeFrom();
 
   var MATCH = {
     fast: function (d) { return fasting(d); },
@@ -2225,6 +2263,9 @@ body.no-dhuta .dhuta-only{display:none}
             : "this filter") : "") +
       ", from " + shortDate(from) + " to " +
       shortDate(days[days.length - 1].date) + ".";
+    if (settings.from)
+      cap += "  The start goes back to today on " + dayMonth(fromLapse()) + ".";
+    releaseBtn.hidden = !settings.from;
     var n = moveCount();
     if (fastOn() || reciteOn())
       cap += n ? "  " + n + (n === 1 ? " day has been moved" :
@@ -2391,11 +2432,21 @@ body.no-dhuta .dhuta-only{display:none}
     markChips();
     renderTable();
   });
+  /* Clearing the box, or choosing the day it would start on anyway, is the
+     same as letting go: pinned to today, the table would not move on
+     tomorrow. Any other date starts a fresh hold from today. */
   fromInput.addEventListener("change", function () {
-    if (!fromInput.value) return;
-    from = fromInput.value;
-    settings.from = from;
+    var v = fromInput.value;
+    if (!v || v === days[cursor].date) settings.from = settings.fromSet = null;
+    else { settings.from = v; settings.fromSet = todayIso; }
     saveSettings();
+    placeFrom();
+    renderTable();
+  });
+  releaseBtn.addEventListener("click", function () {
+    settings.from = settings.fromSet = null;
+    saveSettings();
+    placeFrom();
     renderTable();
   });
   document.getElementById("copy-visible").addEventListener("click",
@@ -2905,10 +2956,9 @@ body.no-dhuta .dhuta-only{display:none}
     settings.fastRules = cloneRules(DEFAULTS.fastRules);
     settings.moves = { fast: {}, recite: {} };
     indexMoves();
-    settings.from = null;
+    settings.from = settings.fromSet = null;
     renderFastRules();
-    from = days[cursor].date;
-    fromInput.value = from;
+    placeFrom();
     saveSettings();
     applyTheme();
     applySettings();
@@ -2988,11 +3038,9 @@ body.no-dhuta .dhuta-only{display:none}
     var was = todayIso;
     locateToday();
     if (todayIso === was) return;
-    /* A start date the reader never chose follows today along. */
-    if (!settings.from) {
-      from = days[cursor].date;
-      fromInput.value = from;
-    }
+    /* A start date the reader never chose follows today along, and one they
+       did lets go once its three days are up. */
+    placeFrom();
     applySettings();
   }, 60000);
 
